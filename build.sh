@@ -74,9 +74,9 @@ fi
 # build idn2
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
-  wget -nc https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz
-  tar -xf libidn2-2.3.0.tar.gz
-  cd libidn2-2.3.0 || exit
+  wget -nc https://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz
+  tar -xf libidn2-2.3.7.tar.gz
+  cd libidn2-2.3.7 || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
@@ -93,9 +93,9 @@ fi
 # build unistring
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
-  wget -nc https://ftp.gnu.org/gnu/libunistring/libunistring-1.1.tar.gz
-  tar -xf libunistring-1.1.tar.gz
-  cd libunistring-1.1 || exit
+  wget -nc https://ftp.gnu.org/gnu/libunistring/libunistring-1.2.tar.gz
+  tar -xf libunistring-1.2.tar.gz
+  cd libunistring-1.2 || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
@@ -148,9 +148,9 @@ fi
 # build cares
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
-  wget -nc https://github.com/c-ares/c-ares/releases/download/cares-1_19_1/c-ares-1.19.1.tar.gz
-  tar -xf c-ares-1.19.1.tar.gz
-  cd c-ares-1.19.1 || exit
+  wget -nc https://github.com/c-ares/c-ares/releases/download/cares-1_28_1/c-ares-1.28.1.tar.gz
+  tar -xf c-ares-1.28.1.tar.gz
+  cd c-ares-1.28.1 || exit
   CPPFLAGS="-DCARES_STATICLIB=1" \
   ./configure \
   --host=$WGET_MINGW_HOST \
