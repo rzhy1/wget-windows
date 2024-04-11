@@ -11,27 +11,27 @@ jobs:
     name: ubuntu
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         name: Checkout project
       - name: Install prerequisites
         run: |
-          sudo apt-get install -y mingw-w64 mingw-w64-tools mingw-w64-i686-dev gcc
+          sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
           sudo apt-get install -y make m4 pkg-config automake gettext
       - name: Build wget 64-bit
         run: |
           x86_64-w64-mingw32-gcc --version
           ./build.sh
       - name: Archive gnutls
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: wget-1.21.4-64bit-GnuTLS
           path: build-wget-webfolder.io/install/wget-gnutls/wget-gnutls-x64.exe
       - name: Archive openssl
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: wget-1.21.4-64bit-OpenSSL
           path: build-wget-webfolder.io/install/wget-openssl/wget-openssl-x64.exe
-      - uses: ncipollo/release-action@v1
+      - uses: ncipollo/release-action@v4
         with:
           allowUpdates: true
           artifacts: "build-wget-webfolder.io/install/wget-gnutls/wget-gnutls-x64.exe,build-wget-webfolder.io/install/wget-openssl/wget-openssl-x64.exe,build-wget-webfolder-x86.io/install/wget-openssl/wget-openssl-x86.exe"
