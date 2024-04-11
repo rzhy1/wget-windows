@@ -1,6 +1,7 @@
 name: wget
 
 on:
+  workflow_dispatch:
   create:
     tags:
       - v*
