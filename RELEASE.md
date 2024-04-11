@@ -14,7 +14,7 @@
 | libpsl        | 0.21.5               | 0.21.5                |
 | pcre2         | 10.43                | 10.43                 |
 | libgpg-error  | 1.47                 | 1.47                  |
-| libassuan     | 2.5.6                | 2.5.6                 |
+| libassuan     | 2.5.7                | 2.5.7                 |
 | gpgme         | 1.23.2               | 1.23.2                |
 | expat         | 2.6.2                | 2.6.2                 |
 | libmetalink   | 0.1.3                | 0.1.3                 |
