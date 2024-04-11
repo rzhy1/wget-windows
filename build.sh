@@ -19,7 +19,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libgmp.a ]; then
   wget -nc https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz
   tar -xf gmp-6.3.0.tar.xz
   cd gmp-6.3.0 || exit
-  ./configure \
+  ./configure --config-cache \
    --host=$WGET_MINGW_HOST \
    --disable-shared \
    --prefix="$INSTALL_PATH"
@@ -39,7 +39,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
   cd nettle-3.9.1 || exit
   CFLAGS="-I$INSTALL_PATH/include" \
   LDFLAGS="-L$INSTALL_PATH/lib" \
-  ./configure \
+  ./configure --config-cache \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --disable-documentation \
@@ -58,7 +58,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libtasn1.a ]; then
   wget -nc https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.19.0.tar.gz
   tar -xf libtasn1-4.19.0.tar.gz
   cd libtasn1-4.19.0 || exit
-  ./configure \
+  ./configure --config-cache \
    --host=$WGET_MINGW_HOST \
    --disable-shared \
    --disable-doc \
@@ -77,7 +77,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
   wget -nc https://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz
   tar -xf libidn2-2.3.7.tar.gz
   cd libidn2-2.3.7 || exit
-  ./configure \
+  ./configure --config-cache \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --disable-doc \
@@ -96,7 +96,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
   wget -nc https://ftp.gnu.org/gnu/libunistring/libunistring-1.2.tar.gz
   tar -xf libunistring-1.2.tar.gz
   cd libunistring-1.2 || exit
-  ./configure \
+  ./configure --config-cache \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --prefix="$INSTALL_PATH"
@@ -127,7 +127,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; then
   NETTLE_CFLAGS=$CFLAGS \
   HOGWEED_CFLAGS=$CFLAGS \
   LIBIDN2_CFLAGS=$CFLAGS \
-  ./configure \
+  ./configure --config-cache \
   --host=$WGET_MINGW_HOST \
   --prefix="$INSTALL_PATH" \
   --with-included-unistring \
@@ -152,7 +152,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
   tar -xf c-ares-1.19.1.tar.gz
   cd c-ares-1.19.1 || exit
   CPPFLAGS="-DCARES_STATICLIB=1" \
-  ./configure \
+  ./configure --config-cache \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --prefix="$INSTALL_PATH" \
@@ -173,7 +173,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libiconv.a ]; then
   wget -nc https://ftp.gnu.org/gnu/libiconv/libiconv-1.17.tar.gz
   tar -xf libiconv-1.17.tar.gz
   cd libiconv-1.17 || exit
-  ./configure \
+  ./configure --config-cache \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --prefix="$INSTALL_PATH" \
@@ -196,7 +196,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libpsl.a ]; then
   LIBS="-L$INSTALL_PATH/lib -lunistring -lidn2" \
   LIBIDN2_CFLAGS="-I$INSTALL_PATH/include" \
   LIBIDN2_LIBS="-L$INSTALL_PATH/lib -lunistring -lidn2" \
-  ./configure \
+  ./configure --config-cache \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --prefix="$INSTALL_PATH" \
@@ -219,7 +219,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libpcre2-8.a ]; then
   wget -nc https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.41/pcre2-10.41.tar.gz
   tar -xf pcre2-10.41.tar.gz
   cd pcre2-10.41 || exit
-  ./configure \
+  ./configure --config-cache \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --prefix="$INSTALL_PATH" \
@@ -238,7 +238,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libgpg-error.a ]; then
   wget -nc https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.47.tar.gz
   tar -xf libgpg-error-1.47.tar.gz
   cd libgpg-error-1.47 || exit
-  ./configure \
+  ./configure --config-cache \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --prefix="$INSTALL_PATH" \
@@ -258,7 +258,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libassuan.a ]; then
   wget -nc https://gnupg.org/ftp/gcrypt/libassuan/libassuan-2.5.6.tar.bz2
   tar -xf libassuan-2.5.6.tar.bz2
   cd libassuan-2.5.6 || exit
-  ./configure \
+  ./configure --config-cache \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --prefix="$INSTALL_PATH" \
@@ -279,7 +279,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
   wget -nc https://gnupg.org/ftp/gcrypt/gpgme/gpgme-1.21.0.tar.bz2
   tar -xf gpgme-1.21.0.tar.bz2
   cd gpgme-1.21.0 || exit
-  ./configure \
+  ./configure --config-cache \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --prefix="$INSTALL_PATH" \
@@ -305,7 +305,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libexpat.a ]; then
   wget -nc https://github.com/libexpat/libexpat/releases/download/R_2_5_0/expat-2.5.0.tar.gz
   tar -xf expat-2.5.0.tar.gz
   cd expat-2.5.0 || exit
-  ./configure \
+  ./configure --config-cache \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --prefix="$INSTALL_PATH" \
@@ -329,7 +329,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libmetalink.a ]; then
   cd libmetalink-0.1.3 || exit
   EXPAT_CFLAGS="-I$INSTALL_PATH/include" \
   EXPAT_LIBS="-L$INSTALL_PATH/lib -lexpat" \
-  ./configure \
+  ./configure --config-cache \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --prefix="$INSTALL_PATH" \
@@ -350,7 +350,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libz.a ]; then
   wget -nc https://zlib.net/zlib-1.3.1.tar.gz
   tar -xf zlib-1.3.1.tar.gz
   cd zlib-1.3.1 || exit
-  CC=$WGET_GCC ./configure --64 --static --prefix="$INSTALL_PATH"
+  CC=$WGET_GCC ./configure --config-cache --64 --static --prefix="$INSTALL_PATH"
   (($? != 0)) && { printf '%s\n' "[zlib] configure failed"; exit 1; }
   make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[zlib] make failed"; exit 1; }
@@ -365,7 +365,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
   wget -nc https://www.openssl.org/source/openssl-1.1.1u.tar.gz
   tar -xf openssl-1.1.1u.tar.gz
   cd openssl-1.1.1u || exit
-  ./Configure \
+  ./configure --config-cache \
   --static \
   -static \
   --prefix="$INSTALL_PATH" \
@@ -399,7 +399,7 @@ CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -D
  METALINK_CFLAGS="-I$INSTALL_PATH/include" \
  METALINK_LIBS="-L$INSTALL_PATH/lib -lmetalink -lexpat" \
  LIBS="-L$INSTALL_PATH/lib -lhogweed -lnettle -lgmp -ltasn1 -lidn2 -lpsl -liphlpapi -lcares -lunistring -liconv -lpcre2-8 -lmetalink -lexpat -lgpgme -lassuan -lgpg-error -lz -lcrypt32 -lpthread" \
- ./configure \
+ ./configure --config-cache \
  --host=$WGET_MINGW_HOST \
  --prefix="$INSTALL_PATH" \
  --disable-debug \
@@ -441,7 +441,7 @@ CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O
  METALINK_CFLAGS="-I$INSTALL_PATH/include" \
  METALINK_LIBS="-L$INSTALL_PATH/lib -lmetalink -lexpat" \
  LIBS="-L$INSTALL_PATH/lib -lidn2 -lpsl -liphlpapi -lcares -lunistring -liconv -lpcre2-8 -lmetalink -lexpat -lgpgme -lassuan -lgpg-error -lcrypto -lssl -lz -lcrypt32" \
- ./configure \
+ ./configure --config-cache \
  --host=$WGET_MINGW_HOST \
  --prefix="$INSTALL_PATH" \
  --disable-debug \
