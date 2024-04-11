@@ -93,9 +93,9 @@ fi
 # build unistring
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
-  wget -nc https://ftp.gnu.org/gnu/libunistring/libunistring-1.2.tar.gz
-  tar -xf libunistring-1.2.tar.gz
-  cd libunistring-1.2 || exit
+  wget -nc https://ftp.gnu.org/gnu/libunistring/libunistring-1.1.tar.gz
+  tar -xf libunistring-1.1.tar.gz
+  cd libunistring-1.1 || exit
   ./configure --config-cache \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
