@@ -32,7 +32,8 @@ jobs:
         with:
           name: wget-1.21.4-64bit-OpenSSL
           path: build-wget-webfolder.io/install/wget-openssl/wget-openssl-x64.exe
-      - uses: ncipollo/release-action@v1
+      - name: Create Release  
+        uses: ncipollo/release-action@v1 
         with:
           tag: 1.21.4
           allowUpdates: true
