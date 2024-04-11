@@ -74,9 +74,9 @@ fi
 # build idn2
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
-  wget -nc https://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz
-  tar -xf libidn2-2.3.7.tar.gz
-  cd libidn2-2.3.7 || exit
+  wget -nc https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz
+  tar -xf libidn2-2.3.0.tar.gz
+  cd libidn2-2.3.0 || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
@@ -93,9 +93,9 @@ fi
 # build unistring
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
-  wget -nc https://ftp.gnu.org/gnu/libunistring/libunistring-1.2.tar.gz
-  tar -xf libunistring-1.2.tar.gz
-  cd libunistring-1.2 || exit
+  wget -nc https://ftp.gnu.org/gnu/libunistring/libunistring-1.1.tar.gz
+  tar -xf libunistring-1.1.tar.gz
+  cd libunistring-1.1 || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
@@ -148,9 +148,9 @@ fi
 # build cares
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
-  wget -nc https://github.com/c-ares/c-ares/releases/download/cares-1_28_1/c-ares-1.28.1.tar.gz
-  tar -xf c-ares-1.28.1.tar.gz
-  cd c-ares-1.28.1 || exit
+  wget -nc https://github.com/c-ares/c-ares/releases/download/cares-1_19_1/c-ares-1.19.1.tar.gz
+  tar -xf c-ares-1.19.1.tar.gz
+  cd c-ares-1.19.1 || exit
   CPPFLAGS="-DCARES_STATICLIB=1" \
   ./configure \
   --host=$WGET_MINGW_HOST \
@@ -189,9 +189,9 @@ fi
 # build psl
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libpsl.a ]; then
-  wget -nc https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz
-  tar -xf libpsl-0.21.5.tar.gz
-  cd libpsl-0.21.5 || exit
+  wget -nc https://github.com/rockdaboot/libpsl/releases/download/0.21.1/libpsl-0.21.1.tar.gz
+  tar -xf libpsl-0.21.1.tar.gz
+  cd libpsl-0.21.1 || exit
   CFLAGS="-I$INSTALL_PATH/include" \
   LIBS="-L$INSTALL_PATH/lib -lunistring -lidn2" \
   LIBIDN2_CFLAGS="-I$INSTALL_PATH/include" \
@@ -216,9 +216,9 @@ fi
 # build pcre2
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libpcre2-8.a ]; then
-  wget -nc https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.43/pcre2-10.43.tar.gz
-  tar -xf pcre2-10.43.tar.gz
-  cd pcre2-10.43 || exit
+  wget -nc https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.41/pcre2-10.41.tar.gz
+  tar -xf pcre2-10.41.tar.gz
+  cd pcre2-10.41 || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
@@ -235,9 +235,9 @@ fi
 # build gpg-error
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libgpg-error.a ]; then
-  wget -nc https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.48.tar.gz
-  tar -xf libgpg-error-1.48.tar.gz
-  cd libgpg-error-1.48 || exit
+  wget -nc https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.47.tar.gz
+  tar -xf libgpg-error-1.47.tar.gz
+  cd libgpg-error-1.47 || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
@@ -255,9 +255,9 @@ fi
 # build assuan
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libassuan.a ]; then
-  wget -nc https://gnupg.org/ftp/gcrypt/libassuan/libassuan-2.5.7.tar.bz2
-  tar -xf libassuan-2.5.7.tar.bz2
-  cd libassuan-2.5.7 || exit
+  wget -nc https://gnupg.org/ftp/gcrypt/libassuan/libassuan-2.5.6.tar.bz2
+  tar -xf libassuan-2.5.6.tar.bz2
+  cd libassuan-2.5.6 || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
@@ -276,9 +276,9 @@ fi
 # build gpgme
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
-  wget -nc https://gnupg.org/ftp/gcrypt/gpgme/gpgme-1.23.2.tar.bz2
-  tar -xf gpgme-1.23.2.tar.bz2
-  cd gpgme-1.23.2 || exit
+  wget -nc https://gnupg.org/ftp/gcrypt/gpgme/gpgme-1.21.0.tar.bz2
+  tar -xf gpgme-1.21.0.tar.bz2
+  cd gpgme-1.21.0 || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
@@ -302,9 +302,9 @@ fi
 # build expat
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libexpat.a ]; then
-  wget -nc https://github.com/libexpat/libexpat/releases/download/R_2_6_2/expat-2.6.2.tar.gz
-  tar -xf expat-2.6.2.tar.gz
-  cd expat-2.6.2 || exit
+  wget -nc https://github.com/libexpat/libexpat/releases/download/R_2_5_0/expat-2.5.0.tar.gz
+  tar -xf expat-2.5.0.tar.gz
+  cd expat-2.5.0 || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
