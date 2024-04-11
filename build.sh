@@ -189,9 +189,9 @@ fi
 # build psl
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libpsl.a ]; then
-  wget -nc https://github.com/rockdaboot/libpsl/releases/download/0.21.1/libpsl-0.21.1.tar.gz
-  tar -xf libpsl-0.21.1.tar.gz
-  cd libpsl-0.21.1 || exit
+  wget -nc https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz
+  tar -xf libpsl-0.21.5.tar.gz
+  cd libpsl-0.21.5 || exit
   CFLAGS="-I$INSTALL_PATH/include" \
   LIBS="-L$INSTALL_PATH/lib -lunistring -lidn2" \
   LIBIDN2_CFLAGS="-I$INSTALL_PATH/include" \
@@ -216,9 +216,9 @@ fi
 # build pcre2
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libpcre2-8.a ]; then
-  wget -nc https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.41/pcre2-10.41.tar.gz
-  tar -xf pcre2-10.41.tar.gz
-  cd pcre2-10.41 || exit
+  wget -nc https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.43/pcre2-10.43.tar.gz
+  tar -xf pcre2-10.43.tar.gz
+  cd pcre2-10.43 || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
