@@ -24,7 +24,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libgmp.a ]; then
    --disable-shared \
    --prefix="$INSTALL_PATH"
   (($? != 0)) && { printf '%s\n' "[gmp] configure failed"; exit 1; }
-  make
+  make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[gmp] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[gmp] make install"; exit 1; }
@@ -45,7 +45,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
   --disable-documentation \
   --prefix="$INSTALL_PATH"
   (($? != 0)) && { printf '%s\n' "[nettle] configure failed"; exit 1; }
-  make
+  make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[nettle] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[nettle] make install"; exit 1; }
@@ -64,7 +64,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libtasn1.a ]; then
    --disable-doc \
    --prefix="$INSTALL_PATH"
   (($? != 0)) && { printf '%s\n' "[tasn] configure failed"; exit 1; }
-  make
+  make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[tasn] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[tasn] make install"; exit 1; }
@@ -83,7 +83,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
   --disable-doc \
   --prefix="$INSTALL_PATH"
   (($? != 0)) && { printf '%s\n' "[idn2] configure failed"; exit 1; }
-  make
+  make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[idn2] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[idn2] make install"; exit 1; }
@@ -101,7 +101,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
   --disable-shared \
   --prefix="$INSTALL_PATH"
   (($? != 0)) && { printf '%s\n' "[unistring] configure failed"; exit 1; }
-  make
+  make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[unistring] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[unistring] make install"; exit 1; }
@@ -138,7 +138,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; then
   --disable-shared \
   --enable-static
   (($? != 0)) && { printf '%s\n' "[gnutls] configure failed"; exit 1; }
-  make
+  make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[gnutls] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[gnutls] make install"; exit 1; }
@@ -160,7 +160,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
   --disable-tests \
   --disable-debug
   (($? != 0)) && { printf '%s\n' "[cares] configure failed"; exit 1; }
-  make
+  make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[cares] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[cares] make install"; exit 1; }
@@ -179,7 +179,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libiconv.a ]; then
   --prefix="$INSTALL_PATH" \
   --enable-static
   (($? != 0)) && { printf '%s\n' "[iconv] configure failed"; exit 1; }
-  make
+  make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[iconv] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[iconv] make install"; exit 1; }
@@ -206,7 +206,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libpsl.a ]; then
   --enable-runtime=libidn2 \
   --with-libiconv-prefix="$INSTALL_PATH"
   (($? != 0)) && { printf '%s\n' "[psl] configure failed"; exit 1; }
-  make
+  make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[psl] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[psl] make install"; exit 1; }
@@ -225,7 +225,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libpcre2-8.a ]; then
   --prefix="$INSTALL_PATH" \
   --enable-static
   (($? != 0)) && { printf '%s\n' "[pcre2] configure failed"; exit 1; }
-  make
+  make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[pcre2] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[pcre2] make install"; exit 1; }
@@ -245,7 +245,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libgpg-error.a ]; then
   --enable-static \
   --disable-doc
   (($? != 0)) && { printf '%s\n' "[gpg-error] configure failed"; exit 1; }
-  make
+  make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[gpg-error] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[gpg-error] make install"; exit 1; }
@@ -266,7 +266,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libassuan.a ]; then
   --disable-doc \
   --with-libgpg-error-prefix="$INSTALL_PATH"
   (($? != 0)) && { printf '%s\n' "[assuan] configure failed"; exit 1; }
-  make
+  make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[assuan] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[assuan] make install"; exit 1; }
@@ -292,7 +292,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
   --disable-glibtest \
   --with-libassuan-prefix="$INSTALL_PATH"
   (($? != 0)) && { printf '%s\n' "[gpgme] configure failed"; exit 1; }
-  make
+  make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[gpgme] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[gpgme] make install"; exit 1; }
@@ -314,7 +314,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libexpat.a ]; then
   --without-tests \
   --with-libgpg-error-prefix="$INSTALL_PATH"
   (($? != 0)) && { printf '%s\n' "[expat] configure failed"; exit 1; }
-  make
+  make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[expat] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[expat] make install"; exit 1; }
@@ -337,7 +337,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libmetalink.a ]; then
   --with-libgpg-error-prefix="$INSTALL_PATH" \
   --with-libexpat
   (($? != 0)) && { printf '%s\n' "[metalink] configure failed"; exit 1; }
-  make
+  make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[metalink] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[metalink] make install"; exit 1; }
@@ -352,7 +352,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libz.a ]; then
   cd zlib-1.3.1 || exit
   CC=$WGET_GCC ./configure --64 --static --prefix="$INSTALL_PATH"
   (($? != 0)) && { printf '%s\n' "[zlib] configure failed"; exit 1; }
-  make
+  make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[zlib] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[zlib] make install"; exit 1; }
@@ -376,7 +376,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
   no-tests \
   --with-zlib-include="$INSTALL_PATH" \
   --with-zlib-lib="$INSTALL_PATH"/lib/libz.a
- make
+ make -j$(nproc)
  make install_sw
  cd ..
 fi
@@ -415,7 +415,7 @@ CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -D
  --with-gpgme-prefix="$INSTALL_PATH"
 (($? != 0)) && { printf '%s\n' "[wget gnutls] configure failed"; exit 1; }
 make clean
-make
+make -j$(nproc)
 (($? != 0)) && { printf '%s\n' "[wget gnutls] make failed"; exit 1; }
 make install
 (($? != 0)) && { printf '%s\n' "[wget gnutls] make install"; exit 1; }
@@ -457,7 +457,7 @@ CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O
  --with-openssl \
  --with-gpgme-prefix="$INSTALL_PATH"
 (($? != 0)) && { printf '%s\n' "[wget openssl] configure failed"; exit 1; }
-make
+make -j$(nproc)
 (($? != 0)) && { printf '%s\n' "[wget openssl] make failed"; exit 1; }
 make install
 (($? != 0)) && { printf '%s\n' "[wget openssl] make install"; exit 1; }
