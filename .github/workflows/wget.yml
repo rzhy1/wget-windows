@@ -34,7 +34,7 @@ jobs:
           path: build-wget-webfolder.io/install/wget-openssl/wget-openssl-x64.exe
       - uses: ncipollo/release-action@v1
         with:
-          tag_name: 1.21.4
+          tag: 1.21.4
           allowUpdates: true
           artifacts: "build-wget-webfolder.io/install/wget-gnutls/wget-gnutls-x64.exe,build-wget-webfolder.io/install/wget-openssl/wget-openssl-x64.exe"
           bodyFile: "RELEASE.md"
