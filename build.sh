@@ -76,7 +76,7 @@ fi
 if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
   wget -nc https://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz
   tar -xf libidn2-2.3.7.tar.gz
-  cd libidn2-2.3. || exit
+  cd libidn2-2.3.7 || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
@@ -362,9 +362,9 @@ fi
 # build openssl
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
-  wget -nc https://www.openssl.org/source/openssl-1.1.1u.tar.gz
-  tar -xf openssl-1.1.1u.tar.gz
-  cd openssl-1.1.1u || exit
+  wget -nc https://www.openssl.org/source/openssl-3.2.1.tar.gz
+  tar -xf openssl-3.2.1.tar.gz
+  cd openssl-3.2.1 || exit
   ./Configure \
   --static \
   -static \
