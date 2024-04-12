@@ -74,9 +74,9 @@ fi
 # build idn2
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
-  wget -nc https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz
-  tar -xf libidn2-2.3.0.tar.gz
-  cd libidn2-2.3.0 || exit
+  wget -nc https://ftp.gnu.org/gnu/libidn/libidn2-2.3.5.tar.gz
+  tar -xf libidn2-2.3.5.tar.gz
+  cd libidn2-2.3.5 || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
