@@ -74,13 +74,15 @@ fi
 # build idn2
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
-  wget -nc https://ftp.gnu.org/gnu/libidn/libidn2-2.3.1.tar.gz
-  tar -xf libidn2-2.3.1.tar.gz
-  cd libidn2-2.3.1 || exit
+  wget -nc https://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz
+  tar -xf libidn2-2.3.7.tar.gz
+  cd libidn2-2.3.7 || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
+  --enable-static \
   --disable-shared \
   --disable-doc \
+  --disable-gcc-warnings \
   --prefix="$INSTALL_PATH"
   (($? != 0)) && { printf '%s\n' "[idn2] configure failed"; exit 1; }
   make -j$(nproc)
