@@ -8,8 +8,8 @@
 | nettle        | 3.9.1                | n/a                   |
 | libtasn1      | 4.19.0               | n/a                   |
 | libidn2       | 2.3.0                | 2.3.0                 |
-| libunistring  | 1.1                  | 1.1                   |
-| cares         | 1.19.1               | 1.19.1                |
+| libunistring  | 1.2                  | 1.2                   |
+| cares         | 1.28.1               | 1.28.1                |
 | libiconv      | 1.17                 | 1.17  
 | libpsl        | 0.21.5               | 0.21.5                |
 | pcre2         | 10.43                | 10.43                 |
@@ -18,4 +18,4 @@
 | gpgme         | 1.23.2               | 1.23.2                |
 | expat         | 2.6.2                | 2.6.2                 |
 | libmetalink   | 0.1.3                | 0.1.3                 |
-| zlib          | 1.2.13               | 1.2.13                |
+| zlib          | 1.3.1               | 1.3.1                |
