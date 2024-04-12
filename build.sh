@@ -383,9 +383,9 @@ fi
 # -----------------------------------------------------------------------------
 # build wget (gnuTLS)
 # -----------------------------------------------------------------------------
-wget -nc https://ftp.gnu.org/gnu/wget/wget-1.24.5.tar.gz
-tar -xf wget-1.24.5.tar.gz
-cd wget-1.24.5 || exit
+wget -nc https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz
+tar -xf wget-1.21.4.tar.gz
+cd wget-1.21.4 || exit
 CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -march=$WGET_ARCH -mtune=generic" \
  LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc" \
  GNUTLS_CFLAGS=$CFLAGS \
