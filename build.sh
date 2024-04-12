@@ -362,9 +362,9 @@ fi
 # build openssl
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
-  wget -nc https://www.openssl.org/source/openssl-3.0.8.tar.gz
-  tar -xf openssl-3.0.8.tar.gz
-  cd openssl-3.0.8 || exit
+  wget -nc https://www.openssl.org/source/openssl-3.1.4.tar.gz
+  tar -xf openssl-3.1.4.tar.gz
+  cd openssl-3.1.4 || exit
   ./Configure \
   --static \
   -static \
