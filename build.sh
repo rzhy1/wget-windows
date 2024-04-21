@@ -387,7 +387,7 @@ fi
 # -----------------------------------------------------------------------------
 git clone https://gitlab.com/gnuwget/wget.git
 cd wget
-autoreconf -ifv
+./bootstrap --skip-po
 CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -march=$WGET_ARCH -mtune=generic" \
  LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc" \
  GNUTLS_CFLAGS=$CFLAGS \
