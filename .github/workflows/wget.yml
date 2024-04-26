@@ -26,17 +26,17 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: wget-1.21.4-64bit-GnuTLS
-          path: build-wget-webfolder.io/install/wget-gnutls/wget-gnutls-x64.exe
+          path: /usr/local/wget-gnutls/wget-gnutls-x64.exe
       - name: Archive openssl
         uses: actions/upload-artifact@v4
         with:
           name: wget-1.21.4-64bit-OpenSSL
-          path: build-wget-webfolder.io/install/wget-openssl/wget-openssl-x64.exe
+          path: /usr/local/wget-openssl/wget-openssl-x64.exe
       - name: Create Release  
         uses: ncipollo/release-action@v1 
         with:
           tag: 1.21.4
           allowUpdates: true
-          artifacts: "build-wget-webfolder.io/install/wget-gnutls/wget-gnutls-x64.exe,build-wget-webfolder.io/install/wget-openssl/wget-openssl-x64.exe"
+          artifacts: "/usr/local/wget-gnutls/wget-gnutls-x64.exe,/usr/local/wget-openssl/wget-openssl-x64.exe"
           bodyFile: "RELEASE.md"
           token: ${{ secrets.GITHUB_TOKEN }}
