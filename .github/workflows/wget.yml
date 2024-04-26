@@ -19,6 +19,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
           sudo apt-get install -y make m4 pkg-config automake gettext
+          pip install mingw-w64-x86-64==13.2.0
       - name: Build wget 64-bit
         run: |
           x86_64-w64-mingw32-gcc --version
