@@ -16,6 +16,7 @@ jobs:
       - name: Install prerequisites
         run: |
           sudo sed -i 's/http:\/\/azure\.archive\.ubuntu\.com\/ubuntu/http:\/\/archive\.ubuntu\.com\/ubuntu/' /etc/apt/apt-mirrors.txt
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
           sudo apt-get update
           sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
           sudo apt-get install -y make m4 pkg-config automake gettext
