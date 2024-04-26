@@ -18,8 +18,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
           sudo apt-get install -y make m4 pkg-config automake gettext
+          sudo apt-get remove gcc-mingw-w64-x86-64
           wget http://archive.ubuntu.com/ubuntu/ubuntu/pool/universe/g/gcc-mingw-w64/gcc-mingw-w64-x86-64-win32_13.2.0-23ubuntu3+26.3_amd64.deb
-          sudo dpkg -i gcc-mingw-w64-x86-64-win32_13.2.0-23ubuntu3+26.3_amd64.deb
+          sudo apt install ./gcc-mingw-w64-x86-64-win32_13.2.0-23ubuntu3+26.3_amd64.deb
       - name: Build wget 64-bit
         run: |
           x86_64-w64-mingw32-gcc --version
