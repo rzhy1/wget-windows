@@ -4,10 +4,7 @@
 # https://webfolder.io
 # March 15, 2021
 #
-mkdir build-wget-webfolder.io
-cd build-wget-webfolder.io || exit
-mkdir install
-export INSTALL_PATH=$PWD/install
+export INSTALL_PATH=/usr/local
 export WGET_GCC=x86_64-w64-mingw32-gcc
 export WGET_MINGW_HOST=x86_64-w64-mingw32
 export WGET_ARCH=x86-64
