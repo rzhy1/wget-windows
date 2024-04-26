@@ -1,8 +1,7 @@
 #
 # wget build script for Windows environment
-# Author: WebFolder
-# https://webfolder.io
-# March 15, 2021
+# Author: rzhy1
+# 2024/4/26
 #
 export INSTALL_PATH=$PWD
 export WGET_GCC=x86_64-w64-mingw32-gcc
