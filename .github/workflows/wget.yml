@@ -9,7 +9,7 @@ on:
 jobs:
   ubuntu:
     name:  build wget-windows
-    runs-on: debian-12.5.0
+    runs-on: debian
     steps:
       - uses: actions/checkout@v4
         name: Checkout project
