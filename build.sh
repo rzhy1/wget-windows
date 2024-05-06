@@ -109,9 +109,9 @@ fi
 # build gnutls
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; then
-  wget -nc https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.5.tar.xz
-  tar -xf gnutls-3.8.5.tar.xz
-  cd gnutls-3.8.5 || exit
+  wget -nc https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.3.tar.xz
+  tar -xf gnutls-3.8.3.tar.xz
+  cd gnutls-3.8.3 || exit
   PKG_CONFIG_PATH="$INSTALL_PATH/lib/pkgconfig" \
   CFLAGS="-I$INSTALL_PATH/include" \
   LDFLAGS="-L$INSTALL_PATH/lib" \
