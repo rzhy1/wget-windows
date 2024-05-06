@@ -1,4 +1,4 @@
-name: wget
+name: 编译wget
 
 on:
   workflow_dispatch:
