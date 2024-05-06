@@ -426,6 +426,9 @@ $MINGW_STRIP_TOOL "$INSTALL_PATH"/wget-gnutls/wget-gnutls-x64.exe
 make clean
 chmod +r windows-openssl.diff
 patch src/openssl.c < windows-openssl.diff
+pkg-config --variable pc_path pkg-config
+find /usr/lib /usr/local/lib -name "libssl*"
+pkg-config --libs --cflags openssl
 CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -march=$WGET_ARCH -mtune=generic" \
  LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc" \
  OPENSSL_CFLAGS=$CFLAGS \
@@ -446,7 +449,7 @@ CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O
  --disable-valgrind-tests \
  --enable-iri \
  --enable-pcre2 \
- --with-ssl=openssl CFLAGS="-lssl -lcrypto" LDFLAGS="-lssl -lcrypto" \
+ --with-ssl=openssl \
  --with-included-libunistring \
  --with-libidn \
  --with-cares \
