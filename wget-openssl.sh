@@ -92,7 +92,7 @@ fi
 # build psl
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libpsl.a ]; then
-  wget -nc https://github.com/rockdaboot/libpsl/releases/download/0.21.2/libpsl-0.21.5.tar.gz
+  wget -nc https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz
   tar -xf libpsl-0.21.5.tar.gz
   cd libpsl-0.21.5 || exit
   CFLAGS="-I$INSTALL_PATH/include" \
