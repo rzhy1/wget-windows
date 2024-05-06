@@ -446,7 +446,7 @@ CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O
  --disable-valgrind-tests \
  --enable-iri \
  --enable-pcre2 \
- --with-ssl=openssl \
+ --with-ssl=openssl CFLAGS="-lssl -lcrypto" LDFLAGS="-lssl -lcrypto" \
  --with-included-libunistring \
  --with-libidn \
  --with-cares \
