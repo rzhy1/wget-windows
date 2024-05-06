@@ -7,8 +7,8 @@ on:
       - v*
 
 jobs:
-  ubuntu:
-    name:  build wget-windows
+  build_gnutls:
+    name: Build wget with GnuTLS
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
@@ -18,20 +18,50 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
           sudo apt-get install -y make m4 pkg-config automake gettext
-      - name: Build wget 64-bit
+      - name: Build wget 64-bit with GnuTLS
         run: |
-          x86_64-w64-mingw32-gcc --version
-          ./wget-gnutls.sh & ./wget-openssl.sh
+          chmod +x wget-gnutls.sh
+          ./wget-gnutls.sh
       - name: Archive gnutls
         uses: actions/upload-artifact@v4
         with:
-          name: wget-64bit-GnuTLS
+          name: wget-1.21.4-64bit-GnuTLS
           path: wget-gnutls/wget-gnutls-x64.exe
+
+  build_openssl:
+    name: Build wget with OpenSSL
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout project
+      - name: Install prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
+          sudo apt-get install -y make m4 pkg-config automake gettext
+      - name: Build wget 64-bit with OpenSSL
+        run: |
+          chmod +x wget-openssl.sh
+          ./wget-openssl.sh
       - name: Archive openssl
         uses: actions/upload-artifact@v4
         with:
-          name: wget-64bit-OpenSSL
+          name: wget-1.21.4-64bit-OpenSSL
           path: wget-openssl/wget-openssl-x64.exe
+
+  create_release:
+    name: Create Release
+    runs-on: ubuntu-20.04
+    needs: [build_gnutls, build_openssl]
+    steps:
+      - name: Set up Git repository
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Generate release notes
+        run: echo "Release notes" > RELEASE.md
       - name: Create Release  
         uses: ncipollo/release-action@v1 
         with:
