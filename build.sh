@@ -424,8 +424,7 @@ $MINGW_STRIP_TOOL "$INSTALL_PATH"/wget-gnutls/wget-gnutls-x64.exe
 # build wget (openssl)
 # -----------------------------------------------------------------------------
 make clean
-find /home/runner/work/wget-windows /home/runner/work/wget-windows/wget-windows -name "windows-openssl.diff" 
-cp $0/windows-openssl.diff .
+cp ../windows-openssl.diff .
 patch src/openssl.c < windows-openssl.diff
 CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -march=$WGET_ARCH -mtune=generic" \
  LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc" \
