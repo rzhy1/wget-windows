@@ -60,5 +60,5 @@ jobs:
           tag: 1.21.4
           allowUpdates: true
           artifacts: "wget-openssl/wget-openssl-x64.exe"
-          bodyFile: "RELEASE.md"
+          # bodyFile: "RELEASE.md"
           token: ${{ secrets.GITHUB_TOKEN }}
