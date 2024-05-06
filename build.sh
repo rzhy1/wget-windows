@@ -449,11 +449,9 @@ CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O
  --enable-pcre2 \
  --with-ssl=openssl \
  --with-included-libunistring \
- --with-libidn \
  --with-cares \
  --with-libpsl \
  --with-metalink \
- --with-openssl \
  --with-gpgme-prefix="$INSTALL_PATH"
 (($? != 0)) && { printf '%s\n' "[wget openssl] configure failed"; exit 1; }
 make -j$(nproc)
