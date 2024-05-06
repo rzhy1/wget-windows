@@ -426,7 +426,7 @@ $MINGW_STRIP_TOOL "$INSTALL_PATH"/wget-gnutls/wget-gnutls-x64.exe
 make clean
 pwd
 echo $PWD
-chmod +r windows-openssl.diff
+cp $0/windows-openssl.diff .
 patch src/openssl.c < windows-openssl.diff
 pkg-config --variable pc_path pkg-config
 find /usr/lib /usr/local/lib -name "libssl*"
