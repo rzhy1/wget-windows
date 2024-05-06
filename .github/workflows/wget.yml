@@ -31,7 +31,7 @@ jobs:
           tag: 1.21.4
           allowUpdates: true
           artifacts: "wget-gnutls/wget-gnutls-x64.exe"
-          bodyFile: "RELEASE.md"
+          # bodyFile: "RELEASE.md"
           token: ${{ secrets.GITHUB_TOKEN }}
 
   build_openssl:
