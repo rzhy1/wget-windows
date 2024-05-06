@@ -51,9 +51,9 @@ fi
 # build cares
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
-  wget -nc https://github.com/c-ares/c-ares/releases/download/cares-1_28_1/c-ares-1.28.1.tar.gz
-  tar -xf c-ares-1.28.1.tar.gz
-  cd c-ares-1.28.1 || exit
+  wget -nc https://github.com/c-ares/c-ares/releases/download/cares-1_19_0/c-ares-1.19.0.tar.gz
+  tar -xf c-ares-1.19.0.tar.gz
+  cd c-ares-1.19.0 || exit
   CPPFLAGS="-DCARES_STATICLIB=1" \
   ./configure \
   --host=$WGET_MINGW_HOST \
@@ -92,9 +92,9 @@ fi
 # build psl
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libpsl.a ]; then
-  wget -nc https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz
-  tar -xf libpsl-0.21.5.tar.gz
-  cd libpsl-0.21.5 || exit
+  wget -nc https://github.com/rockdaboot/libpsl/releases/download/0.21.2/libpsl-0.21.2.tar.gz
+  tar -xf libpsl-0.21.2.tar.gz
+  cd libpsl-0.21.2 || exit
   CFLAGS="-I$INSTALL_PATH/include" \
   LIBS="-L$INSTALL_PATH/lib -lunistring -lidn2" \
   LIBIDN2_CFLAGS="-I$INSTALL_PATH/include" \
@@ -119,9 +119,9 @@ fi
 # build pcre2
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libpcre2-8.a ]; then
-  wget -nc https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.43/pcre2-10.43.tar.gz
-  tar -xf pcre2-10.43.tar.gz
-  cd pcre2-10.43 || exit
+  wget -nc https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.42/pcre2-10.42.tar.gz
+  tar -xf pcre2-10.42.tar.gz
+  cd pcre2-10.42 || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
@@ -179,9 +179,9 @@ fi
 # build gpgme
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
-  wget -nc https://gnupg.org/ftp/gcrypt/gpgme/gpgme-1.23.2.tar.bz2
-  tar -xf gpgme-1.23.2.tar.bz2
-  cd gpgme-1.23.2 || exit
+  wget -nc https://gnupg.org/ftp/gcrypt/gpgme/gpgme-1.20.0.tar.bz2
+  tar -xf gpgme-1.20.0.tar.bz2
+  cd gpgme-1.20.0 || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
@@ -265,9 +265,9 @@ fi
 # build openssl
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
-  wget -nc https://www.openssl.org/source/openssl-3.3.0.tar.gz
-  tar -xf openssl-3.3.0.tar.gz
-  cd openssl-3.3.0 || exit
+  wget -nc https://www.openssl.org/source/openssl-3.1.0.tar.gz
+  tar -xf openssl-3.1.0.tar.gz
+  cd openssl-3.1.0 || exit
   ./Configure \
   --static \
   -static \
@@ -286,9 +286,9 @@ fi
 # -----------------------------------------------------------------------------
 # build wget (openssl)
 # -----------------------------------------------------------------------------
-wget -nc https://ftp.gnu.org/gnu/wget/wget-1.24.5.tar.gz
-tar -xf wget-1.24.5.tar.gz
-cd wget-1.24.5 || exit
+wget -nc https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz
+tar -xf wget-1.21.4.tar.gz
+cd wget-1.21.4 || exit
 cp ../windows-openssl.diff .
 patch src/openssl.c < windows-openssl.diff
 CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -march=$WGET_ARCH -mtune=generic" \
