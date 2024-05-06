@@ -25,6 +25,14 @@ jobs:
         with:
           name: wget-64bit-GnuTLS
           path: wget-gnutls/wget-gnutls-x64.exe
+      - name: Create GnuTLS Release  
+        uses: ncipollo/release-action@v1 
+        with:
+          tag: 1.21.4
+          allowUpdates: true
+          artifacts: "wget-gnutls/wget-gnutls-x64.exe"
+          bodyFile: "RELEASE.md"
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   build_openssl:
     name: Build wget with OpenSSL
@@ -46,44 +54,6 @@ jobs:
         with:
           name: wget-64bit-OpenSSL
           path: wget-openssl/wget-openssl-x64.exe
-
-  create_release_gnutls:
-    name: Create Release with GnuTLS
-    runs-on: ubuntu-20.04
-    needs: build_gnutls
-    if: ${{ needs.build_gnutls.result == 'success' }}
-    steps:
-      - name: Set up Git repository
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Generate release notes
-        run: echo "Release notes" > RELEASE.md
-      - name: Create GnuTLS Release  
-        uses: ncipollo/release-action@v1 
-        with:
-          tag: 1.21.4
-          allowUpdates: true
-          artifacts: "wget-gnutls/wget-gnutls-x64.exe"
-          bodyFile: "RELEASE.md"
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-  create_release_openssl:
-    name: Create Release with OpenSSL
-    runs-on: ubuntu-20.04
-    needs: build_openssl
-    if: ${{ needs.build_openssl.result == 'success' }}
-    steps:
-      - name: Set up Git repository
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Generate release notes
-        run: echo "Release notes" > RELEASE.md
       - name: Create OpenSSL Release  
         uses: ncipollo/release-action@v1 
         with:
