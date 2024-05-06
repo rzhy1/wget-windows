@@ -21,16 +21,16 @@ jobs:
       - name: Build wget 64-bit
         run: |
           x86_64-w64-mingw32-gcc --version
-          ./build.sh
+          ./wget-gnutls.sh & ./wget-openssl.sh
       - name: Archive gnutls
         uses: actions/upload-artifact@v4
         with:
-          name: wget-1.21.4-64bit-GnuTLS
+          name: wget-64bit-GnuTLS
           path: wget-gnutls/wget-gnutls-x64.exe
       - name: Archive openssl
         uses: actions/upload-artifact@v4
         with:
-          name: wget-1.21.4-64bit-OpenSSL
+          name: wget-64bit-OpenSSL
           path: wget-openssl/wget-openssl-x64.exe
       - name: Create Release  
         uses: ncipollo/release-action@v1 
