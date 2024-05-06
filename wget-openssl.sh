@@ -48,43 +48,6 @@ if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build gnutls
-# -----------------------------------------------------------------------------
-if [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; then
-  wget -nc https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.3.tar.xz
-  tar -xf gnutls-3.8.3.tar.xz
-  cd gnutls-3.8.3 || exit
-  PKG_CONFIG_PATH="$INSTALL_PATH/lib/pkgconfig" \
-  CFLAGS="-I$INSTALL_PATH/include" \
-  LDFLAGS="-L$INSTALL_PATH/lib" \
-  GMP_LIBS="-L$INSTALL_PATH/lib -lgmp" \
-  NETTLE_LIBS="-L$INSTALL_PATH/lib -lnettle -lgmp" \
-  HOGWEED_LIBS="-L$INSTALL_PATH/lib -lhogweed -lnettle -lgmp" \
-  LIBTASN1_LIBS="-L$INSTALL_PATH/lib -ltasn1" \
-  LIBIDN2_LIBS="-L$INSTALL_PATH/lib -lidn2" \
-  GMP_CFLAGS=$CFLAGS \
-  LIBTASN1_CFLAGS=$CFLAGS \
-  NETTLE_CFLAGS=$CFLAGS \
-  HOGWEED_CFLAGS=$CFLAGS \
-  LIBIDN2_CFLAGS=$CFLAGS \
-  ./configure \
-  --host=$WGET_MINGW_HOST \
-  --prefix="$INSTALL_PATH" \
-  --with-included-unistring \
-  --disable-openssl-compatibility \
-  --without-p11-kit \
-  --disable-tests \
-  --disable-doc \
-  --disable-shared \
-  --enable-static
-  (($? != 0)) && { printf '%s\n' "[gnutls] configure failed"; exit 1; }
-  make -j$(nproc)
-  (($? != 0)) && { printf '%s\n' "[gnutls] make failed"; exit 1; }
-  make install
-  (($? != 0)) && { printf '%s\n' "[gnutls] make install"; exit 1; }
-  cd ..
-fi
-# -----------------------------------------------------------------------------
 # build cares
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
