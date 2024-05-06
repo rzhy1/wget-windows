@@ -424,6 +424,8 @@ $MINGW_STRIP_TOOL "$INSTALL_PATH"/wget-gnutls/wget-gnutls-x64.exe
 # build wget (openssl)
 # -----------------------------------------------------------------------------
 make clean
+pwd
+echo $PWD
 chmod +r windows-openssl.diff
 patch src/openssl.c < windows-openssl.diff
 pkg-config --variable pc_path pkg-config
