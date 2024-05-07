@@ -15,7 +15,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
-          sudo apt-get install -y make m4 pkg-config automake gettext 
+          sudo apt-get install -y make m4 pkg-config automake gettext meson
           pip install --upgrade --force-reinstall $(pip list --outdated --format=freeze | cut -d = -f 1)
       - name: Build wget 64-bit with GnuTLS
         run: |
@@ -45,7 +45,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
-          sudo apt-get install -y make m4 pkg-config automake gettext
+          sudo apt-get install -y make m4 pkg-config automake gettext meson
           pip install --upgrade --force-reinstall $(pip list --outdated --format=freeze | cut -d = -f 1)
       - name: Build wget 64-bit with OpenSSL
         run: |
