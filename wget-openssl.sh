@@ -51,9 +51,9 @@ fi
 # build cares
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
-  wget -nc https://github.com/c-ares/c-ares/releases/download/cares-1_19_0/c-ares-1.19.0.tar.gz
-  tar -xf c-ares-1.19.0.tar.gz
-  cd c-ares-1.19.0 || exit
+  wget -nc https://github.com/c-ares/c-ares/releases/download/cares-1_28_1/c-ares-1.28.1.tar.gz
+  tar -xf c-ares-1.28.1.tar.gz
+  cd c-ares-1.28.1 || exit
   CPPFLAGS="-DCARES_STATICLIB=1" \
   ./configure \
   --host=$WGET_MINGW_HOST \
@@ -179,9 +179,9 @@ fi
 # build gpgme
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
-  wget -nc https://gnupg.org/ftp/gcrypt/gpgme/gpgme-1.20.0.tar.bz2
-  tar -xf gpgme-1.20.0.tar.bz2
-  cd gpgme-1.20.0 || exit
+  wget -nc https://gnupg.org/ftp/gcrypt/gpgme/gpgme-1.23.2.tar.bz2
+  tar -xf gpgme-1.23.2.tar.bz2
+  cd gpgme-1.23.2 || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
@@ -286,9 +286,9 @@ fi
 # -----------------------------------------------------------------------------
 # build wget (openssl)
 # -----------------------------------------------------------------------------
-wget -nc https://ftp.gnu.org/gnu/wget/wget-1.24.5.tar.gz
-tar -xf wget-1.24.5.tar.gz
-cd wget-1.24.5 || exit
+wget -nc https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz
+tar -xf wget-1.21.4.tar.gz
+cd wget-1.21.4 || exit
 cp ../windows-openssl.diff .
 patch src/openssl.c < windows-openssl.diff
 CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -march=$WGET_ARCH -mtune=generic" \
