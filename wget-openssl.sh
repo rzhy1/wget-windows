@@ -265,9 +265,9 @@ fi
 # build openssl
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
-  wget -nc https://www.openssl.org/source/openssl-3.3.0.tar.gz
-  tar -xf openssl-3.3.0.tar.gz
-  cd openssl-3.3.0 || exit
+  wget -nc https://www.openssl.org/source/openssl-1.1.1w.tar.gz
+  tar -xf openssl-1.1.1w.tar.gz
+  cd openssl-1.1.1w || exit
   ./Configure \
   --static \
   -static \
@@ -286,9 +286,9 @@ fi
 # -----------------------------------------------------------------------------
 # build wget (openssl)
 # -----------------------------------------------------------------------------
-wget -nc https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz
-tar -xf wget-1.21.4.tar.gz
-cd wget-1.21.4 || exit
+wget -nc https://ftp.gnu.org/gnu/wget/wget-1.24.5.tar.gz
+tar -xf wget-1.24.5.tar.gz
+cd wget-1.24.5 || exit
 cp ../windows-openssl.diff .
 patch src/openssl.c < windows-openssl.diff
 CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -march=$WGET_ARCH -mtune=generic" \
