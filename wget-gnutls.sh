@@ -369,7 +369,6 @@ CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -D
  --enable-pcre2 \
  --with-ssl=gnutls \
  --with-included-libunistring \
- --with-libidn \
  --with-cares \
  --with-libpsl \
  --with-metalink \
