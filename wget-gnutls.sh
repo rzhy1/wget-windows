@@ -70,9 +70,9 @@ fi
 # build idn2
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
-  wget -nc https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz
-  tar -xf libidn2-2.3.0.tar.gz
-  cd libidn2-2.3.0 || exit
+  wget -nc https://github.com/unypkg/libidn2/releases/download/2.3.7-2024-04-28T20.51.37Z/libidn2-2.3.7-source.tar.xz
+  tar -xf libidn2-2.3.7-source.tar.xz
+  cd libidn2-2.3.7 || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --enable-static \
