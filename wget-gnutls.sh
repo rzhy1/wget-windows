@@ -99,7 +99,11 @@ if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
   make install
   (($? != 0)) && { printf '%s\n' "[unistring] make install"; exit 1; }
   cd ..
-fiif [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
+fi
+# -----------------------------------------------------------------------------
+# build cares
+# -----------------------------------------------------------------------------
+if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
   wget -q -O- https://github.com/c-ares/c-ares/releases/download/cares-1_28_1/c-ares-1.28.1.tar.gz | tar xz
   cd c-ares-* || exit
   CPPFLAGS="-DCARES_STATICLIB=1" \
