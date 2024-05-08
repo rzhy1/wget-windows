@@ -47,7 +47,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
-          sudo apt-get install -y make m4 pkg-config automake gettext
+          sudo apt-get install -y make m4 pkg-config automake gettext gperf
           pip install --upgrade setuptools
           #sudo apt upgrade
           #sudo apt full-upgrade
