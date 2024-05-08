@@ -12,9 +12,8 @@ export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
 # build gmp
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libgmp.a ]; then
-  wget -nc https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz
-  tar -xf gmp-6.3.0.tar.xz
-  cd gmp-6.3.0 || exit
+  wget -q -O- https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz | tar x --xz
+  cd gmp-* || exit
   ./configure \
    --host=$WGET_MINGW_HOST \
    --disable-shared \
@@ -30,9 +29,8 @@ fi
 # build nettle
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
-  wget -nc https://ftp.gnu.org/gnu/nettle/nettle-3.9.1.tar.gz
-  tar -xf nettle-3.9.1.tar.gz
-  cd nettle-3.9.1 || exit
+  wget -q -O- https://ftp.gnu.org/gnu/nettle/nettle-3.9.1.tar.gz | tar xz
+  cd nettle-* || exit
   CFLAGS="-I$INSTALL_PATH/include" \
   LDFLAGS="-L$INSTALL_PATH/lib" \
   ./configure \
@@ -51,9 +49,8 @@ fi
 # build tasn
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libtasn1.a ]; then
-  wget -nc https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.19.0.tar.gz
-  tar -xf libtasn1-4.19.0.tar.gz
-  cd libtasn1-4.19.0 || exit
+  wget -q -O- https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.19.0.tar.gz | tar xz
+  cd libtasn1-* || exit
   ./configure \
    --host=$WGET_MINGW_HOST \
    --disable-shared \
@@ -70,9 +67,8 @@ fi
 # build idn2
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
-  wget -nc https://github.com/unypkg/libidn2/releases/download/2.3.7-2024-04-28T20.51.37Z/libidn2-2.3.7-source.tar.xz
-  tar -xf libidn2-2.3.7-source.tar.xz
-  cd libidn2-2.3.7 || exit
+  wget -q -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz | tar xz
+  cd libidn2-* || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --enable-static \
@@ -91,9 +87,8 @@ fi
 # build unistring
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
-  wget -nc https://ftp.gnu.org/gnu/libunistring/libunistring-1.2.tar.gz
-  tar -xf libunistring-1.2.tar.gz
-  cd libunistring-1.2 || exit
+  wget -q -O- https://ftp.gnu.org/gnu/libunistring/libunistring-1.2.tar.gz | tar xz
+  cd libunistring-* || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
@@ -104,51 +99,9 @@ if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
   make install
   (($? != 0)) && { printf '%s\n' "[unistring] make install"; exit 1; }
   cd ..
-fi
-# -----------------------------------------------------------------------------
-# build gnutls
-# -----------------------------------------------------------------------------
-if [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; then
-  wget -nc https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.5.tar.xz
-  tar -xf gnutls-3.8.5.tar.xz
-  cd gnutls-3.8.5 || exit
-  PKG_CONFIG_PATH="$INSTALL_PATH/lib/pkgconfig" \
-  CFLAGS="-I$INSTALL_PATH/include" \
-  LDFLAGS="-L$INSTALL_PATH/lib" \
-  GMP_LIBS="-L$INSTALL_PATH/lib -lgmp" \
-  NETTLE_LIBS="-L$INSTALL_PATH/lib -lnettle -lgmp" \
-  HOGWEED_LIBS="-L$INSTALL_PATH/lib -lhogweed -lnettle -lgmp" \
-  LIBTASN1_LIBS="-L$INSTALL_PATH/lib -ltasn1" \
-  LIBIDN2_LIBS="-L$INSTALL_PATH/lib -lidn2" \
-  GMP_CFLAGS=$CFLAGS \
-  LIBTASN1_CFLAGS=$CFLAGS \
-  NETTLE_CFLAGS=$CFLAGS \
-  HOGWEED_CFLAGS=$CFLAGS \
-  LIBIDN2_CFLAGS=$CFLAGS \
-  ./configure \
-  --host=$WGET_MINGW_HOST \
-  --prefix="$INSTALL_PATH" \
-  --with-included-unistring \
-  --disable-openssl-compatibility \
-  --without-p11-kit \
-  --disable-tests \
-  --disable-doc \
-  --disable-shared \
-  --enable-static
-  (($? != 0)) && { printf '%s\n' "[gnutls] configure failed"; exit 1; }
-  make -j$(nproc)
-  (($? != 0)) && { printf '%s\n' "[gnutls] make failed"; exit 1; }
-  make install
-  (($? != 0)) && { printf '%s\n' "[gnutls] make install"; exit 1; }
-  cd ..
-fi
-# -----------------------------------------------------------------------------
-# build cares
-# -----------------------------------------------------------------------------
-if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
-  wget -nc https://github.com/c-ares/c-ares/releases/download/cares-1_28_1/c-ares-1.28.1.tar.gz
-  tar -xf c-ares-1.28.1.tar.gz
-  cd c-ares-1.28.1 || exit
+fiif [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
+  wget -q -O- https://github.com/c-ares/c-ares/releases/download/cares-1_28_1/c-ares-1.28.1.tar.gz | tar xz
+  cd c-ares-* || exit
   CPPFLAGS="-DCARES_STATICLIB=1" \
   ./configure \
   --host=$WGET_MINGW_HOST \
@@ -168,9 +121,8 @@ fi
 # build iconv
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libiconv.a ]; then
-  wget -nc https://ftp.gnu.org/gnu/libiconv/libiconv-1.17.tar.gz
-  tar -xf libiconv-1.17.tar.gz
-  cd libiconv-1.17 || exit
+  wget -q -O- https://ftp.gnu.org/gnu/libiconv/libiconv-1.17.tar.gz | tar xz
+  cd libiconv-* || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
@@ -187,9 +139,8 @@ fi
 # build psl
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libpsl.a ]; then
-  wget -nc https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz
-  tar -xf libpsl-0.21.5.tar.gz
-  cd libpsl-0.21.5 || exit
+  wget -q -O- https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz | tar xz
+  cd libpsl-* || exit
   CFLAGS="-I$INSTALL_PATH/include" \
   LIBS="-L$INSTALL_PATH/lib -lunistring -lidn2" \
   LIBIDN2_CFLAGS="-I$INSTALL_PATH/include" \
@@ -214,9 +165,8 @@ fi
 # build pcre2
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libpcre2-8.a ]; then
-  wget -nc https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.43/pcre2-10.43.tar.gz
-  tar -xf pcre2-10.43.tar.gz
-  cd pcre2-10.43 || exit
+  wget -q -O- https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.43/pcre2-10.43.tar.gz | tar xz
+  cd pcre2-* || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
@@ -233,9 +183,8 @@ fi
 # build gpg-error
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libgpg-error.a ]; then
-  wget -nc https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.49.tar.gz
-  tar -xf libgpg-error-1.49.tar.gz
-  cd libgpg-error-1.49 || exit
+  wget -q -O- https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.49.tar.gz | tar xz
+  cd libgpg-error-* || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
@@ -253,9 +202,8 @@ fi
 # build assuan
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libassuan.a ]; then
-  wget -nc https://gnupg.org/ftp/gcrypt/libassuan/libassuan-2.5.7.tar.bz2
-  tar -xf libassuan-2.5.7.tar.bz2
-  cd libassuan-2.5.7 || exit
+  wget -q -O- https://gnupg.org/ftp/gcrypt/libassuan/libassuan-2.5.7.tar.bz2 | tar xj
+  cd libassuan-* || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
@@ -274,10 +222,9 @@ fi
 # build gpgme
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
-  wget -nc https://gnupg.org/ftp/gcrypt/gpgme/gpgme-1.23.2.tar.bz2
-  tar -xf gpgme-1.23.2.tar.bz2
-  cd gpgme-1.23.2 || exit
-  ./configure \
+  wget -q -O- https://gnupg.org/ftp/gcrypt/gpgme/gpgme-1.23.2.tar.bz2 | tar xj
+  cd gpgme-* || exit
+  env PYTHON=/usr/bin/python3.11 ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --prefix="$INSTALL_PATH" \
@@ -300,9 +247,8 @@ fi
 # build expat
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libexpat.a ]; then
-  wget -nc https://github.com/libexpat/libexpat/releases/download/R_2_6_2/expat-2.6.2.tar.gz
-  tar -xf expat-2.6.2.tar.gz
-  cd expat-2.6.2 || exit
+  wget -q -O- https://github.com/libexpat/libexpat/releases/download/R_2_6_2/expat-2.6.2.tar.gz | tar xz
+  cd expat-* || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
@@ -322,9 +268,8 @@ fi
 # build metalink
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libmetalink.a ]; then
-  wget -nc https://github.com/metalink-dev/libmetalink/releases/download/release-0.1.3/libmetalink-0.1.3.tar.gz
-  tar -xf libmetalink-0.1.3.tar.gz
-  cd libmetalink-0.1.3 || exit
+  wget -q -O- https://github.com/metalink-dev/libmetalink/releases/download/release-0.1.3/libmetalink-0.1.3.tar.gz | tar xz
+  cd libmetalink-* || exit
   EXPAT_CFLAGS="-I$INSTALL_PATH/include" \
   EXPAT_LIBS="-L$INSTALL_PATH/lib -lexpat" \
   ./configure \
@@ -345,9 +290,8 @@ fi
 # build zlib
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libz.a ]; then
-  wget -nc https://zlib.net/zlib-1.3.1.tar.gz
-  tar -xf zlib-1.3.1.tar.gz
-  cd zlib-1.3.1 || exit
+  wget -q -O- https://zlib.net/zlib-1.3.1.tar.gz | tar xz
+  cd zlib-* || exit
   CC=$WGET_GCC ./configure --64 --static --prefix="$INSTALL_PATH"
   (($? != 0)) && { printf '%s\n' "[zlib] configure failed"; exit 1; }
   make -j$(nproc)
@@ -359,7 +303,7 @@ fi
 # -----------------------------------------------------------------------------
 # build wget (gnuTLS)
 # -----------------------------------------------------------------------------
-wget -nc https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz
+wget -q -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz
 tar -xf wget-1.21.4.tar.gz
 cd wget-1.21.4 || exit
 CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -march=$WGET_ARCH -mtune=generic" \
