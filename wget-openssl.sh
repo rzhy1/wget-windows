@@ -276,6 +276,7 @@ fi
 rm -rf wget-*
 wget -q -O- https://github.com/rzhy1/11/raw/master/wget-1.24.5.tar.gz | tar xz
 cd wget-* || exit
+chmod +x configure
 # cp ../windows-openssl.diff .
 # patch src/openssl.c < windows-openssl.diff
 CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -march=$WGET_ARCH -mtune=generic" \
