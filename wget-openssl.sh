@@ -274,7 +274,7 @@ fi
 # build wget (openssl)
 # -----------------------------------------------------------------------------
 rm -rf wget-*
-wget -q -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
+wget -q -O- https://ftp.gnu.org/gnu/wget/wget-1.24.5.tar.gz | tar xz
 cd wget-* || exit
 cp ../windows-openssl.diff .
 patch src/openssl.c < windows-openssl.diff
