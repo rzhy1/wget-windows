@@ -274,7 +274,7 @@ fi
 # build wget (openssl)
 # -----------------------------------------------------------------------------
 rm -rf wget-*
-wget -q -O- https://github.com/rzhy1/11/raw/master/wget-1.24.5.tar.gz | tar xz
+wget -q -O- https://github.com/rzhy1/11/raw/master/wget-1.21.4.tar.gz | tar xz
 cd wget-* || exit
 chmod +x configure
 # cp ../windows-openssl.diff .
