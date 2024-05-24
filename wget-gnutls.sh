@@ -141,7 +141,7 @@ fi
 # build cares
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
-  wget -q -O- https://github.com/c-ares/c-ares/releases/download/cares-1_28_1/c-ares-1.28.1.tar.gz | tar xz
+  wget -q -O- https://github.com/c-ares/c-ares/releases/download/cares-1_29_0/c-ares-1.29.0.tar.gz | tar xz
   cd c-ares-* || exit
   CPPFLAGS="-DCARES_STATICLIB=1" \
   ./configure \
