@@ -25,6 +25,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
           sudo apt-get install -y make m4 pkg-config automake gettext gperf
+          python3 -m venv myenv       # 创建名为'myenv'的虚拟环境
+          source myenv/bin/activate   # 激活虚拟环境
+          pip install setuptools      # 在虚拟环境中安装setuptools
           sudo pip install --upgrade setuptools
           #sudo apt upgrade
           #sudo apt full-upgrade
@@ -57,6 +60,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
           sudo apt-get install -y make m4 pkg-config automake gettext gperf
+          python3 -m venv myenv       # 创建名为'myenv'的虚拟环境
+          source myenv/bin/activate   # 激活虚拟环境
+          pip install setuptools      # 在虚拟环境中安装setuptools
           sudo pip install --upgrade setuptools
           #sudo apt upgrade
           #sudo apt full-upgrade
