@@ -16,7 +16,7 @@ on:
 jobs:
   build_gnutls:
     name: Build wget with GnuTLS
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         name: Checkout project
@@ -51,7 +51,7 @@ jobs:
 
   build_openssl:
     name: Build wget with OpenSSL
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         name: Checkout project
