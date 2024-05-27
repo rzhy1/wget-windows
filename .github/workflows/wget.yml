@@ -51,7 +51,7 @@ jobs:
 
   build_openssl:
     name: Build wget with OpenSSL
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         name: Checkout project
