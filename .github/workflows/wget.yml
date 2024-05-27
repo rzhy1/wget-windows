@@ -25,6 +25,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
           sudo apt-get install -y make m4 pkg-config automake gettext gperf
+          pip install --break-system-packages setuptools
           pip install --upgrade setuptools
           #sudo apt upgrade
           #sudo apt full-upgrade
@@ -48,7 +49,7 @@ jobs:
 
   build_openssl:
     name: Build wget with OpenSSL
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         name: Checkout project
@@ -57,6 +58,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
           sudo apt-get install -y make m4 pkg-config automake gettext gperf
+          pip install --break-system-packages setuptools
           pip install --upgrade setuptools
           #sudo apt upgrade
           #sudo apt full-upgrade
