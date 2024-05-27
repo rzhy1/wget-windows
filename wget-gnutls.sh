@@ -67,7 +67,7 @@ fi
 # build idn2
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
-  wget -q -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz | tar xz
+  wget -q -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz | tar xz
   cd libidn2-* || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
@@ -104,9 +104,8 @@ fi
 # build gnutls
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; then
-  wget -nc https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.5.tar.xz
-  tar -xf gnutls-3.8.5.tar.xz
-  cd gnutls-3.8.5 || exit
+  wget -q -O- https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.5.tar.xz | tar x --xz
+  cd gnutls-* || exit
   PKG_CONFIG_PATH="$INSTALL_PATH/lib/pkgconfig" \
   CFLAGS="-I$INSTALL_PATH/include" \
   LDFLAGS="-L$INSTALL_PATH/lib" \
