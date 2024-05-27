@@ -24,9 +24,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
-          sudo apt-get install -y make m4 pkg-config automake gettext gperf
-          sudo pip install --break-system-packages setuptools
-          sudo pip install --upgrade setuptools
+          sudo apt-get install -y make m4 pkg-config automake gettext gperf python3-venv
+          python3 -m venv myenv
+          source myenv/bin/activate
+          pip install setuptools
+          pip install --upgrade setuptools
           #sudo apt upgrade
           #sudo apt full-upgrade
       - name: Build wget 64-bit with GnuTLS
@@ -57,9 +59,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
-          sudo apt-get install -y make m4 pkg-config automake gettext gperf
-          sudo pip install --break-system-packages setuptools
-          sudo pip install --upgrade setuptools
+          sudo apt-get install -y make m4 pkg-config automake gettext gperf python3-venv
+          python3 -m venv myenv
+          source myenv/bin/activate
+          pip install setuptools
+          pip install --upgrade setuptools
           #sudo apt upgrade
           #sudo apt full-upgrade
       - name: Build wget 64-bit with OpenSSL
