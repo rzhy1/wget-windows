@@ -344,8 +344,11 @@ fi
 # build wget (gnuTLS)
 # -----------------------------------------------------------------------------
 rm -rf wget-*
-wget -q -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
-cd wget-* || exit
+#wget -q -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
+https://gitlab.com/gnuwget/wget.git
+cd wget
+autoreconf -i 
+#cd wget-* || exit
 chmod +x configure
 CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -march=$WGET_ARCH -mtune=generic" \
  LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc" \
