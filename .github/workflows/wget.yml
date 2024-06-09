@@ -29,8 +29,8 @@ jobs:
           source myenv/bin/activate
           pip install setuptools
           pip install --upgrade setuptools
-          sudo apt upgrade
-          sudo apt full-upgrade
+          #sudo apt upgrade
+          #sudo apt full-upgrade
       - name: Build wget 64-bit with GnuTLS
         run: |
           chmod +x wget-gnutls.sh
