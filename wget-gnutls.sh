@@ -14,7 +14,17 @@ build_library() {
   local configure_args=$3
 
   if [ ! -f "$INSTALL_PATH/lib/lib${name}.a" ]; then
-    wget -O- "$url" | tar x --xz
+    wget -O "${name}.tar" "$url"
+    if [[ "$url" == *.tar.gz ]]; then
+      tar xzf "${name}.tar"
+    elif [[ "$url" == *.tar.xz ]]; then
+      tar xJf "${name}.tar"
+    elif [[ "$url" == *.tar.bz2 ]]; then
+      tar xjf "${name}.tar"
+    else
+      echo "Unsupported file format: $url"
+      exit 1
+    fi
     local dir=$(find . -maxdepth 1 -type d -name "${name}-*" | head -n 1)
     cd "$dir" || exit
     ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" $configure_args
