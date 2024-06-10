@@ -23,7 +23,7 @@ jobs:
       - name: Install prerequisites
         run: |
           sudo apt-get update
-          sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
+          sudo apt-get install -y mingw-w64 mingw-w64-tools gcc libgpgme-dev
           sudo apt-get install -y autopoint make m4 pkg-config automake gettext gperf python3-venv
           python3 -m venv myenv
           source myenv/bin/activate
