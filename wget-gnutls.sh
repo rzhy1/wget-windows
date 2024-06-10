@@ -345,7 +345,7 @@ fi
 # -----------------------------------------------------------------------------
 rm -rf wget-*
 #wget -q -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
-https://gitlab.com/gnuwget/wget.git
+git clone https://gitlab.com/gnuwget/wget.git
 cd wget
 autoreconf -i 
 #cd wget-* || exit
