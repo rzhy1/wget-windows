@@ -15,7 +15,7 @@ build_library() {
 
   if [ ! -f "$INSTALL_PATH/lib/lib${name}.a" ]; then
     wget -O- "$url" | tar x --xz
-    cd "${name}" || exit
+    cd "${name}-*" || exit
     ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" $configure_args
     (($? != 0)) && { printf '%s\n' "[${name}] configure failed"; exit 1; }
     make -j$(nproc)
