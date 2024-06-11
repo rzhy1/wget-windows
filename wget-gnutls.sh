@@ -8,9 +8,6 @@ export WGET_GCC=x86_64-w64-mingw32-gcc
 export WGET_MINGW_HOST=x86_64-w64-mingw32
 export WGET_ARCH=x86-64
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
-echo $PKG_CONFIG_PATH
-export PKG_CONFIG_PATH=$INSTALL_PATH/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:$PKG_CONFIG_PATH
-echo $PKG_CONFIG_PATH
 # -----------------------------------------------------------------------------
 # build gmp
 # -----------------------------------------------------------------------------
@@ -354,10 +351,8 @@ pkg-config --exists gnutls && echo "gnutls is installed" || echo "gnutls is not 
 pkg-config --cflags --libs zlib
 pkg-config --cflags --libs libpsl
 pkg-config --cflags --libs gnutls
-pkg-config --cflags --libs zlib
-pkg-config --cflags --libs libpsl
-pkg-config --cflags --libs gnutls
 echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - 查询结束"
+export PKG_CONFIG_PATH=$INSTALL_PATH/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:$PKG_CONFIG_PATH
 rm -rf wget-*
 wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
 cd wget-* || exit
