@@ -343,11 +343,16 @@ fi
 # -----------------------------------------------------------------------------
 # build wget (gnuTLS)
 # -----------------------------------------------------------------------------
+pkg-config --exists zlib && echo "zlib is installed" || echo "zlib is not installed"
+pkg-config --exists libpsl && echo "libpsl is installed" || echo "libpsl is not installed"
+pkg-config --exists gnutls && echo "gnutls is installed" || echo "gnutls is not installed"
+pkg-config --cflags --libs zlib
+pkg-config --cflags --libs libpsl
+pkg-config --cflags --libs gnutls
+pkg-config --cflags --libs zlib
+pkg-config --cflags --libs libpsl
+pkg-config --cflags --libs gnutls
 rm -rf wget-*
-echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - upgrade"
-sudo apt upgrade
-echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - full-upgrade"
-sudo apt full-upgrade
 wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
 cd wget-* || exit
 chmod +x configure
