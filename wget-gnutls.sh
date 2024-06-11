@@ -343,6 +343,8 @@ fi
 # -----------------------------------------------------------------------------
 # build wget (gnuTLS)
 # -----------------------------------------------------------------------------
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - 查询开始"
+find $INSTALL_PATH -name "libpsl.pc"
 pkg-config --exists zlib && echo "zlib is installed" || echo "zlib is not installed"
 pkg-config --exists libpsl && echo "libpsl is installed" || echo "libpsl is not installed"
 pkg-config --exists gnutls && echo "gnutls is installed" || echo "gnutls is not installed"
@@ -352,6 +354,7 @@ pkg-config --cflags --libs gnutls
 pkg-config --cflags --libs zlib
 pkg-config --cflags --libs libpsl
 pkg-config --cflags --libs gnutls
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - 查询结束"
 rm -rf wget-*
 wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
 cd wget-* || exit
