@@ -344,7 +344,7 @@ fi
 # build wget (gnuTLS)
 # -----------------------------------------------------------------------------
 echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - 查询开始"
-export PKG_CONFIG_PATH=$INSTALL_PATH/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:$PKG_CONFIG_PATH
+export PKG_CONFIG_PATH=$INSTALL_PATH/lib/pkgconfig:$PKG_CONFIG_PATH
 find $INSTALL_PATH -name "libpsl.pc"
 pkg-config --exists gnutls && echo "gnutls 已安装" || echo "gnutls 未安装"
 pkg-config --exists libpsl && echo "libpsl 已安装" || echo "libpsl 未安装"
