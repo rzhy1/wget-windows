@@ -8,6 +8,7 @@ export WGET_GCC=x86_64-w64-mingw32-gcc
 export WGET_MINGW_HOST=x86_64-w64-mingw32
 export WGET_ARCH=x86-64
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
+echo $PKG_CONFIG_PATH
 export PKG_CONFIG_PATH=$INSTALL_PATH/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:$PKG_CONFIG_PATH
 # -----------------------------------------------------------------------------
 # build gmp
