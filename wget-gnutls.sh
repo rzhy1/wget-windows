@@ -10,6 +10,7 @@ export WGET_ARCH=x86-64
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
 echo $PKG_CONFIG_PATH
 export PKG_CONFIG_PATH=$INSTALL_PATH/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:$PKG_CONFIG_PATH
+echo $PKG_CONFIG_PATH
 # -----------------------------------------------------------------------------
 # build gmp
 # -----------------------------------------------------------------------------
