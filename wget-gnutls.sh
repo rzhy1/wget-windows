@@ -377,12 +377,12 @@ pkg-config --cflags --libs pcre2
 pkg-config --cflags --libs metalink
 pkg-config --cflags --libs cares
 pkg-config --cflags --libs libiconv
-find / -name "libunistring.pc"
-find / -name "libgpg-error.pc"
-find / -name "pcre2.pc"
-find / -name "metalink.pc"
-find / -name "cares.pc"
-find / -name "libiconv.pc"
+sudo find / -name "libunistring.pc"
+sudo find / -name "libgpg-error.pc"
+sudo find / -name "pcre2.pc"
+sudo find / -name "metalink.pc"
+sudo find / -name "cares.pc"
+sudo find / -name "libiconv.pc"
 pkg-config --list-all
 echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - 查询结束"
 rm -rf wget-*
