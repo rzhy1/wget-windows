@@ -31,6 +31,9 @@ jobs:
           pip install --upgrade setuptools
           #sudo apt upgrade
           #sudo apt full-upgrade
+          pkg-config --version
+          sudo apt-get update && sudo apt-get install --only-upgrade pkg-config
+          pkg-config --version
       - name: Build wget 64-bit with GnuTLS
         run: |
           chmod +x wget-gnutls.sh
