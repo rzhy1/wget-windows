@@ -9,7 +9,7 @@ export WGET_MINGW_HOST=x86_64-w64-mingw32
 export WGET_ARCH=x86-64
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
 # -----------------------------------------------------------------------------
-# build idn2
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build idn2" 
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
   wget -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz | tar xz
@@ -29,7 +29,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build unistring
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build unistring" 
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
   wget -O- https://ftp.gnu.org/gnu/libunistring/libunistring-1.2.tar.gz | tar xz
@@ -46,7 +46,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build cares
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build cares" 
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
   wget -O- https://github.com/c-ares/c-ares/releases/download/v1.30.0/c-ares-1.30.0.tar.gz | tar xz
@@ -67,7 +67,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build iconv
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build iconv"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libiconv.a ]; then
   wget -O- https://ftp.gnu.org/gnu/libiconv/libiconv-1.17.tar.gz | tar xz
@@ -85,7 +85,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libiconv.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build psl
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build psl"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libpsl.a ]; then
   wget -O- https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz | tar xz
@@ -111,7 +111,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libpsl.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build pcre2
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build pcre2"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libpcre2-8.a ]; then
   wget -O- https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.44/pcre2-10.44.tar.gz | tar xz
@@ -129,7 +129,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libpcre2-8.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build gpg-error
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gpg-error"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libgpg-error.a ]; then
   wget -O- https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.49.tar.gz | tar xz
@@ -148,7 +148,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libgpg-error.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build assuan
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build assuan"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libassuan.a ]; then
   wget -O- https://gnupg.org/ftp/gcrypt/libassuan/libassuan-2.5.7.tar.bz2 | tar xj
@@ -168,7 +168,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libassuan.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build gpgme
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gpgme"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
   wget -O- https://gnupg.org/ftp/gcrypt/gpgme/gpgme-1.23.2.tar.bz2 | tar xj
@@ -193,7 +193,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build expat
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build expat"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libexpat.a ]; then
   wget -O- https://github.com/libexpat/libexpat/releases/download/R_2_6_2/expat-2.6.2.tar.gz | tar xz
@@ -214,7 +214,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libexpat.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build metalink
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build metalink"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libmetalink.a ]; then
   wget -O- https://github.com/metalink-dev/libmetalink/releases/download/release-0.1.3/libmetalink-0.1.3.tar.gz | tar xz
@@ -236,7 +236,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libmetalink.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build zlib
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build zlib"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libz.a ]; then
   wget -O- https://zlib.net/zlib-1.3.1.tar.gz | tar xz
@@ -250,7 +250,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libz.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build openssl
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build openssl"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
   wget -O- https://www.openssl.org/source/openssl-1.1.1w.tar.gz | tar xz
@@ -271,7 +271,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
  cd ..
 fi
 # -----------------------------------------------------------------------------
-# build wget (openssl)
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (openssl)"
 # -----------------------------------------------------------------------------
 rm -rf wget-*
 wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
