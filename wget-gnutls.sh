@@ -411,7 +411,10 @@ CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -D
  --enable-iri \
  --enable-pcre2 \
  --with-ssl=gnutls \
+ --with-libgnutls-prefix="$INSTALL_PATH" \
  --with-included-libunistring \
+ --with-libunistring-prefix="$INSTALL_PATH" \
+ --with-libiconv-prefix="$INSTALL_PATH" \
  --with-cares \
  --with-libpsl \
  --with-metalink \
