@@ -379,6 +379,7 @@ pkg-config --cflags --libs metalink
 pkg-config --cflags --libs cares
 pkg-config --cflags --libs libiconv
 find $INSTALL_PATH -name "*.pc"
+sudo find / -name "libgpg-error.pc" 2>/dev/null
 pkg-config --list-all
 echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - 查询结束"
 rm -rf wget-*
