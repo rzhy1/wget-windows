@@ -344,7 +344,6 @@ fi
 # build wget (gnuTLS)
 # -----------------------------------------------------------------------------
 echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - 查询开始"
-export PKG_CONFIG_PATH="$INSTALL_PATH/lib/pkgconfig:/home/runner/work/wget-windows/wget-windows/libmetalink-0.1.3/lib:/home/runner/work/wget-windows/wget-windows/libpsl-0.21.5:/home/runner/work/wget-windows/wget-windows/gpgme-1.23.2/src:/home/runner/work/wget-windows/wget-windows/expat-2.6.2:/home/runner/work/wget-windows/wget-windows/libtasn1-4.19.0/lib:/home/runner/work/wget-windows/wget-windows/zlib-1.3.1:/home/runner/work/wget-windows/wget-windows/gmp-6.3.0:/home/runner/work/wget-windows/wget-windows/gnutls-3.8.5/lib:/home/runner/work/wget-windows/wget-windows/gnutls-3.8.5/libdane:/home/runner/work/wget-windows/wget-windows/pcre2-10.44:/home/runner/work/wget-windows/wget-windows/libgpg-error-1.49/src:/home/runner/work/wget-windows/wget-windows/libidn2-2.3.0:/home/runner/work/wget-windows/wget-windows/libassuan-2.5.7/src:/home/runner/work/wget-windows/wget-windows/c-ares-1.30.0:/home/runner/work/wget-windows/wget-windows/nettle-3.9.1:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:$PKG_CONFIG_PATH"
 pkg-config --exists gnutls && echo "gnutls 已安装" || echo "gnutls 未安装"
 pkg-config --exists libpsl && echo "libpsl 已安装" || echo "libpsl 未安装"
 pkg-config --exists gmp && echo "gmp 已安装" || echo "gmp 未安装"
@@ -377,7 +376,7 @@ pkg-config --cflags --libs pcre2
 pkg-config --cflags --libs metalink
 pkg-config --cflags --libs cares
 pkg-config --cflags --libs libiconv
-find $INSTALL_PATH -name "*.pc"
+find / -name "*.pc"
 pkg-config --list-all
 echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - 查询结束"
 rm -rf wget-*
