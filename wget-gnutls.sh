@@ -9,10 +9,10 @@ export WGET_MINGW_HOST=x86_64-w64-mingw32
 export WGET_ARCH=x86-64
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
 # -----------------------------------------------------------------------------
-# build gmp
+echo "⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gmp⭐⭐⭐⭐⭐" 
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libgmp.a ]; then
-  wget -O- https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz | tar x --xz
+  wget -nv -O- https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz | tar x --xz
   cd gmp-* || exit
   ./configure \
    --host=$WGET_MINGW_HOST \
@@ -26,7 +26,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libgmp.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build nettle
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build nettle" 
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
   wget -O- https://ftp.gnu.org/gnu/nettle/nettle-3.9.1.tar.gz | tar xz
@@ -46,7 +46,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build tasn
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libtasn1"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libtasn1.a ]; then
   wget -O- https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.19.0.tar.gz | tar xz
@@ -64,7 +64,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libtasn1.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build idn2
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libidn2" 
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
   wget -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz | tar xz
@@ -84,7 +84,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build unistring
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libunistring" 
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
   wget -O- https://ftp.gnu.org/gnu/libunistring/libunistring-1.2.tar.gz | tar xz
@@ -101,7 +101,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build gnutls
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gnutls"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; then
   wget -O- https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.5.tar.xz | tar x --xz
@@ -137,7 +137,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build cares
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build c-ares" 
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
   wget -O- https://github.com/c-ares/c-ares/releases/download/v1.30.0/c-ares-1.30.0.tar.gz | tar xz
@@ -158,7 +158,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build iconv
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libiconv"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libiconv.a ]; then
   wget -O- https://ftp.gnu.org/gnu/libiconv/libiconv-1.17.tar.gz | tar xz
@@ -176,7 +176,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libiconv.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build psl
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libpsl"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libpsl.a ]; then
   wget -O- https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz | tar xz
@@ -202,7 +202,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libpsl.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build pcre2
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build pcre2"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libpcre2-8.a ]; then
   wget -O- https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.44/pcre2-10.44.tar.gz | tar xz
@@ -220,7 +220,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libpcre2-8.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build gpg-error
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gpg-error"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libgpg-error.a ]; then
   wget -O- https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.49.tar.gz | tar xz
@@ -239,7 +239,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libgpg-error.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build assuan
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libassuan"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libassuan.a ]; then
   wget -O- https://gnupg.org/ftp/gcrypt/libassuan/libassuan-2.5.7.tar.bz2 | tar xj
@@ -259,7 +259,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libassuan.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build gpgme
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gpgme"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
   wget -O- https://gnupg.org/ftp/gcrypt/gpgme/gpgme-1.23.2.tar.bz2 | tar xj
@@ -284,7 +284,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build expat
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build expat"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libexpat.a ]; then
   wget -O- https://github.com/libexpat/libexpat/releases/download/R_2_6_2/expat-2.6.2.tar.gz | tar xz
@@ -305,7 +305,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libexpat.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build metalink
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libmetalink"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libmetalink.a ]; then
   wget -O- https://github.com/metalink-dev/libmetalink/releases/download/release-0.1.3/libmetalink-0.1.3.tar.gz | tar xz
@@ -327,7 +327,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libmetalink.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build zlib
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build zlib"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libz.a ]; then
   wget -O- https://zlib.net/zlib-1.3.1.tar.gz | tar xz
@@ -341,46 +341,10 @@ if [ ! -f "$INSTALL_PATH"/lib/libz.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-# build wget (gnuTLS)
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (gnuTLS)"
 # -----------------------------------------------------------------------------
-echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - 查询开始"
-#export PKG_CONFIG_PATH="$INSTALL_PATH:$INSTALL_PATH/lib:$INSTALL_PATH/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:$PKG_CONFIG_PATH"
-pkg-config --exists gnutls && echo "gnutls 已安装" || echo "gnutls 未安装"
-pkg-config --exists libpsl && echo "libpsl 已安装" || echo "libpsl 未安装"
-pkg-config --exists gmp && echo "gmp 已安装" || echo "gmp 未安装"
-pkg-config --exists nettle && echo "nettle 已安装" || echo "nettle 未安装"
-pkg-config --exists libtasn1 && echo "libtasn1 已安装" || echo "libtasn1 未安装"
-pkg-config --exists libidn2 && echo "libidn2 已安装" || echo "libidn2 未安装"
-pkg-config --exists libunistring && echo "libunistring 已安装" || echo "libunistring 未安装"
-pkg-config --exists libgpg-error && echo "libgpg-error 已安装" || echo "libgpg-error 未安装"
-pkg-config --exists libassuan && echo "libassuan 已安装" || echo "libassuan 未安装"
-pkg-config --exists gpgme && echo "gpgme 已安装" || echo "gpgme 未安装"
-pkg-config --exists expat && echo "expat 已安装" || echo "expat 未安装"
-pkg-config --exists zlib && echo "zlib 已安装" || echo "zlib 未安装"
-pkg-config --exists pcre2 && echo "pcre2 已安装" || echo "pcre2 未安装"
-pkg-config --exists metalink && echo "metalink 已安装" || echo "metalink 未安装"
-pkg-config --exists cares && echo "cares 已安装" || echo "cares 未安装"
-pkg-config --exists libiconv && echo "libiconv 已安装" || echo "libiconv 未安装"
-pkg-config --cflags --libs gnutls
-pkg-config --cflags --libs libpsl
-pkg-config --cflags --libs gmp
-pkg-config --cflags --libs nettle
-pkg-config --cflags --libs libtasn1
-pkg-config --cflags --libs libidn2
-pkg-config --cflags --libs libunistring
-pkg-config --cflags --libs libgpg-error
-pkg-config --cflags --libs libassuan
-pkg-config --cflags --libs gpgme
-pkg-config --cflags --libs expat
-pkg-config --cflags --libs zlib
-pkg-config --cflags --libs pcre2
-pkg-config --cflags --libs metalink
-pkg-config --cflags --libs cares
-pkg-config --cflags --libs libiconv
-pkg-config --list-all
-echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - 查询结束"
 rm -rf wget-*
-wget -q -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
+wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
 cd wget-* || exit
 chmod +x configure
 CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -march=$WGET_ARCH -mtune=generic" \
@@ -396,7 +360,6 @@ CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -D
  METALINK_CFLAGS="-I$INSTALL_PATH/include" \
  METALINK_LIBS="-L$INSTALL_PATH/lib -lmetalink -lexpat" \
  LIBS="-L$INSTALL_PATH/lib -lhogweed -lnettle -lgmp -ltasn1 -lidn2 -lpsl -liphlpapi -lcares -lunistring -liconv -lpcre2-8 -lmetalink -lexpat -lgpgme -lassuan -lgpg-error -lz -lcrypt32 -lpthread" \
- echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - configure"
  ./configure \
  --host=$WGET_MINGW_HOST \
  --prefix="$INSTALL_PATH" \
@@ -411,12 +374,9 @@ CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -D
  --with-metalink \
  --with-gpgme-prefix="$INSTALL_PATH"
 (($? != 0)) && { printf '%s\n' "[wget gnutls] configure failed"; exit 1; }
-echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - make clean"
 make clean
-echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - make"
 make -j$(nproc)
 (($? != 0)) && { printf '%s\n' "[wget gnutls] make failed"; exit 1; }
-echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - install"
 make install
 (($? != 0)) && { printf '%s\n' "[wget gnutls] make install"; exit 1; }
 mkdir "$INSTALL_PATH"/wget-gnutls
