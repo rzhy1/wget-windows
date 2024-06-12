@@ -46,6 +46,3 @@ cd wget-windows
 ./build.sh
 ```
 
-### Notes
-
-Project sponsored by [WebFolder](https://webfolder.io)
