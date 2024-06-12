@@ -343,6 +343,41 @@ fi
 # -----------------------------------------------------------------------------
 # build wget (gnuTLS)
 # -----------------------------------------------------------------------------
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - 查询开始"
+pkg-config --exists gnutls && echo "gnutls 已安装" || echo "gnutls 未安装"
+pkg-config --exists libpsl && echo "libpsl 已安装" || echo "libpsl 未安装"
+pkg-config --exists gmp && echo "gmp 已安装" || echo "gmp 未安装"
+pkg-config --exists nettle && echo "nettle 已安装" || echo "nettle 未安装"
+pkg-config --exists libtasn1 && echo "libtasn1 已安装" || echo "libtasn1 未安装"
+pkg-config --exists libidn2 && echo "libidn2 已安装" || echo "libidn2 未安装"
+pkg-config --exists libunistring && echo "libunistring 已安装" || echo "libunistring 未安装"
+pkg-config --exists libgpg-error && echo "libgpg-error 已安装" || echo "libgpg-error 未安装"
+pkg-config --exists libassuan && echo "libassuan 已安装" || echo "libassuan 未安装"
+pkg-config --exists gpgme && echo "gpgme 已安装" || echo "gpgme 未安装"
+pkg-config --exists expat && echo "expat 已安装" || echo "expat 未安装"
+pkg-config --exists zlib && echo "zlib 已安装" || echo "zlib 未安装"
+pkg-config --exists pcre2 && echo "pcre2 已安装" || echo "pcre2 未安装"
+pkg-config --exists metalink && echo "metalink 已安装" || echo "metalink 未安装"
+pkg-config --exists cares && echo "cares 已安装" || echo "cares 未安装"
+pkg-config --exists libiconv && echo "libiconv 已安装" || echo "libiconv 未安装"
+pkg-config --cflags --libs gnutls
+pkg-config --cflags --libs libpsl
+pkg-config --cflags --libs gmp
+pkg-config --cflags --libs nettle
+pkg-config --cflags --libs libtasn1
+pkg-config --cflags --libs libidn2
+pkg-config --cflags --libs libunistring
+pkg-config --cflags --libs libgpg-error
+pkg-config --cflags --libs libassuan
+pkg-config --cflags --libs gpgme
+pkg-config --cflags --libs expat
+pkg-config --cflags --libs zlib
+pkg-config --cflags --libs pcre2
+pkg-config --cflags --libs metalink
+pkg-config --cflags --libs cares
+pkg-config --cflags --libs libiconv
+pkg-config --list-all
+echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - 查询结束"
 rm -rf wget-*
 wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
 cd wget-* || exit
