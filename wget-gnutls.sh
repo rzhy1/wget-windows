@@ -377,12 +377,6 @@ pkg-config --cflags --libs pcre2
 pkg-config --cflags --libs metalink
 pkg-config --cflags --libs cares
 pkg-config --cflags --libs libiconv
-sudo find / -name "libunistring.pc"
-sudo find / -name "libgpg-error.pc"
-sudo find / -name "pcre2.pc"
-sudo find / -name "metalink.pc"
-sudo find / -name "cares.pc"
-sudo find / -name "libiconv.pc"
 pkg-config --list-all
 echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - 查询结束"
 rm -rf wget-*
@@ -406,7 +400,8 @@ CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -D
  ./configure \
  --host=$WGET_MINGW_HOST \
  --prefix="$INSTALL_PATH" \
- --disable-debug \
+ #--disable-debug \
+ --disable-silent-rules \
  --disable-valgrind-tests \
  --enable-iri \
  --enable-pcre2 \
