@@ -1,7 +1,7 @@
 #
 # wget build script for Windows environment
 # Author: rzhy1
-# 2024/5/6
+# 2024/6/12
 #
 export INSTALL_PATH=$PWD
 export WGET_GCC=x86_64-w64-mingw32-gcc
