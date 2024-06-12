@@ -344,7 +344,7 @@ fi
 # build wget (gnuTLS)
 # -----------------------------------------------------------------------------
 echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - 查询开始"
-export PKG_CONFIG_PATH="$INSTALL_PATH:$INSTALL_PATH/lib:$INSTALL_PATH/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:$PKG_CONFIG_PATH"
+#export PKG_CONFIG_PATH="$INSTALL_PATH:$INSTALL_PATH/lib:$INSTALL_PATH/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:$PKG_CONFIG_PATH"
 pkg-config --exists gnutls && echo "gnutls 已安装" || echo "gnutls 未安装"
 pkg-config --exists libpsl && echo "libpsl 已安装" || echo "libpsl 未安装"
 pkg-config --exists gmp && echo "gmp 已安装" || echo "gmp 未安装"
@@ -380,7 +380,7 @@ pkg-config --cflags --libs libiconv
 pkg-config --list-all
 echo "⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - 查询结束"
 rm -rf wget-*
-wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
+wget -q -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
 cd wget-* || exit
 chmod +x configure
 CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -march=$WGET_ARCH -mtune=generic" \
@@ -400,16 +400,12 @@ CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -D
  ./configure \
  --host=$WGET_MINGW_HOST \
  --prefix="$INSTALL_PATH" \
- #--disable-debug \
- --disable-silent-rules \
+ --disable-debug \
  --disable-valgrind-tests \
  --enable-iri \
  --enable-pcre2 \
  --with-ssl=gnutls \
- --with-libgnutls-prefix="$INSTALL_PATH" \
  --with-included-libunistring \
- --with-libunistring-prefix="$INSTALL_PATH" \
- --with-libiconv-prefix="$INSTALL_PATH" \
  --with-cares \
  --with-libpsl \
  --with-metalink \
