@@ -1,7 +1,5 @@
 # Windows binaries of GNU Wget 1.21.4
 
-[![wget](https://github.com/webfolderio/wget-windows/actions/workflows/wget.yml/badge.svg)](https://github.com/webfolderio/wget-windows/actions/workflows/wget.yml)
-
 This is a command-line tool that can be used to retrieve files via the HTTP, HTTPS, and FTP protocols.
 
 GNU Wget is a free software package that allows users to retrieve files through the most commonly used Internet protocols,
