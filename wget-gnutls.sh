@@ -29,7 +29,7 @@ fi
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build nettle⭐⭐⭐⭐⭐⭐" 
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
-  wget -O- https://ftp.gnu.org/gnu/nettle/nettle-3.9.1.tar.gz | tar xz
+  wget -O- https://ftp.gnu.org/gnu/nettle/nettle-3.10.tar.gz | tar xz
   cd nettle-* || exit
   CFLAGS="-I$INSTALL_PATH/include" \
   LDFLAGS="-L$INSTALL_PATH/lib" \
