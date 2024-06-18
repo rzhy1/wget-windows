@@ -140,7 +140,7 @@ fi
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build c-ares⭐⭐⭐⭐⭐⭐" 
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
-  wget -O- https://github.com/c-ares/c-ares/releases/download/v1.30.0/c-ares-1.30.0.tar.gz | tar xz
+  wget -O- https://github.com/c-ares/c-ares/releases/download/v1.31.0/c-ares-1.31.0.tar.gz | tar xz
   cd c-ares-* || exit
   CPPFLAGS="-DCARES_STATICLIB=1" \
   ./configure \
@@ -242,7 +242,7 @@ fi
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libassuan⭐⭐⭐⭐⭐⭐"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libassuan.a ]; then
-  wget -O- https://gnupg.org/ftp/gcrypt/libassuan/libassuan-2.5.7.tar.bz2 | tar xj
+  wget -O- https://gnupg.org/ftp/gcrypt/libassuan/libassuan-3.0.0.tar.bz2 | tar xj
   cd libassuan-* || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
