@@ -223,7 +223,7 @@ fi
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gpg-error⭐⭐⭐⭐⭐⭐"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libgpg-error.a ]; then
-  wget -O- https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.49.tar.gz | tar xz
+  wget -O- https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.50.tar.gz | tar xz
   cd libgpg-error-* || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
