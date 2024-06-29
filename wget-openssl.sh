@@ -2,7 +2,7 @@
 # wget build script for Windows environment
 # Author: rzhy1
 # 2024/6/12
-find / -name "*crypt32*" 2>/dev/null|| exit 1
+
 export INSTALL_PATH=$PWD
 export WGET_GCC=x86_64-w64-mingw32-gcc
 export WGET_MINGW_HOST=x86_64-w64-mingw32
@@ -256,7 +256,6 @@ if [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
   wget -O- https://www.openssl.org/source/openssl-1.1.1w.tar.gz | tar xz
   cd openssl-* || exit
   ./Configure \
-  --static \
   -static \
   --prefix="$INSTALL_PATH" \
   --cross-compile-prefix=x86_64-w64-mingw32- \
