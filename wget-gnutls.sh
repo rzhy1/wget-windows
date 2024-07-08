@@ -8,6 +8,20 @@ export WGET_GCC=x86_64-w64-mingw32-gcc
 export WGET_MINGW_HOST=x86_64-w64-mingw32
 export WGET_ARCH=x86-64
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
+
+echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build zlib⭐⭐⭐⭐⭐⭐"
+# -----------------------------------------------------------------------------
+if [ ! -f "$INSTALL_PATH"/lib/libz.a ]; then
+  wget -O- https://zlib.net/zlib-1.3.1.tar.gz | tar xz
+  cd zlib-* || exit
+  CC=$WGET_GCC ./configure --64 --static --prefix="$INSTALL_PATH"
+  (($? != 0)) && { printf '%s\n' "[zlib] configure failed"; exit 1; }
+  make -j$(nproc)
+  (($? != 0)) && { printf '%s\n' "[zlib] make failed"; exit 1; }
+  make install
+  (($? != 0)) && { printf '%s\n' "[zlib] make install"; exit 1; }
+  cd ..
+fi
 # -----------------------------------------------------------------------------
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gmp⭐⭐⭐⭐⭐⭐" 
 # -----------------------------------------------------------------------------
@@ -23,26 +37,6 @@ if [ ! -f "$INSTALL_PATH"/lib/libgmp.a ]; then
   (($? != 0)) && { printf '%s\n' "[gmp] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[gmp] make install"; exit 1; }
-  cd ..
-fi
-# -----------------------------------------------------------------------------
-echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build nettle⭐⭐⭐⭐⭐⭐" 
-# -----------------------------------------------------------------------------
-if [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
-  wget -O- https://ftp.gnu.org/gnu/nettle/nettle-3.10.tar.gz | tar xz
-  cd nettle-* || exit
-  CFLAGS="-I$INSTALL_PATH/include" \
-  LDFLAGS="-L$INSTALL_PATH/lib" \
-  ./configure \
-  --host=$WGET_MINGW_HOST \
-  --disable-shared \
-  --disable-documentation \
-  --prefix="$INSTALL_PATH"
-  (($? != 0)) && { printf '%s\n' "[nettle] configure failed"; exit 1; }
-  make -j$(nproc)
-  (($? != 0)) && { printf '%s\n' "[nettle] make failed"; exit 1; }
-  make install
-  (($? != 0)) && { printf '%s\n' "[nettle] make install"; exit 1; }
   cd ..
 fi
 # -----------------------------------------------------------------------------
@@ -63,7 +57,6 @@ if [ ! -f "$INSTALL_PATH"/lib/libtasn1.a ]; then
   (($? != 0)) && { printf '%s\n' "[tasn] make install"; exit 1; }
   cd ..
 fi
-# -----------------------------------------------------------------------------
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libunistring⭐⭐⭐⭐⭐⭐" 
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
@@ -78,6 +71,27 @@ if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
   (($? != 0)) && { printf '%s\n' "[unistring] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[unistring] make install"; exit 1; }
+  cd ..
+fi
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build nettle⭐⭐⭐⭐⭐⭐" 
+# -----------------------------------------------------------------------------
+if [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
+  wget -O- https://ftp.gnu.org/gnu/nettle/nettle-3.10.tar.gz | tar xz
+  cd nettle-* || exit
+  CFLAGS="-I$INSTALL_PATH/include" \
+  LDFLAGS="-L$INSTALL_PATH/lib" \
+  ./configure \
+  --host=$WGET_MINGW_HOST \
+  --disable-shared \
+  --disable-documentation \
+  --prefix="$INSTALL_PATH"
+  (($? != 0)) && { printf '%s\n' "[nettle] configure failed"; exit 1; }
+  make -j$(nproc)
+  (($? != 0)) && { printf '%s\n' "[nettle] make failed"; exit 1; }
+  make install
+  (($? != 0)) && { printf '%s\n' "[nettle] make install"; exit 1; }
   cd ..
 fi
 # -----------------------------------------------------------------------------
@@ -114,6 +128,70 @@ if [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; then
   (($? != 0)) && { printf '%s\n' "[gnutls] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[gnutls] make install"; exit 1; }
+  cd ..
+fi
+# -----------------------------------------------------------------------------
+echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gpg-error⭐⭐⭐⭐⭐⭐"
+# -----------------------------------------------------------------------------
+if [ ! -f "$INSTALL_PATH"/lib/libgpg-error.a ]; then
+  wget -O- https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.50.tar.gz | tar xz
+  cd libgpg-error-* || exit
+  ./configure \
+  --host=$WGET_MINGW_HOST \
+  --disable-shared \
+  --prefix="$INSTALL_PATH" \
+  --enable-static \
+  --disable-doc
+  (($? != 0)) && { printf '%s\n' "[gpg-error] configure failed"; exit 1; }
+  make -j$(nproc)
+  (($? != 0)) && { printf '%s\n' "[gpg-error] make failed"; exit 1; }
+  make install
+  (($? != 0)) && { printf '%s\n' "[gpg-error] make install"; exit 1; }
+  cd ..
+fi
+# -----------------------------------------------------------------------------
+echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libassuan⭐⭐⭐⭐⭐⭐"
+# -----------------------------------------------------------------------------
+if [ ! -f "$INSTALL_PATH"/lib/libassuan.a ]; then
+  wget -O- https://gnupg.org/ftp/gcrypt/libassuan/libassuan-3.0.1.tar.bz2 | tar xj
+  cd libassuan-* || exit
+  ./configure \
+  --host=$WGET_MINGW_HOST \
+  --disable-shared \
+  --prefix="$INSTALL_PATH" \
+  --enable-static \
+  --disable-doc \
+  --with-libgpg-error-prefix="$INSTALL_PATH"
+  (($? != 0)) && { printf '%s\n' "[assuan] configure failed"; exit 1; }
+  make -j$(nproc)
+  (($? != 0)) && { printf '%s\n' "[assuan] make failed"; exit 1; }
+  make install
+  (($? != 0)) && { printf '%s\n' "[assuan] make install"; exit 1; }
+  cd ..
+fi
+# -----------------------------------------------------------------------------
+echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gpgme⭐⭐⭐⭐⭐⭐"
+# -----------------------------------------------------------------------------
+if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
+  wget -O- https://gnupg.org/ftp/gcrypt/gpgme/gpgme-1.23.2.tar.bz2 | tar xj
+  cd gpgme-* || exit
+  env PYTHON=/usr/bin/python3.11 ./configure \
+  --host=$WGET_MINGW_HOST \
+  --disable-shared \
+  --prefix="$INSTALL_PATH" \
+  --enable-static \
+  --with-libgpg-error-prefix="$INSTALL_PATH" \
+  --disable-gpg-test \
+  --disable-g13-test \
+  --disable-gpgsm-test \
+  --disable-gpgconf-test \
+  --disable-glibtest \
+  --with-libassuan-prefix="$INSTALL_PATH"
+  (($? != 0)) && { printf '%s\n' "[gpgme] configure failed"; exit 1; }
+  make -j$(nproc)
+  (($? != 0)) && { printf '%s\n' "[gpgme] make failed"; exit 1; }
+  make install
+  (($? != 0)) && { printf '%s\n' "[gpgme] make install"; exit 1; }
   cd ..
 fi
 # -----------------------------------------------------------------------------
@@ -220,70 +298,6 @@ if [ ! -f "$INSTALL_PATH"/lib/libpcre2-8.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gpg-error⭐⭐⭐⭐⭐⭐"
-# -----------------------------------------------------------------------------
-if [ ! -f "$INSTALL_PATH"/lib/libgpg-error.a ]; then
-  wget -O- https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.50.tar.gz | tar xz
-  cd libgpg-error-* || exit
-  ./configure \
-  --host=$WGET_MINGW_HOST \
-  --disable-shared \
-  --prefix="$INSTALL_PATH" \
-  --enable-static \
-  --disable-doc
-  (($? != 0)) && { printf '%s\n' "[gpg-error] configure failed"; exit 1; }
-  make -j$(nproc)
-  (($? != 0)) && { printf '%s\n' "[gpg-error] make failed"; exit 1; }
-  make install
-  (($? != 0)) && { printf '%s\n' "[gpg-error] make install"; exit 1; }
-  cd ..
-fi
-# -----------------------------------------------------------------------------
-echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libassuan⭐⭐⭐⭐⭐⭐"
-# -----------------------------------------------------------------------------
-if [ ! -f "$INSTALL_PATH"/lib/libassuan.a ]; then
-  wget -O- https://gnupg.org/ftp/gcrypt/libassuan/libassuan-3.0.1.tar.bz2 | tar xj
-  cd libassuan-* || exit
-  ./configure \
-  --host=$WGET_MINGW_HOST \
-  --disable-shared \
-  --prefix="$INSTALL_PATH" \
-  --enable-static \
-  --disable-doc \
-  --with-libgpg-error-prefix="$INSTALL_PATH"
-  (($? != 0)) && { printf '%s\n' "[assuan] configure failed"; exit 1; }
-  make -j$(nproc)
-  (($? != 0)) && { printf '%s\n' "[assuan] make failed"; exit 1; }
-  make install
-  (($? != 0)) && { printf '%s\n' "[assuan] make install"; exit 1; }
-  cd ..
-fi
-# -----------------------------------------------------------------------------
-echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gpgme⭐⭐⭐⭐⭐⭐"
-# -----------------------------------------------------------------------------
-if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
-  wget -O- https://gnupg.org/ftp/gcrypt/gpgme/gpgme-1.23.2.tar.bz2 | tar xj
-  cd gpgme-* || exit
-  env PYTHON=/usr/bin/python3.11 ./configure \
-  --host=$WGET_MINGW_HOST \
-  --disable-shared \
-  --prefix="$INSTALL_PATH" \
-  --enable-static \
-  --with-libgpg-error-prefix="$INSTALL_PATH" \
-  --disable-gpg-test \
-  --disable-g13-test \
-  --disable-gpgsm-test \
-  --disable-gpgconf-test \
-  --disable-glibtest \
-  --with-libassuan-prefix="$INSTALL_PATH"
-  (($? != 0)) && { printf '%s\n' "[gpgme] configure failed"; exit 1; }
-  make -j$(nproc)
-  (($? != 0)) && { printf '%s\n' "[gpgme] make failed"; exit 1; }
-  make install
-  (($? != 0)) && { printf '%s\n' "[gpgme] make install"; exit 1; }
-  cd ..
-fi
-# -----------------------------------------------------------------------------
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build expat⭐⭐⭐⭐⭐⭐"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libexpat.a ]; then
@@ -324,20 +338,6 @@ if [ ! -f "$INSTALL_PATH"/lib/libmetalink.a ]; then
   (($? != 0)) && { printf '%s\n' "[metalink] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[metalink] make install"; exit 1; }
-  cd ..
-fi
-# -----------------------------------------------------------------------------
-echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build zlib⭐⭐⭐⭐⭐⭐"
-# -----------------------------------------------------------------------------
-if [ ! -f "$INSTALL_PATH"/lib/libz.a ]; then
-  wget -O- https://zlib.net/zlib-1.3.1.tar.gz | tar xz
-  cd zlib-* || exit
-  CC=$WGET_GCC ./configure --64 --static --prefix="$INSTALL_PATH"
-  (($? != 0)) && { printf '%s\n' "[zlib] configure failed"; exit 1; }
-  make -j$(nproc)
-  (($? != 0)) && { printf '%s\n' "[zlib] make failed"; exit 1; }
-  make install
-  (($? != 0)) && { printf '%s\n' "[zlib] make install"; exit 1; }
   cd ..
 fi
 # -----------------------------------------------------------------------------
