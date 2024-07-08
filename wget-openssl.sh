@@ -8,27 +8,7 @@ export WGET_GCC=x86_64-w64-mingw32-gcc
 export WGET_MINGW_HOST=x86_64-w64-mingw32
 export WGET_ARCH=x86-64
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
-# -----------------------------------------------------------------------------
-echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libidn2⭐⭐⭐⭐⭐⭐" 
-# -----------------------------------------------------------------------------
-if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
-  wget -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz | tar xz
-  cd libidn2-* || exit
-  ./configure \
-  --host=$WGET_MINGW_HOST \
-  --enable-static \
-  --disable-shared \
-  --disable-doc \
-  --disable-gcc-warnings \
-  --prefix="$INSTALL_PATH"
-  (($? != 0)) && { printf '%s\n' "[idn2] configure failed"; exit 1; }
-  make -j$(nproc)
-  (($? != 0)) && { printf '%s\n' "[idn2] make failed"; exit 1; }
-  make install
-  (($? != 0)) && { printf '%s\n' "[idn2] make install"; exit 1; }
-  cd ..
-fi
-# -----------------------------------------------------------------------------
+
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libunistring⭐⭐⭐⭐⭐⭐" 
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
@@ -83,6 +63,26 @@ if [ ! -f "$INSTALL_PATH"/lib/libiconv.a ]; then
   (($? != 0)) && { printf '%s\n' "[iconv] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[iconv] make install"; exit 1; }
+  cd ..
+fi
+# -----------------------------------------------------------------------------
+echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libidn2⭐⭐⭐⭐⭐⭐" 
+# -----------------------------------------------------------------------------
+if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
+  wget -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz | tar xz
+  cd libidn2-* || exit
+  ./configure \
+  --host=$WGET_MINGW_HOST \
+  --enable-static \
+  --disable-shared \
+  --disable-doc \
+  --disable-gcc-warnings \
+  --prefix="$INSTALL_PATH"
+  (($? != 0)) && { printf '%s\n' "[idn2] configure failed"; exit 1; }
+  make -j$(nproc)
+  (($? != 0)) && { printf '%s\n' "[idn2] make failed"; exit 1; }
+  make install
+  (($? != 0)) && { printf '%s\n' "[idn2] make install"; exit 1; }
   cd ..
 fi
 # -----------------------------------------------------------------------------
