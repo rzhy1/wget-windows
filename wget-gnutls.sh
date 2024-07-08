@@ -94,43 +94,6 @@ if [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
   (($? != 0)) && { printf '%s\n' "[nettle] make install"; exit 1; }
   cd ..
 fi
-# -----------------------------------------------------------------------------
-echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gnutls⭐⭐⭐⭐⭐⭐"
-# -----------------------------------------------------------------------------
-if [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; then
-  wget -O- https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.6.tar.xz | tar x --xz
-  cd gnutls-* || exit
-  PKG_CONFIG_PATH="$INSTALL_PATH/lib/pkgconfig" \
-  CFLAGS="-I$INSTALL_PATH/include" \
-  LDFLAGS="-L$INSTALL_PATH/lib" \
-  GMP_LIBS="-L$INSTALL_PATH/lib -lgmp" \
-  NETTLE_LIBS="-L$INSTALL_PATH/lib -lnettle -lgmp" \
-  HOGWEED_LIBS="-L$INSTALL_PATH/lib -lhogweed -lnettle -lgmp" \
-  LIBTASN1_LIBS="-L$INSTALL_PATH/lib -ltasn1" \
-  LIBIDN2_LIBS="-L$INSTALL_PATH/lib -lidn2" \
-  GMP_CFLAGS=$CFLAGS \
-  LIBTASN1_CFLAGS=$CFLAGS \
-  NETTLE_CFLAGS=$CFLAGS \
-  HOGWEED_CFLAGS=$CFLAGS \
-  LIBIDN2_CFLAGS=$CFLAGS \
-  ./configure \
-  --host=$WGET_MINGW_HOST \
-  --prefix="$INSTALL_PATH" \
-  --with-included-unistring \
-  --disable-openssl-compatibility \
-  --without-p11-kit \
-  --disable-tests \
-  --disable-doc \
-  --disable-shared \
-  --enable-static
-  (($? != 0)) && { printf '%s\n' "[gnutls] configure failed"; exit 1; }
-  make -j$(nproc)
-  (($? != 0)) && { printf '%s\n' "[gnutls] make failed"; exit 1; }
-  make install
-  (($? != 0)) && { printf '%s\n' "[gnutls] make install"; exit 1; }
-  cd ..
-fi
-# -----------------------------------------------------------------------------
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gpg-error⭐⭐⭐⭐⭐⭐"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libgpg-error.a ]; then
@@ -338,6 +301,43 @@ if [ ! -f "$INSTALL_PATH"/lib/libmetalink.a ]; then
   (($? != 0)) && { printf '%s\n' "[metalink] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[metalink] make install"; exit 1; }
+  cd ..
+fi
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gnutls⭐⭐⭐⭐⭐⭐"
+# -----------------------------------------------------------------------------
+if [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; then
+  wget -O- https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.6.tar.xz | tar x --xz
+  cd gnutls-* || exit
+  PKG_CONFIG_PATH="$INSTALL_PATH/lib/pkgconfig" \
+  CFLAGS="-I$INSTALL_PATH/include" \
+  LDFLAGS="-L$INSTALL_PATH/lib" \
+  GMP_LIBS="-L$INSTALL_PATH/lib -lgmp" \
+  NETTLE_LIBS="-L$INSTALL_PATH/lib -lnettle -lgmp" \
+  HOGWEED_LIBS="-L$INSTALL_PATH/lib -lhogweed -lnettle -lgmp" \
+  LIBTASN1_LIBS="-L$INSTALL_PATH/lib -ltasn1" \
+  LIBIDN2_LIBS="-L$INSTALL_PATH/lib -lidn2" \
+  GMP_CFLAGS=$CFLAGS \
+  LIBTASN1_CFLAGS=$CFLAGS \
+  NETTLE_CFLAGS=$CFLAGS \
+  HOGWEED_CFLAGS=$CFLAGS \
+  LIBIDN2_CFLAGS=$CFLAGS \
+  ./configure \
+  --host=$WGET_MINGW_HOST \
+  --prefix="$INSTALL_PATH" \
+  --with-included-unistring \
+  --disable-openssl-compatibility \
+  --without-p11-kit \
+  --disable-tests \
+  --disable-doc \
+  --disable-shared \
+  --enable-static
+  (($? != 0)) && { printf '%s\n' "[gnutls] configure failed"; exit 1; }
+  make -j$(nproc)
+  (($? != 0)) && { printf '%s\n' "[gnutls] make failed"; exit 1; }
+  make install
+  (($? != 0)) && { printf '%s\n' "[gnutls] make install"; exit 1; }
   cd ..
 fi
 # -----------------------------------------------------------------------------
