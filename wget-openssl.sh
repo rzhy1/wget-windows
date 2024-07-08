@@ -9,6 +9,20 @@ export WGET_MINGW_HOST=x86_64-w64-mingw32
 export WGET_ARCH=x86-64
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
 
+echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build zlib⭐⭐⭐⭐⭐⭐"
+# -----------------------------------------------------------------------------
+if [ ! -f "$INSTALL_PATH"/lib/libz.a ]; then
+  wget -O- https://zlib.net/zlib-1.3.1.tar.gz | tar xz
+  cd zlib-* || exit
+  CC=$WGET_GCC ./configure --64 --static --prefix="$INSTALL_PATH"
+  (($? != 0)) && { printf '%s\n' "[zlib] configure failed"; exit 1; }
+  make -j$(nproc)
+  (($? != 0)) && { printf '%s\n' "[zlib] make failed"; exit 1; }
+  make install
+  (($? != 0)) && { printf '%s\n' "[zlib] make install"; exit 1; }
+  cd ..
+fi
+# -----------------------------------------------------------------------------
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libunistring⭐⭐⭐⭐⭐⭐" 
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
@@ -26,34 +40,12 @@ if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build c-ares⭐⭐⭐⭐⭐⭐" 
-# -----------------------------------------------------------------------------
-if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
-  wget -O- https://github.com/c-ares/c-ares/releases/download/v1.32.1/c-ares-1.32.1.tar.gz | tar xz
-  cd c-ares-* || exit
-  CPPFLAGS="-DCARES_STATICLIB=1" \
-  ./configure \
-  --host=$WGET_MINGW_HOST \
-  --disable-shared \
-  --prefix="$INSTALL_PATH" \
-  --enable-static \
-  --disable-tests \
-  --disable-debug
-  (($? != 0)) && { printf '%s\n' "[cares] configure failed"; exit 1; }
-  make -j$(nproc)
-  (($? != 0)) && { printf '%s\n' "[cares] make failed"; exit 1; }
-  make install
-  (($? != 0)) && { printf '%s\n' "[cares] make install"; exit 1; }
-  cd ..
-fi
-# -----------------------------------------------------------------------------
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libiconv⭐⭐⭐⭐⭐⭐"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libiconv.a ]; then
   wget -O- https://ftp.gnu.org/gnu/libiconv/libiconv-1.17.tar.gz | tar xz
   cd libiconv-* || exit
   ./configure \
-  --build=x86_64-pc-linux-gnu
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --prefix="$INSTALL_PATH" \
@@ -237,20 +229,6 @@ if [ ! -f "$INSTALL_PATH"/lib/libmetalink.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build zlib⭐⭐⭐⭐⭐⭐"
-# -----------------------------------------------------------------------------
-if [ ! -f "$INSTALL_PATH"/lib/libz.a ]; then
-  wget -O- https://zlib.net/zlib-1.3.1.tar.gz | tar xz
-  cd zlib-* || exit
-  CC=$WGET_GCC ./configure --64 --static --prefix="$INSTALL_PATH"
-  (($? != 0)) && { printf '%s\n' "[zlib] configure failed"; exit 1; }
-  make -j$(nproc)
-  (($? != 0)) && { printf '%s\n' "[zlib] make failed"; exit 1; }
-  make install
-  (($? != 0)) && { printf '%s\n' "[zlib] make install"; exit 1; }
-  cd ..
-fi
-# -----------------------------------------------------------------------------
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build openssl⭐⭐⭐⭐⭐⭐"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
@@ -269,6 +247,27 @@ if [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
  make -j$(nproc)
  make install_sw
  cd ..
+fi
+# -----------------------------------------------------------------------------
+echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build c-ares⭐⭐⭐⭐⭐⭐" 
+# -----------------------------------------------------------------------------
+if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
+  wget -O- https://github.com/c-ares/c-ares/releases/download/v1.32.1/c-ares-1.32.1.tar.gz | tar xz
+  cd c-ares-* || exit
+  CPPFLAGS="-DCARES_STATICLIB=1" \
+  ./configure \
+  --host=$WGET_MINGW_HOST \
+  --disable-shared \
+  --prefix="$INSTALL_PATH" \
+  --enable-static \
+  --disable-tests \
+  --disable-debug
+  (($? != 0)) && { printf '%s\n' "[cares] configure failed"; exit 1; }
+  make -j$(nproc)
+  (($? != 0)) && { printf '%s\n' "[cares] make failed"; exit 1; }
+  make install
+  (($? != 0)) && { printf '%s\n' "[cares] make install"; exit 1; }
+  cd ..
 fi
 # -----------------------------------------------------------------------------
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (openssl)⭐⭐⭐⭐⭐⭐"
