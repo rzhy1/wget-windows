@@ -73,6 +73,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libiconv.a ]; then
   wget -O- https://ftp.gnu.org/gnu/libiconv/libiconv-1.17.tar.gz | tar xz
   cd libiconv-* || exit
   ./configure \
+  --build=x86_64-pc-linux-gnu
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --prefix="$INSTALL_PATH" \
