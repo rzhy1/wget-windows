@@ -38,8 +38,6 @@ jobs:
           pip install --upgrade setuptools
       - name: Build wget 64-bit with ${{ matrix.ssl }}
         run: |
-          #chmod +x wget-${{ matrix.ssl }}.sh
-          #./wget-${{ matrix.ssl }}.sh
           chmod +x wget-build.sh
           ./wget-build.sh
       - name: Archive ${{ matrix.ssl }}
