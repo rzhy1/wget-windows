@@ -10,7 +10,7 @@ export WGET_ARCH=x86-64
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
 
 # 获取 GitHub Actions workflow 传递的 ssl 变量
-ssl_type="${{ matrix.ssl }}"
+ssl_type="$SSL_TYPE"
 
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build zlib⭐⭐⭐⭐⭐⭐"
 # -----------------------------------------------------------------------------
