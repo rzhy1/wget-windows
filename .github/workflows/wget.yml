@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-24.04
     name: Build wget with ${{ matrix.ssl }}
     env:
-      ssl_type: ${{ matrix.ssl }}
+      SSL_TYPE: ${{ matrix.ssl }}
     steps:
       - uses: actions/checkout@v4
         name: Checkout project
