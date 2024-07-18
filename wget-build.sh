@@ -28,7 +28,7 @@ fi
 # -----------------------------------------------------------------------------
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gmp⭐⭐⭐⭐⭐⭐" 
 # -----------------------------------------------------------------------------
-if [ ! -f "$INSTALL_PATH"/lib/libgmp.a ]; then
+if [[ "$ssl_type" == "gnutls" ]] &&  [ ! -f "$INSTALL_PATH"/lib/libgmp.a ]; then
   wget -nv -O- https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz | tar x --xz
   cd gmp-* || exit
   ./configure \
@@ -45,7 +45,7 @@ fi
 # -----------------------------------------------------------------------------
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libtasn1⭐⭐⭐⭐⭐⭐"
 # -----------------------------------------------------------------------------
-if [ ! -f "$INSTALL_PATH"/lib/libtasn1.a ]; then
+if [[ "$ssl_type" == "gnutls" ]] &&  [ ! -f "$INSTALL_PATH"/lib/libtasn1.a ]; then
   wget -O- https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.19.0.tar.gz | tar xz
   cd libtasn1-* || exit
   ./configure \
@@ -80,7 +80,7 @@ fi
 # -----------------------------------------------------------------------------
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build nettle⭐⭐⭐⭐⭐⭐" 
 # -----------------------------------------------------------------------------
-if [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
+if [[ "$ssl_type" == "gnutls" ]] &&  [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
   wget -O- https://ftp.gnu.org/gnu/nettle/nettle-3.10.tar.gz | tar xz
   cd nettle-* || exit
   CFLAGS="-I$INSTALL_PATH/include" \
