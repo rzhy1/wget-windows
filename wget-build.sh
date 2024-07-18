@@ -43,41 +43,6 @@ if [[ "$ssl_type" == "gnutls" ]] &&  [ ! -f "$INSTALL_PATH"/lib/libgmp.a ]; then
   cd ..
 fi
 # -----------------------------------------------------------------------------
-echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libtasn1⭐⭐⭐⭐⭐⭐"
-# -----------------------------------------------------------------------------
-if [[ "$ssl_type" == "gnutls" ]] &&  [ ! -f "$INSTALL_PATH"/lib/libtasn1.a ]; then
-  wget -O- https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.19.0.tar.gz | tar xz
-  cd libtasn1-* || exit
-  ./configure \
-   --host=$WGET_MINGW_HOST \
-   --disable-shared \
-   --disable-doc \
-   --prefix="$INSTALL_PATH"
-  (($? != 0)) && { printf '%s\n' "[tasn] configure failed"; exit 1; }
-  make -j$(nproc)
-  (($? != 0)) && { printf '%s\n' "[tasn] make failed"; exit 1; }
-  make install
-  (($? != 0)) && { printf '%s\n' "[tasn] make install"; exit 1; }
-  cd ..
-fi
-echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libunistring⭐⭐⭐⭐⭐⭐" 
-# -----------------------------------------------------------------------------
-if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
-  wget -O- https://ftp.gnu.org/gnu/libunistring/libunistring-1.2.tar.gz | tar xz
-  cd libunistring-* || exit
-  ./configure \
-  --host=$WGET_MINGW_HOST \
-  --disable-shared \
-  --prefix="$INSTALL_PATH"
-  (($? != 0)) && { printf '%s\n' "[unistring] configure failed"; exit 1; }
-  make -j$(nproc)
-  (($? != 0)) && { printf '%s\n' "[unistring] make failed"; exit 1; }
-  make install
-  (($? != 0)) && { printf '%s\n' "[unistring] make install"; exit 1; }
-  cd ..
-fi
-# -----------------------------------------------------------------------------
-# -----------------------------------------------------------------------------
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build nettle⭐⭐⭐⭐⭐⭐" 
 # -----------------------------------------------------------------------------
 if [[ "$ssl_type" == "gnutls" ]] &&  [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
@@ -97,6 +62,42 @@ if [[ "$ssl_type" == "gnutls" ]] &&  [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; t
   (($? != 0)) && { printf '%s\n' "[nettle] make install"; exit 1; }
   cd ..
 fi
+# -----------------------------------------------------------------------------
+echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libtasn1⭐⭐⭐⭐⭐⭐"
+# -----------------------------------------------------------------------------
+if [[ "$ssl_type" == "gnutls" ]] &&  [ ! -f "$INSTALL_PATH"/lib/libtasn1.a ]; then
+  wget -O- https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.19.0.tar.gz | tar xz
+  cd libtasn1-* || exit
+  ./configure \
+   --host=$WGET_MINGW_HOST \
+   --disable-shared \
+   --disable-doc \
+   --prefix="$INSTALL_PATH"
+  (($? != 0)) && { printf '%s\n' "[tasn] configure failed"; exit 1; }
+  make -j$(nproc)
+  (($? != 0)) && { printf '%s\n' "[tasn] make failed"; exit 1; }
+  make install
+  (($? != 0)) && { printf '%s\n' "[tasn] make install"; exit 1; }
+  cd ..
+fi
+# -----------------------------------------------------------------------------
+echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libunistring⭐⭐⭐⭐⭐⭐" 
+# -----------------------------------------------------------------------------
+if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
+  wget -O- https://ftp.gnu.org/gnu/libunistring/libunistring-1.2.tar.gz | tar xz
+  cd libunistring-* || exit
+  ./configure \
+  --host=$WGET_MINGW_HOST \
+  --disable-shared \
+  --prefix="$INSTALL_PATH"
+  (($? != 0)) && { printf '%s\n' "[unistring] configure failed"; exit 1; }
+  make -j$(nproc)
+  (($? != 0)) && { printf '%s\n' "[unistring] make failed"; exit 1; }
+  make install
+  (($? != 0)) && { printf '%s\n' "[unistring] make install"; exit 1; }
+  cd ..
+fi
+# -----------------------------------------------------------------------------
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gpg-error⭐⭐⭐⭐⭐⭐"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libgpg-error.a ]; then
