@@ -1,4 +1,5 @@
-name: build wget
+name: Build wget
+
 on:
   workflow_dispatch:
   push:
@@ -12,11 +13,15 @@ on:
       - v*
   schedule:
     - cron: "0 0 * * *"
-    
+
 jobs:
-  build_gnutls:
-    name: Build wget with GnuTLS
+  build:
+    strategy:
+      matrix:
+        ssl: [gnutls, openssl]
+      fail-fast: false
     runs-on: ubuntu-24.04
+    name: Build wget with ${{ matrix.ssl }}
     steps:
       - uses: actions/checkout@v4
         name: Checkout project
@@ -29,57 +34,20 @@ jobs:
           source myenv/bin/activate
           pip install setuptools
           pip install --upgrade setuptools
-          #sudo apt upgrade
-          #sudo apt full-upgrade
-      - name: Build wget 64-bit with GnuTLS
+      - name: Build wget 64-bit with ${{ matrix.ssl }}
         run: |
-          chmod +x wget-gnutls.sh
-          ./wget-gnutls.sh
-      - name: Archive gnutls
+          chmod +x wget-${{ matrix.ssl }}.sh
+          ./wget-${{ matrix.ssl }}.sh
+      - name: Archive ${{ matrix.ssl }}
         uses: actions/upload-artifact@v4
         with:
-          name: wget-64bit-GnuTLS
-          path: wget-gnutls/wget-gnutls-x64.exe
-      - name: Create GnuTLS Release  
+          name: wget-64bit-${{ matrix.ssl }}
+          path: wget-${{ matrix.ssl }}/wget-${{ matrix.ssl }}-x64.exe
+      - name: Create ${{ matrix.ssl }} Release  
         uses: ncipollo/release-action@v1 
         with:
           tag: 1.21.4
           allowUpdates: true
-          artifacts: "wget-gnutls/wget-gnutls-x64.exe"
-          bodyFile: "RELEASE.md"
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-  build_openssl:
-    name: Build wget with OpenSSL
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-        name: Checkout project
-      - name: Install prerequisites
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
-          sudo apt-get install -y make m4 pkg-config automake gettext gperf python3-venv
-          python3 -m venv myenv
-          source myenv/bin/activate
-          pip install setuptools
-          pip install --upgrade setuptools
-          #sudo apt upgrade
-          #sudo apt full-upgrade
-      - name: Build wget 64-bit with OpenSSL
-        run: |
-          chmod +x wget-openssl.sh
-          ./wget-openssl.sh
-      - name: Archive openssl
-        uses: actions/upload-artifact@v4
-        with:
-          name: wget-64bit-OpenSSL
-          path: wget-openssl/wget-openssl-x64.exe
-      - name: Create OpenSSL Release  
-        uses: ncipollo/release-action@v1 
-        with:
-          tag: 1.21.4
-          allowUpdates: true
-          artifacts: "wget-openssl/wget-openssl-x64.exe"
+          artifacts: "wget-${{ matrix.ssl }}/wget-${{ matrix.ssl }}-x64.exe"
           bodyFile: "RELEASE.md"
           token: ${{ secrets.GITHUB_TOKEN }}
