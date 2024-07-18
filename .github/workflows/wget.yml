@@ -22,6 +22,11 @@ jobs:
       fail-fast: false
     runs-on: ubuntu-24.04
     name: Build wget with ${{ matrix.ssl }}
+    env:
+      ssl_type: ${{ matrix.ssl }}
+    defaults:
+      run:
+        shell: msys2 {0}
     steps:
       - uses: actions/checkout@v4
         name: Checkout project
