@@ -204,9 +204,10 @@ fi
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libidn2⭐⭐⭐⭐⭐⭐" 
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
-  wget -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz | tar xz
+  wget -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz | tar xz
   cd libidn2-* || exit
   ./configure \
+  --build=x86_64-pc-linux-gnu \
   --host=$WGET_MINGW_HOST \
   --enable-static \
   --disable-shared \
@@ -236,7 +237,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libpsl.a ]; then
   --prefix="$INSTALL_PATH" \
   --enable-static \
   --disable-gtk-doc \
-  --enable-builtin=libidn2 \
+  --enable-builtin \
   --enable-runtime=libidn2 \
   --with-libiconv-prefix="$INSTALL_PATH"
   (($? != 0)) && { printf '%s\n' "[psl] configure failed"; exit 1; }
