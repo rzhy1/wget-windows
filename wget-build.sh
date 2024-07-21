@@ -204,10 +204,9 @@ fi
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libidn2⭐⭐⭐⭐⭐⭐" 
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
-  wget -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz | tar xz
+  wget -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz | tar xz
   cd libidn2-* || exit
   ./configure \
-  --build=x86_64-pc-linux-gnu \
   --host=$WGET_MINGW_HOST \
   --enable-static \
   --disable-shared \
@@ -372,7 +371,6 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   rm -rf wget-*
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
   cd wget-* || exit
-  sed -i 's/^/#include <fcntl.h>\n/' lib/fcntl.c || exit
   chmod +x configure
   CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -march=$WGET_ARCH -mtune=generic" \
    LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc" \
@@ -415,7 +413,6 @@ else
   rm -rf wget-*
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
   cd wget-* || exit
-  sed -i 's/^/#include <fcntl.h>\n/' lib/fcntl.c || exit
   chmod +x configure
   # cp ../windows-openssl.diff .
   # patch src/openssl.c < windows-openssl.diff
