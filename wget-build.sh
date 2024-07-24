@@ -419,7 +419,7 @@ else
   CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -pipe -march=$WGET_ARCH -mtune=generic" \
    LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc" \
    OPENSSL_CFLAGS=$CFLAGS \
-   OPENSSL_LIBS="-L$INSTALL_PATH/lib64 -lcrypto -lssl -L -lz" \
+   OPENSSL_LIBS="-L$INSTALL_PATH/lib64 -lcrypto -lssl -lbcrypt -L -lz" \
    LIBPSL_CFLAGS=$CFLAGS \
    LIBPSL_LIBS="-L$INSTALL_PATH/lib -lpsl" \
    CARES_CFLAGS=$CFLAGS \
