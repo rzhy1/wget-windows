@@ -429,8 +429,7 @@ else
    PCRE2_LIBS="-L$INSTALL_PATH/lib -lpcre2-8"  \
    METALINK_CFLAGS="-I$INSTALL_PATH/include" \
    METALINK_LIBS="-L$INSTALL_PATH/lib -lmetalink -lexpat" \
-   LIBS="-L$INSTALL_PATH/lib -lidn2 -lpsl -liphlpapi -lcares -lunistring -liconv -lpcre2-8 -lmetalink -lexpat -lgpgme -lassuan -lgpg-error -lcrypto -lssl -lz -lcrypt32" \
-   CC=$WGET_GCC \
+   LIBS="-L$INSTALL_PATH/lib -lunistring -liconv -lcares -liphlpapi -lpcre2-8 -lmetalink -lexpat -lgpgme -lassuan -lgpg-error -lz -lcrypt32 -lidn2 -lpsl -lcrypto -lssl"
    ./configure \
    --host=$WGET_MINGW_HOST \
    --prefix="$INSTALL_PATH" \
