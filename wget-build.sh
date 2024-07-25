@@ -417,7 +417,7 @@ else
   chmod +x configure
   # cp ../windows-openssl.diff .
   # patch src/openssl.c < windows-openssl.diff
-  CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -pipe -march=$WGET_ARCH -mtune=generic" \
+   CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -pipe -march=$WGET_ARCH -mtune=generic" \
    LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc" \
    OPENSSL_CFLAGS=$CFLAGS \
    OPENSSL_LIBS="-L$INSTALL_PATH/lib64 -lcrypto -lssl -lbcrypt -lz" \
@@ -429,8 +429,8 @@ else
    PCRE2_LIBS="-L$INSTALL_PATH/lib -lpcre2-8"  \
    METALINK_CFLAGS="-I$INSTALL_PATH/include" \
    METALINK_LIBS="-L$INSTALL_PATH/lib -lmetalink -lexpat" \
-  LIBS="-L$INSTALL_PATH/lib -liconv -lidn2 -lpsl -liphlpapi -lcares -lunistring -lpcre2-8 -lmetalink -lexpat -lgpgme -lassuan -lgpg-error -lcrypto -lssl -lz -lcrypt32 -libintl" \
-   ./configure \
+   LIBS="-L$INSTALL_PATH/lib -lidn2 -lpsl -liphlpapi -lcares -lunistring -liconv -lpcre2-8 -lmetalink -lexpat -lgpgme -lassuan -lgpg-error -lcrypto -lssl -lz -lcrypt32" \
+  ./configure \
    --host=$WGET_MINGW_HOST \
    --prefix="$INSTALL_PATH" \
    --disable-debug \
