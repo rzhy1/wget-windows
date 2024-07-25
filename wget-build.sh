@@ -414,6 +414,7 @@ else
   rm -rf wget-*
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
   cd wget-* || exit
+  which x86_64-w64-mingw32-gcc
   chmod +x configure
   # cp ../windows-openssl.diff .
   # patch src/openssl.c < windows-openssl.diff
