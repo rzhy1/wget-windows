@@ -385,7 +385,7 @@ if [[ "$ssl_type" == "gnutls" ]]; then
    PCRE2_LIBS="-L$INSTALL_PATH/lib -lpcre2-8"  \
    METALINK_CFLAGS="-I$INSTALL_PATH/include" \
    METALINK_LIBS="-L$INSTALL_PATH/lib -lmetalink -lexpat" \
-   LIBS="-L$INSTALL_PATH/lib -lidn2 -lpsl -liphlpapi -lcares -lunistring -liconv -lpcre2-8 -lmetalink -lexpat -lgpgme -lassuan -lgpg-error -lcrypto -lssl -lz -lcrypt32" \
+   LIBS="-L$INSTALL_PATH/lib -lhogweed -lnettle -lgmp -ltasn1 -lidn2 -lpsl -liphlpapi -lcares -lunistring -liconv -lpcre2-8 -lmetalink -lexpat -lgpgme -lassuan -lgpg-error -lz -lcrypt32 -lpthread" \
    ./configure \
    --host=$WGET_MINGW_HOST \
    --prefix="$INSTALL_PATH" \
@@ -429,7 +429,7 @@ else
    PCRE2_LIBS="-L$INSTALL_PATH/lib -lpcre2-8"  \
    METALINK_CFLAGS="-I$INSTALL_PATH/include" \
    METALINK_LIBS="-L$INSTALL_PATH/lib -lmetalink -lexpat" \
-   LIBS="-L$INSTALL_PATH/lib -lunistring -liconv -lidn2 -lpsl -liphlpapi -lcares -lpcre2-8 -lgpg-error -lassuan -lgpgme -lexpat -lmetalink -lcrypto -lssl -lz -lcrypt32" \
+  LIBS="-L$INSTALL_PATH/lib -liconv -lidn2 -lpsl -liphlpapi -lcares -lunistring -lpcre2-8 -lmetalink -lexpat -lgpgme -lassuan -lgpg-error -lcrypto -lssl -lz -lcrypt32 -libintl" \
    ./configure \
    --host=$WGET_MINGW_HOST \
    --prefix="$INSTALL_PATH" \
