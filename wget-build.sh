@@ -370,7 +370,7 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (gnuTLS)⭐⭐⭐⭐⭐⭐"
   # -----------------------------------------------------------------------------
   rm -rf wget-*
-  wget -O- https://ftp.gnu.org/gnu/wget/wget-1.24.5.tar.gz | tar xz
+  wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
   cd wget-* || exit
   chmod +x configure
   CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -pipe -march=$WGET_ARCH -mtune=generic" \
