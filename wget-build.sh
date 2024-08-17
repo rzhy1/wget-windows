@@ -344,7 +344,7 @@ if [[ "$ssl_type" == "gnutls" ]] && [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; th
   --disable-shared \
   --enable-static 
   (($? != 0)) && { printf '%s\n' "[gnutls] configure failed"; exit 1; }
-  make -j8
+  make -j16
   (($? != 0)) && { printf '%s\n' "[gnutls] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[gnutls] make install"; exit 1; }
@@ -407,7 +407,7 @@ if [[ "$ssl_type" == "gnutls" ]]; then
    --with-gpgme-prefix="$INSTALL_PATH"
   (($? != 0)) && { printf '%s\n' "[wget gnutls] configure failed"; exit 1; }
   make clean
-  make -j$(nproc)
+  make -j16
   (($? != 0)) && { printf '%s\n' "[wget gnutls] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[wget gnutls] make install"; exit 1; }
@@ -450,7 +450,7 @@ else
    --with-metalink \
    --with-gpgme-prefix="$INSTALL_PATH"
   (($? != 0)) && { printf '%s\n' "[wget openssl] configure failed"; exit 1; }
-  make -j$(nproc)
+  make -j16
   (($? != 0)) && { printf '%s\n' "[wget openssl] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[wget openssl] make install"; exit 1; }
