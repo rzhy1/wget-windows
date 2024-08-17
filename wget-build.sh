@@ -332,13 +332,19 @@ if [[ "$ssl_type" == "gnutls" ]] && [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; th
   --prefix="$INSTALL_PATH" \
   --with-included-unistring \
   --disable-openssl-compatibility \
+  --disable-hardware-acceleration \
   --without-p11-kit \
   --disable-tests \
   --disable-doc \
+  --disable-full-test-suite \
+  --disable-tools \
+  --disable-cxx \
+  --disable-maintainer-mode \
+  --disable-libdane \
   --disable-shared \
-  --enable-static
+  --enable-static 
   (($? != 0)) && { printf '%s\n' "[gnutls] configure failed"; exit 1; }
-  make -j$(nproc)
+  make -j8
   (($? != 0)) && { printf '%s\n' "[gnutls] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[gnutls] make install"; exit 1; }
