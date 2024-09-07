@@ -20,7 +20,7 @@ jobs:
       matrix:
         ssl: [gnutls, openssl]
       fail-fast: false
-    runs-on: ubuntu-24.10
+    runs-on: ubuntu-24.04
     name: Build wget with ${{ matrix.ssl }}
     env:
       SSL_TYPE: ${{ matrix.ssl }}
