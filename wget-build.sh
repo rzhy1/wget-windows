@@ -84,7 +84,7 @@ fi
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libunistring⭐⭐⭐⭐⭐⭐" 
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
-  wget -O- https://ftp.gnu.org/gnu/libunistring/libunistring-1.2.tar.gz | tar xz
+  wget -O- https://ftp.gnu.org/gnu/libunistring/libunistring-1.3.tar.gz | tar xz
   cd libunistring-* || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
