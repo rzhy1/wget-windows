@@ -21,8 +21,6 @@ jobs:
         ssl: [gnutls, openssl]
       fail-fast: false
     runs-on: ubuntu-24.04
-    container:
-      image: ubuntu:24.10
     name: Build wget with ${{ matrix.ssl }}
     env:
       SSL_TYPE: ${{ matrix.ssl }}
@@ -32,12 +30,12 @@ jobs:
 
       - name: Install prerequisites
         run: |
-          apt-get update
-          apt-get install -y mingw-w64 mingw-w64-tools gcc wget
-          apt-get install -y make m4 pkg-config automake gettext gperf python3-venv
-          python3 -m venv myenv && \
-          . myenv/bin/activate && \
-          pip install setuptools && \
+          sudo apt-get update
+          sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
+          sudo apt-get install -y make m4 pkg-config automake gettext gperf python3-venv
+          python3 -m venv myenv
+          source myenv/bin/activate
+          pip install setuptools
           pip install --upgrade setuptools
 
       - name: Build wget 64-bit with ${{ matrix.ssl }}
