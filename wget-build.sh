@@ -140,7 +140,7 @@ fi
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gpgme⭐⭐⭐⭐⭐⭐"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
-  wget -O- https://gnupg.org/ftp/gcrypt/gpgme/gpgme-1.23.2.tar.bz2 | tar xj
+  wget -O- https://gnupg.org/ftp/gcrypt/gpgme/gpgme-1.24.0.tar.bz2 | tar xj
   cd gpgme-* || exit
   env PYTHON=/usr/bin/python3.11 ./configure \
   --host=$WGET_MINGW_HOST \
