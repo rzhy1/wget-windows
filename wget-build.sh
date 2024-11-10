@@ -165,7 +165,7 @@ fi
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build c-ares⭐⭐⭐⭐⭐⭐" 
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
-  wget -O- https://github.com/c-ares/c-ares/releases/download/v1.34.2/c-ares-1.34.2.tar.gz | tar xz
+  wget -O- https://github.com/c-ares/c-ares/releases/download/v1.34.3/c-ares-1.34.3.tar.gz | tar xz
   cd c-ares-* || exit
   CPPFLAGS="-DCARES_STATICLIB=1" \
   ./configure \
