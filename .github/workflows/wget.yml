@@ -32,7 +32,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
-          sudo apt-get install -y make m4 pkg-config automake gettext gperf python3-venv
+          sudo apt-get install -y make m4 pkg-config automake gettext autopoint gperf python3-venv
           python3 -m venv myenv
           source myenv/bin/activate
           pip install setuptools
