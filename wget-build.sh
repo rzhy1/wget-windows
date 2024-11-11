@@ -11,7 +11,11 @@ export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
 
 # 获取 GitHub Actions workflow 传递的 ssl 变量
 ssl_type="$SSL_TYPE"
-
+git clone -j$(nproc)  https://gitlab.com/gnuwget/wget.git wget-1.25.0
+cd wget-* || exit 1
+echo "Listing files in $(pwd):"
+ls -la
+bash .bootstrap || exit 1
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build zlib⭐⭐⭐⭐⭐⭐"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libz.a ]; then
