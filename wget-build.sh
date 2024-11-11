@@ -376,8 +376,10 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (gnuTLS)⭐⭐⭐⭐⭐⭐"
   # -----------------------------------------------------------------------------
   rm -rf wget-*
-  wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
-  cd wget-* || exit
+  #wget -O- https://ftp.gnu.org/gnu/wget/wget-1.24.5.tar.gz | tar xz
+  git clone -j$(nproc)  https://gitlab.com/gnuwget/wget.git wget-1.25.0
+  cd wget-* || exit 1
+  bash .bootstrap || exit 1
   chmod +x configure
   CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O3 -pipe -march=$WGET_ARCH -mtune=generic" \
    LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc" \
@@ -418,8 +420,10 @@ else
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (openssl)⭐⭐⭐⭐⭐⭐"
   # -----------------------------------------------------------------------------
   rm -rf wget-*
-  wget -O- https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
-  cd wget-* || exit
+  #wget -O- https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
+  git clone -j$(nproc)  https://gitlab.com/gnuwget/wget.git wget-1.25.0
+  cd wget-* || exit 1
+  bash .bootstrap || exit 1
   chmod +x configure
   # cp ../windows-openssl.diff .
   # patch src/openssl.c < windows-openssl.diff
