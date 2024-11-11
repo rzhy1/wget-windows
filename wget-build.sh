@@ -418,7 +418,7 @@ else
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (openssl)⭐⭐⭐⭐⭐⭐"
   # -----------------------------------------------------------------------------
   rm -rf wget-*
-  wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
+  wget -O- https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
   cd wget-* || exit
   chmod +x configure
   # cp ../windows-openssl.diff .
