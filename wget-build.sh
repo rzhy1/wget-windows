@@ -11,11 +11,7 @@ export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
 
 # 获取 GitHub Actions workflow 传递的 ssl 变量
 ssl_type="$SSL_TYPE"
-git clone -j$(nproc)  https://gitlab.com/gnuwget/wget.git wget-1.25.0
-cd wget-1.25.0 || exit 1
-echo "Listing files in $(pwd):"
-ls -la
-bash bootstrap || exit 1
+
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build zlib⭐⭐⭐⭐⭐⭐"
 # -----------------------------------------------------------------------------
 if [ ! -f "$INSTALL_PATH"/lib/libz.a ]; then
@@ -382,8 +378,8 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   rm -rf wget-*
   #wget -O- https://ftp.gnu.org/gnu/wget/wget-1.24.5.tar.gz | tar xz
   git clone -j$(nproc)  https://gitlab.com/gnuwget/wget.git wget-1.25.0
-  cd wget-* || exit 1
-  bash ./bootstrap --skip-po || exit 1
+  cd wget-1.25.0 || exit 1
+  bash bootstrap || exit 1
   chmod +x configure
   CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O3 -pipe -march=$WGET_ARCH -mtune=generic" \
    LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc" \
@@ -426,8 +422,8 @@ else
   rm -rf wget-*
   #wget -O- https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
   git clone -j$(nproc)  https://gitlab.com/gnuwget/wget.git wget-1.25.0
-  cd wget-* || exit 1
-  bash ./bootstrap --skip-po || exit 1
+  cd wget-1.25.0 || exit 1
+  bash bootstrap || exit 1
   chmod +x configure
   # cp ../windows-openssl.diff .
   # patch src/openssl.c < windows-openssl.diff
