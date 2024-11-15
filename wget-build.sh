@@ -89,7 +89,9 @@ if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
-  --prefix="$INSTALL_PATH"
+  --prefix="$INSTALL_PATH" \
+  CFLAGS="-O2 -g0 -flto=$(nproc)" \
+  CXXFLAGS="-O2 -g0 -flto=$(nproc)"
   (($? != 0)) && { printf '%s\n' "[unistring] configure failed"; exit 1; }
   make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[unistring] make failed"; exit 1; }
