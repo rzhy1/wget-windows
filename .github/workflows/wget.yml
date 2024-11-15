@@ -37,10 +37,11 @@ jobs:
           source myenv/bin/activate
           pip install setuptools
           pip install --upgrade setuptools
+          curl -SLf -o "/tmp/mingw-w64-x86_64-toolchain.zip" "https://github.com/rzhy1/build-mingw-w64/releases/download/mingw-w64/mingw-w64-x86_64-toolchain.zip"
+          unzip -o "/tmp/mingw-w64-x86_64-toolchain.zip" -d "/usr/"
           x86_64-w64-mingw32-gcc --version
           which x86_64-w64-mingw32-gcc
           whereis x86_64-w64-mingw32-gcc
-          sudo find / -type f -name "x86_64-w64-mingw32-gcc"
 
       - name: Build wget 64-bit with ${{ matrix.ssl }}
         run: |
