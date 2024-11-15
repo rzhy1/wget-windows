@@ -13,9 +13,9 @@
 | libiconv      | 1.17                 | 1.17                  |
 | libpsl        | 0.21.5               | 0.21.5                |
 | pcre2         | 10.44                | 10.44                 |
-| libgpg-error  | 1.50                 | 1.50                  |
+| libgpg-error  | 1.51                 | 1.51                  |
 | libassuan     | 3.0.1                | 3.0.1                 |
-| gpgme         | 1.23.2               | 1.23.2                |
+| gpgme         | 1.24.0               | 1.24.0                |
 | expat         | 2.6.4                | 2.6.4                 |
 | libmetalink   | 0.1.3                | 0.1.3                 |
 | zlib          | 1.3.1                | 1.3.1                 |
