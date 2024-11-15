@@ -37,8 +37,8 @@ jobs:
           source myenv/bin/activate
           pip install setuptools
           pip install --upgrade setuptools
-          curl -SLf -o "/tmp/x86_64-w64-mingw32.tar.xz" "https://github.com/rzhy1/musl-cross/releases/download/mingw-w64/x86_64-w64-mingw32.tar.xz"
-          sudo tar -xf "/tmp/x86_64-w64-mingw32.tar.xz" --strip-components=1 -C /usr/
+          #curl -SLf -o "/tmp/x86_64-w64-mingw32.tar.xz" "https://github.com/rzhy1/musl-cross/releases/download/mingw-w64/x86_64-w64-mingw32.tar.xz"
+          #sudo tar -xf "/tmp/x86_64-w64-mingw32.tar.xz" --strip-components=1 -C /usr/
           x86_64-w64-mingw32-gcc --version
           which x86_64-w64-mingw32-gcc
           whereis x86_64-w64-mingw32-gcc
