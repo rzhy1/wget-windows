@@ -90,8 +90,8 @@ if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --prefix="$INSTALL_PATH" \
-  CFLAGS="-O2 -g0" \
-  CXXFLAGS="-O2 -g0"
+  CFLAGS="-O2 -g0 -flto=$(nproc)" \
+  CXXFLAGS="-O2 -g0 -flto=$(nproc)"
   (($? != 0)) && { printf '%s\n' "[unistring] configure failed"; exit 1; }
   make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[unistring] make failed"; exit 1; }
@@ -425,7 +425,7 @@ else
   chmod +x configure
   # cp ../windows-openssl.diff .
   # patch src/openssl.c < windows-openssl.diff
-   CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -pipe -march=$WGET_ARCH -mtune=generic -flto=$(nproc)" \
+   CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -pipe -march=$WGET_ARCH -mtune=generic" \
    LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc" \
    OPENSSL_CFLAGS=$CFLAGS \
    OPENSSL_LIBS="-L$INSTALL_PATH/lib64 -lcrypto -lssl -lbcrypt -lz" \
