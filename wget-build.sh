@@ -354,8 +354,8 @@ fi
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build openssl⭐⭐⭐⭐⭐⭐"
 # -----------------------------------------------------------------------------
 if [[ "$ssl_type" == "openssl" ]] && [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
-  #wget -O- https://github.com/openssl/openssl/releases/download/openssl-3.4.0-alpha1/openssl-3.4.0-alpha1.tar.gz | tar xz
-  wget -O- https://openssl.org/source/old/1.1.1/openssl-1.1.1w.tar.gz | tar xz
+  wget -O- https://github.com/openssl/openssl/releases/download/openssl-3.4.0-alpha1/openssl-3.4.0-alpha1.tar.gz | tar xz
+  #wget -O- https://openssl.org/source/old/1.1.1/openssl-1.1.1w.tar.gz | tar xz
   cd openssl-* || exit
   ./Configure \
   -static \
@@ -376,7 +376,7 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (gnuTLS)⭐⭐⭐⭐⭐⭐"
   # -----------------------------------------------------------------------------
   rm -rf wget-*
-  wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
+  wget -O- https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
   cd wget-* || exit 1
   chmod +x configure
   CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O3 -pipe -march=$WGET_ARCH -mtune=generic" \
@@ -418,7 +418,7 @@ else
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (openssl)⭐⭐⭐⭐⭐⭐"
   # -----------------------------------------------------------------------------
   rm -rf wget-*
-  wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
+  wget -O- https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
   cd wget-* || exit 1
   #git clone -j$(nproc)  https://gitlab.com/gnuwget/wget.git wget-1.25.0
   #cd wget-1.25.0 || exit 1
