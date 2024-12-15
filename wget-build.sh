@@ -217,7 +217,7 @@ echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libiconv⭐�
 # -----------------------------------------------------------------------------
 start_time=$(date +%s.%N)
 if [ ! -f "$INSTALL_PATH"/lib/libiconv.a ]; then
-  wget -O- https://ftp.gnu.org/gnu/libiconv/libiconv-1.17.tar.gz | tar xz
+  wget -O- https://ftp.gnu.org/gnu/libiconv/libiconv-1.18.tar.gz | tar xz
   cd libiconv-* || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
