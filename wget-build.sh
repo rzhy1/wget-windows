@@ -290,7 +290,7 @@ echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build pcre2⭐⭐�
 # -----------------------------------------------------------------------------
 start_time=$(date +%s.%N)
 if [ ! -f "$INSTALL_PATH"/lib/libpcre2-8.a ]; then
-  wget -O- https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.45-RC1/pcre2-10.45-RC1.tar.gz | tar xz
+  wget -O- https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.45/pcre2-10.45.tar.gz | tar xz
   cd pcre2-* || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
