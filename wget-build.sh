@@ -77,7 +77,7 @@ echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libtasn1⭐�
 # -----------------------------------------------------------------------------
 start_time=$(date +%s.%N)
 if [[ "$ssl_type" == "gnutls" ]] &&  [ ! -f "$INSTALL_PATH"/lib/libtasn1.a ]; then
-  wget -O- https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.19.0.tar.gz | tar xz
+  wget -O- https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.20.0.tar.gz | tar xz
   cd libtasn1-* || exit
   ./configure \
    --host=$WGET_MINGW_HOST \
