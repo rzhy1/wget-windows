@@ -8,6 +8,7 @@ export WGET_GCC=x86_64-w64-mingw32-gcc
 export WGET_MINGW_HOST=x86_64-w64-mingw32
 export WGET_ARCH=x86-64
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
+LDFLAGS="-flto=$(nproc)" 
 
 # 获取 GitHub Actions workflow 传递的 ssl 变量
 ssl_type="$SSL_TYPE"
@@ -56,8 +57,8 @@ start_time=$(date +%s.%N)
 if [[ "$ssl_type" == "gnutls" ]] &&  [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
   wget -O- https://ftp.gnu.org/gnu/nettle/nettle-3.10.1.tar.gz | tar xz
   cd nettle-* || exit
-  CFLAGS="-I$INSTALL_PATH/include" \
-  LDFLAGS="-L$INSTALL_PATH/lib" \
+  CFLAGS="-I$INSTALL_PATH/include -flto=$(nproc)" \
+  LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS" \
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
@@ -263,7 +264,7 @@ start_time=$(date +%s.%N)
 if [ ! -f "$INSTALL_PATH"/lib/libpsl.a ]; then
   wget -O- https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz | tar xz
   cd libpsl-* || exit
-  CFLAGS="-I$INSTALL_PATH/include" \
+  CFLAGS="-I$INSTALL_PATH/include -flto=$(nproc)" \
   LIBS="-L$INSTALL_PATH/lib -lunistring -lidn2" \
   LIBIDN2_CFLAGS="-I$INSTALL_PATH/include" \
   LIBIDN2_LIBS="-L$INSTALL_PATH/lib -lunistring -lidn2" \
@@ -365,7 +366,7 @@ if [[ "$ssl_type" == "gnutls" ]] && [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; th
   cd gnutls-* || exit
   PKG_CONFIG_PATH="$INSTALL_PATH/lib/pkgconfig" \
   CFLAGS="-I$INSTALL_PATH/include" \
-  LDFLAGS="-L$INSTALL_PATH/lib" \
+  LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS" \
   GMP_LIBS="-L$INSTALL_PATH/lib -lgmp" \
   NETTLE_LIBS="-L$INSTALL_PATH/lib -lnettle -lgmp" \
   HOGWEED_LIBS="-L$INSTALL_PATH/lib -lhogweed -lnettle -lgmp" \
@@ -434,8 +435,8 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
   cd wget-* || exit 1
   chmod +x configure
-  CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -pipe -march=$WGET_ARCH -mtune=generic -flto=$(nproc)" \
-   LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc" \
+  CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -pipe -march=tigerlake -mtune=tigerlake -flto=$(nproc)" \
+   LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc $LDFLAGS" \
    GNUTLS_CFLAGS=$CFLAGS \
    GNUTLS_LIBS="-L$INSTALL_PATH/lib -lgnutls -lbcrypt -lncrypt" \
    LIBPSL_CFLAGS=$CFLAGS \
@@ -481,8 +482,8 @@ else
   chmod +x configure
   # cp ../windows-openssl.diff .
   # patch src/openssl.c < windows-openssl.diff
-   CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -pipe -march=$WGET_ARCH -mtune=generic" \
-   LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc" \
+   CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -pipe -march=tigerlake -mtune=tigerlake -flto=$(nproc)" \
+   LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc $LDFLAGS" \
    OPENSSL_CFLAGS=$CFLAGS \
    OPENSSL_LIBS="-L$INSTALL_PATH/lib64 -lcrypto -lssl -lbcrypt -lz" \
    LIBPSL_CFLAGS=$CFLAGS \
