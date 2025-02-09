@@ -376,7 +376,7 @@ if [[ "$ssl_type" == "gnutls" ]] && [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; th
   wget -O- https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.9.tar.xz | tar x --xz
   cd gnutls-* || exit
   PKG_CONFIG_PATH="$INSTALL_PATH/lib/pkgconfig" \
-  CFLAGS="-I$INSTALL_PATH/include" \
+  CFLAGS="-D_GNU_SOURCE -D_POSIX_SOURCE -D_XOPEN_SOURCE -I$INSTALL_PATH/include" \
   LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS" \
   GMP_LIBS="-L$INSTALL_PATH/lib -lgmp" \
   NETTLE_LIBS="-L$INSTALL_PATH/lib -lnettle -lgmp" \
