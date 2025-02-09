@@ -170,10 +170,7 @@ start_time=$(date +%s.%N)
 if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
   wget -O- https://gnupg.org/ftp/gcrypt/gpgme/gpgme-1.24.1.tar.bz2 | tar xj
   cd gpgme-* || exit
-  python3 --version
-  env PYTHON=/usr/bin/python3.12.3 \
-  LIBS="-L$INSTALL_PATH/lib" \
-  ./configure \
+  env PYTHON=/usr/bin/python3.12.3 LIBS="-L$INSTALL_PATH/lib" ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --prefix="$INSTALL_PATH" \
@@ -484,7 +481,7 @@ else
   # cp ../windows-openssl.diff .
   # patch src/openssl.c < windows-openssl.diff
    CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -pipe -march=tigerlake -mtune=tigerlake -flto=$(nproc)" \
-   LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc -flto=$(nproc)" \
+   LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc" \
    OPENSSL_CFLAGS=$CFLAGS \
    OPENSSL_LIBS="-L$INSTALL_PATH/lib64 -lcrypto -lssl -lbcrypt -lz" \
    LIBPSL_CFLAGS=$CFLAGS \
