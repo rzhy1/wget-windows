@@ -10,6 +10,11 @@ export WGET_ARCH=x86-64
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
 export PKG_CONFIG_PATH=$INSTALL_PATH/lib/pkgconfig:$PKG_CONFIG_PATH
 export LDFLAGS="-flto=$(nproc)" 
+echo "查询"
+pkg-config --libs python-3.12
+pkg-config --cflags python-3.12
+pkg-config --libs python3
+pkg-config --cflags python3
 
 # 获取 GitHub Actions workflow 传递的 ssl 变量
 ssl_type="$SSL_TYPE"
