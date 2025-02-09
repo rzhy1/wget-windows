@@ -253,6 +253,11 @@ if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
   --disable-doc \
   --disable-gcc-warnings \
   --prefix="$INSTALL_PATH"
+  (($? != 0)) && { printf '%s\n' "[idn2] configure failed"; exit 1; }
+  make -j$(nproc)
+  (($? != 0)) && { printf '%s\n' "[idn2] make failed"; exit 1; }
+  make install
+  (($? != 0)) && { printf '%s\n' "[idn2] make install"; exit 1; }
   echo "查询"
   echo "PKG_CONFIG_PATH的路径是" $PKG_CONFIG_PATH
   pkg-config --libs libidn2
@@ -261,11 +266,6 @@ if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
   ls $INSTALL_PATH/include
   sudo find / -type f -name "libidn2.*"
   echo "查询结束"
-  (($? != 0)) && { printf '%s\n' "[idn2] configure failed"; exit 1; }
-  make -j$(nproc)
-  (($? != 0)) && { printf '%s\n' "[idn2] make failed"; exit 1; }
-  make install
-  (($? != 0)) && { printf '%s\n' "[idn2] make install"; exit 1; }
   cd ..
 fi
 end_time=$(date +%s.%N)
