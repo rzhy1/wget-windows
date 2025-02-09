@@ -171,7 +171,7 @@ start_time=$(date +%s.%N)
 if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
   wget -O- https://gnupg.org/ftp/gcrypt/gpgme/gpgme-1.24.1.tar.bz2 | tar xj
   cd gpgme-* || exit
-  env PYTHON=/usr/bin/python3 ./configure \
+  env PYTHON=/usr/bin/python3.12 ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --prefix="$INSTALL_PATH" \
