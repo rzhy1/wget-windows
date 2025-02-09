@@ -258,7 +258,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
   pkg-config --cflags libidn2
   ls $INSTALL_PATH/lib
   ls $INSTALL_PATH/include
-  find / -type f -name "libidn2.*"
+  sudo find / -type f -name "libidn2.*"
   echo "查询结束"
   (($? != 0)) && { printf '%s\n' "[idn2] configure failed"; exit 1; }
   make -j$(nproc)
