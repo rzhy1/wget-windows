@@ -8,7 +8,8 @@ export WGET_GCC=x86_64-w64-mingw32-gcc
 export WGET_MINGW_HOST=x86_64-w64-mingw32
 export WGET_ARCH=x86-64
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
-LDFLAGS="-flto=$(nproc)" 
+export PKG_CONFIG_PATH=$INSTALL_PATH/lib/pkgconfig:$PKG_CONFIG_PATH
+export LDFLAGS="-flto=$(nproc)" 
 echo "PKG_CONFIG_PATH的路径是" $PKG_CONFIG_PATH
 
 # 获取 GitHub Actions workflow 传递的 ssl 变量
@@ -170,7 +171,7 @@ start_time=$(date +%s.%N)
 if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
   wget -O- https://gnupg.org/ftp/gcrypt/gpgme/gpgme-1.24.1.tar.bz2 | tar xj
   cd gpgme-* || exit
-  env PYTHON=/usr/bin/python3.13 ./configure \
+  env PYTHON=/usr/bin/python3 ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --prefix="$INSTALL_PATH" \
