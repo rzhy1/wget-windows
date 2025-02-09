@@ -63,6 +63,7 @@ if [[ "$ssl_type" == "gnutls" ]] &&  [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; t
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --disable-documentation \
+  --libdir=$INSTALL_PATH/lib \
   --prefix="$INSTALL_PATH"
   (($? != 0)) && { printf '%s\n' "[nettle] configure failed"; exit 1; }
   make -j$(nproc)
@@ -168,7 +169,7 @@ start_time=$(date +%s.%N)
 if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
   wget -O- https://gnupg.org/ftp/gcrypt/gpgme/gpgme-1.24.1.tar.bz2 | tar xj
   cd gpgme-* || exit
-  env PYTHON=/usr/bin/python3.11 ./configure \
+  env PYTHON=/usr/bin/python3.13 ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --prefix="$INSTALL_PATH" \
@@ -202,8 +203,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
   --disable-shared \
   --prefix="$INSTALL_PATH" \
   --enable-static \
-  --disable-tests \
-  --disable-debug
+  --disable-tests
   (($? != 0)) && { printf '%s\n' "[cares] configure failed"; exit 1; }
   make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[cares] make failed"; exit 1; }
@@ -248,6 +248,12 @@ if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
   --disable-doc \
   --disable-gcc-warnings \
   --prefix="$INSTALL_PATH"
+  echo "查询"
+  pkg-config --libs libidn2
+  pkg-config --cflags libidn2
+  ls $INSTALL_PATH/lib
+  ls $INSTALL_PATH/include
+  echo "查询结束"
   (($? != 0)) && { printf '%s\n' "[idn2] configure failed"; exit 1; }
   make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[idn2] make failed"; exit 1; }
@@ -320,8 +326,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libexpat.a ]; then
   --prefix="$INSTALL_PATH" \
   --enable-static \
   --without-docbook \
-  --without-tests \
-  --with-libgpg-error-prefix="$INSTALL_PATH"
+  --without-tests
   (($? != 0)) && { printf '%s\n' "[expat] configure failed"; exit 1; }
   make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[expat] make failed"; exit 1; }
@@ -345,7 +350,6 @@ if [ ! -f "$INSTALL_PATH"/lib/libmetalink.a ]; then
   --disable-shared \
   --prefix="$INSTALL_PATH" \
   --enable-static \
-  --with-libgpg-error-prefix="$INSTALL_PATH" \
   --with-libexpat
   (($? != 0)) && { printf '%s\n' "[metalink] configure failed"; exit 1; }
   make -j$(nproc)
