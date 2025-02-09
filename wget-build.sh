@@ -494,6 +494,8 @@ else
    PCRE2_LIBS="-L$INSTALL_PATH/lib -lpcre2-8"  \
    METALINK_CFLAGS="-I$INSTALL_PATH/include" \
    METALINK_LIBS="-L$INSTALL_PATH/lib -lmetalink -lexpat" \
+   LIBIDN2_CFLAGS="-I$INSTALL_PATH/include" \
+   LIBIDN2_LIBS="-L$INSTALL_PATH/lib -lunistring -lidn2" \
    LIBS="-L$INSTALL_PATH/lib -liconv -lunistring -lidn2 -lpsl -liphlpapi -lcares -lpcre2-8 -lmetalink -lexpat -lgpgme -lassuan -lgpg-error  -lcrypto -lssl -lz -lcrypt32" \
   ./configure \
    --host=$WGET_MINGW_HOST \
