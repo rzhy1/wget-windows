@@ -376,7 +376,7 @@ if [[ "$ssl_type" == "gnutls" ]] && [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; th
   wget -O- https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.9.tar.xz | tar x --xz
   cd gnutls-* || exit
   PKG_CONFIG_PATH="$INSTALL_PATH/lib/pkgconfig" \
-  CFLAGS="-D_GNU_SOURCE -D_POSIX_SOURCE -D_XOPEN_SOURCE -I$INSTALL_PATH/include" \
+  CFLAGS="-I$INSTALL_PATH/include" \
   LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS" \
   GMP_LIBS="-L$INSTALL_PATH/lib -lgmp" \
   NETTLE_LIBS="-L$INSTALL_PATH/lib -lnettle -lgmp" \
@@ -446,7 +446,7 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
   cd wget-* || exit 1
   chmod +x configure
-  CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -pipe -march=tigerlake -mtune=tigerlake -flto=$(nproc)" \
+  CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -D_GNU_SOURCE -D_POSIX_SOURCE -D_XOPEN_SOURCE -DNDEBUG -O2 -pipe -march=tigerlake -mtune=tigerlake -flto=$(nproc)" \
    LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc $LDFLAGS" \
    GNUTLS_CFLAGS=$CFLAGS \
    GNUTLS_LIBS="-L$INSTALL_PATH/lib -lgnutls -lbcrypt -lncrypt" \
