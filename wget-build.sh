@@ -8,13 +8,7 @@ export WGET_GCC=x86_64-w64-mingw32-gcc
 export WGET_MINGW_HOST=x86_64-w64-mingw32
 export WGET_ARCH=x86-64
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
-export PKG_CONFIG_PATH=$INSTALL_PATH/lib/pkgconfig:$PKG_CONFIG_PATH
 export LDFLAGS="-flto=$(nproc)" 
-echo "查询"
-pkg-config --libs python-3.12
-pkg-config --cflags python-3.12
-pkg-config --libs python3
-pkg-config --cflags python3
 
 # 获取 GitHub Actions workflow 传递的 ssl 变量
 ssl_type="$SSL_TYPE"
@@ -368,6 +362,7 @@ start_time=$(date +%s.%N)
 if [[ "$ssl_type" == "gnutls" ]] && [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; then
   wget -O- https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.9.tar.xz | tar x --xz
   cd gnutls-* || exit
+  PKG_CONFIG_PATH="$INSTALL_PATH/lib/pkgconfig" \
   CFLAGS="-I$INSTALL_PATH/include" \
   LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS" \
   GMP_LIBS="-L$INSTALL_PATH/lib -lgmp" \
