@@ -9,6 +9,7 @@ export WGET_MINGW_HOST=x86_64-w64-mingw32
 export WGET_ARCH=x86-64
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
 LDFLAGS="-flto=$(nproc)" 
+echo "PKG_CONFIG_PATH的路径是" $PKG_CONFIG_PATH
 
 # 获取 GitHub Actions workflow 传递的 ssl 变量
 ssl_type="$SSL_TYPE"
@@ -241,6 +242,8 @@ start_time=$(date +%s.%N)
 if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
   wget -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz | tar xz
   cd libidn2-* || exit
+  echo "PKG_CONFIG_PATH的路径是" $PKG_CONFIG_PATH
+  PKG_CONFIG_PATH="$INSTALL_PATH/lib/pkgconfig" \
   ./configure \
   --host=$WGET_MINGW_HOST \
   --enable-static \
@@ -249,6 +252,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
   --disable-gcc-warnings \
   --prefix="$INSTALL_PATH"
   echo "查询"
+  echo "PKG_CONFIG_PATH的路径是" $PKG_CONFIG_PATH
   pkg-config --libs libidn2
   pkg-config --cflags libidn2
   ls $INSTALL_PATH/lib
