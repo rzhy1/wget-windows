@@ -10,7 +10,6 @@ export WGET_ARCH=x86-64
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
 export PKG_CONFIG_PATH=$INSTALL_PATH/lib/pkgconfig:$PKG_CONFIG_PATH
 export LDFLAGS="-flto=$(nproc)" 
-echo "PKG_CONFIG_PATH的路径是" $PKG_CONFIG_PATH
 
 # 获取 GitHub Actions workflow 传递的 ssl 变量
 ssl_type="$SSL_TYPE"
@@ -172,7 +171,9 @@ if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
   wget -O- https://gnupg.org/ftp/gcrypt/gpgme/gpgme-1.24.1.tar.bz2 | tar xj
   cd gpgme-* || exit
   python3 --version
-  env PYTHON=/usr/bin/python3.12.3 ./configure \
+  env PYTHON=/usr/bin/python3.12.3 \
+  LIBS="-L$INSTALL_PATH/lib" \
+  ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --prefix="$INSTALL_PATH" \
@@ -242,10 +243,8 @@ echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libidn2⭐⭐
 # -----------------------------------------------------------------------------
 start_time=$(date +%s.%N)
 if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
-  wget -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz | tar xz
+  wget -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz | tar xz
   cd libidn2-* || exit
-  echo "PKG_CONFIG_PATH的路径是" $PKG_CONFIG_PATH
-  PKG_CONFIG_PATH="$INSTALL_PATH/lib/pkgconfig" \
   ./configure \
   --host=$WGET_MINGW_HOST \
   --enable-static \
@@ -258,14 +257,6 @@ if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
   (($? != 0)) && { printf '%s\n' "[idn2] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[idn2] make install"; exit 1; }
-  echo "查询"
-  echo "PKG_CONFIG_PATH的路径是" $PKG_CONFIG_PATH
-  pkg-config --libs libidn2
-  pkg-config --cflags libidn2
-  ls $INSTALL_PATH/lib
-  ls $INSTALL_PATH/include
-  sudo find / -type f -name "libidn2.*"
-  echo "查询结束"
   cd ..
 fi
 end_time=$(date +%s.%N)
@@ -375,7 +366,6 @@ start_time=$(date +%s.%N)
 if [[ "$ssl_type" == "gnutls" ]] && [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; then
   wget -O- https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.9.tar.xz | tar x --xz
   cd gnutls-* || exit
-  PKG_CONFIG_PATH="$INSTALL_PATH/lib/pkgconfig" \
   CFLAGS="-I$INSTALL_PATH/include" \
   LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS" \
   GMP_LIBS="-L$INSTALL_PATH/lib -lgmp" \
@@ -446,7 +436,7 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
   cd wget-* || exit 1
   chmod +x configure
-  CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -D_GNU_SOURCE -D_POSIX_SOURCE -D_XOPEN_SOURCE -DNDEBUG -O2 -pipe -march=tigerlake -mtune=tigerlake -flto=$(nproc)" \
+  CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -pipe -march=tigerlake -mtune=tigerlake -flto=$(nproc)" \
    LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc $LDFLAGS" \
    GNUTLS_CFLAGS=$CFLAGS \
    GNUTLS_LIBS="-L$INSTALL_PATH/lib -lgnutls -lbcrypt -lncrypt" \
@@ -493,8 +483,8 @@ else
   chmod +x configure
   # cp ../windows-openssl.diff .
   # patch src/openssl.c < windows-openssl.diff
-   CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG  -D_GNU_SOURCE -O2 -pipe -march=tigerlake -mtune=tigerlake" \
-   LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc" \
+   CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -O2 -pipe -march=tigerlake -mtune=tigerlake -flto=$(nproc)" \
+   LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc -flto=$(nproc)" \
    OPENSSL_CFLAGS=$CFLAGS \
    OPENSSL_LIBS="-L$INSTALL_PATH/lib64 -lcrypto -lssl -lbcrypt -lz" \
    LIBPSL_CFLAGS=$CFLAGS \
@@ -505,8 +495,6 @@ else
    PCRE2_LIBS="-L$INSTALL_PATH/lib -lpcre2-8"  \
    METALINK_CFLAGS="-I$INSTALL_PATH/include" \
    METALINK_LIBS="-L$INSTALL_PATH/lib -lmetalink -lexpat" \
-   LIBIDN2_CFLAGS="-I$INSTALL_PATH/include" \
-   LIBIDN2_LIBS="-L$INSTALL_PATH/lib -lunistring -lidn2" \
    LIBS="-L$INSTALL_PATH/lib -liconv -lunistring -lidn2 -lpsl -liphlpapi -lcares -lpcre2-8 -lmetalink -lexpat -lgpgme -lassuan -lgpg-error  -lcrypto -lssl -lz -lcrypt32" \
   ./configure \
    --host=$WGET_MINGW_HOST \
