@@ -410,8 +410,6 @@ if [[ "$ssl_type" == "openssl" ]] && [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
   #wget -O- https://github.com/openssl/openssl/releases/download/openssl-3.4.0/openssl-3.4.0.tar.gz | tar xz
   wget -O- https://openssl.org/source/old/1.1.1/openssl-1.1.1w.tar.gz | tar xz
   cd openssl-* || exit
-  unset CFLAGS
-  unset LDFLAGS
   ./Configure \
   -static \
   --prefix="$INSTALL_PATH" \
