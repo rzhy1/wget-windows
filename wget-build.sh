@@ -222,10 +222,10 @@ start_time=$(date +%s.%N)
 if [ ! -f "$INSTALL_PATH"/lib/libiconv.a ]; then
   wget -O- https://ftp.gnu.org/gnu/libiconv/libiconv-1.18.tar.gz | tar xz
   cd libiconv-* || exit
-  sed -i '1133s/^/#if defined(__GLIBC__) \&\& !defined(__UCLIBC__) \&\& !__GLIBC_PREREQ(2, 16)\n/' srclib/stdio.in.h
-  sed -i '1135s/^/#endif\n/' srclib/stdio.in.h
+  sed -i '1098s/^/#if defined(__GLIBC__) \&\& !defined(__UCLIBC__) \&\& !__GLIBC_PREREQ(2, 16)\n/' srclib/stdio.in.h
+  sed -i '1099s/^/#endif\n/' srclib/stdio.in.h
   # 强制覆盖问题头文件
-  cp -f $INSTALL_PATH/include/stdio.h srclib/stdio.in.h 2>/dev/null || true
+  #cp -f $INSTALL_PATH/include/stdio.h srclib/stdio.in.h 2>/dev/null || true
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
