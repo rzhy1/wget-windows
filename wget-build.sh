@@ -248,6 +248,8 @@ start_time=$(date +%s.%N)
 if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
   wget -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz | tar xz
   cd libidn2-* || exit
+  CPPFLAGS="-I$INSTALL_PATH/include -DIDN2_VERSION_NUMBER=0x020307" \
+  LDFLAGS="-L$INSTALL_PATH/lib -liconv -lunistring" \
   ./configure \
   --host=$WGET_MINGW_HOST \
   --enable-static \
@@ -255,9 +257,7 @@ if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
   --with-libiconv-prefix="$INSTALL_PATH" \ 
   --disable-doc \
   --disable-gcc-warnings \
-  --prefix="$INSTALL_PATH" \
-  CPPFLAGS="-I$INSTALL_PATH/include -DIDN2_VERSION_NUMBER=0x020307" \  # 显式声明版本宏
-  LDFLAGS="-L$INSTALL_PATH/lib -liconv -lunistring"  # 强制链接顺序
+  --prefix="$INSTALL_PATH"
   # 处理新版API变更
   sed -i 's/idn2_register_ul/idn2_register_ull/' src/idn2.c  # 适配函数名变更
   (($? != 0)) && { printf '%s\n' "[idn2] configure failed"; exit 1; }
