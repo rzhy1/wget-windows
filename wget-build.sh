@@ -9,8 +9,8 @@ export WGET_MINGW_HOST=x86_64-w64-mingw32
 export WGET_ARCH=x86-64
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
 export LDFLAGS="-flto=$(nproc)" 
-export CXXFLAGS="$CFLAGS"
 export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -g0"
+export CXXFLAGS="$CFLAGS"
 
 # 获取 GitHub Actions workflow 传递的 ssl 变量
 ssl_type="$SSL_TYPE"
@@ -222,16 +222,11 @@ start_time=$(date +%s.%N)
 if [ ! -f "$INSTALL_PATH"/lib/libiconv.a ]; then
   wget -O- https://ftp.gnu.org/gnu/libiconv/libiconv-1.18.tar.gz | tar xz
   cd libiconv-* || exit
-  sed -i '1098s/^/#if defined(__GLIBC__) \&\& !defined(__UCLIBC__) \&\& !__GLIBC_PREREQ(2, 16)\n/' srclib/stdio.in.h
-  sed -i '1099s/^/#endif\n/' srclib/stdio.in.h
-  # 强制覆盖问题头文件
-  #cp -f $INSTALL_PATH/include/stdio.h srclib/stdio.in.h 2>/dev/null || true
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
   --prefix="$INSTALL_PATH" \
-  --enable-static \
-  --disable-nls
+  --enable-static
   (($? != 0)) && { printf '%s\n' "[iconv] configure failed"; exit 1; }
   make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[iconv] make failed"; exit 1; }
@@ -246,24 +241,15 @@ echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libidn2⭐⭐
 # -----------------------------------------------------------------------------
 start_time=$(date +%s.%N)
 if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
-  wget -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz | tar xz
+  wget -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz | tar xz
   cd libidn2-* || exit
-  CPPFLAGS="-I$INSTALL_PATH/include -DIDN2_VERSION_NUMBER=0x020307" \
-  LDFLAGS="-L$INSTALL_PATH/lib -liconv -lunistring" \
   ./configure \
   --host=$WGET_MINGW_HOST \
   --enable-static \
   --disable-shared \
-  --with-libiconv-prefix="$INSTALL_PATH" \
   --disable-doc \
   --disable-gcc-warnings \
   --prefix="$INSTALL_PATH"
-  # 处理新版API变更
-  # 关键修复3：新版API适配（确认函数名变更）
-  sed -i 's/idn2_register_ul/idn2_register_ull/' src/idn2.c || {
-    echo "[!] 函数名替换失败，请检查libidn2版本是否为2.3.7"
-    exit 1
-  }
   (($? != 0)) && { printf '%s\n' "[idn2] configure failed"; exit 1; }
   make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[idn2] make failed"; exit 1; }
@@ -449,8 +435,6 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
   cd wget-* || exit 1
   chmod +x configure
-  export C_INCLUDE_PATH="$INSTALL_PATH/include:$C_INCLUDE_PATH"
-  export LIBRARY_PATH="$INSTALL_PATH/lib:$LIBRARY_PATH"
   CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -flto=$(nproc)" \
    LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc $LDFLAGS" \
    GNUTLS_CFLAGS=$CFLAGS \
@@ -496,8 +480,6 @@ else
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
   cd wget-* || exit 1
   chmod +x configure
-  export C_INCLUDE_PATH="$INSTALL_PATH/include:$C_INCLUDE_PATH"
-  export LIBRARY_PATH="$INSTALL_PATH/lib:$LIBRARY_PATH"
   # cp ../windows-openssl.diff .
   # patch src/openssl.c < windows-openssl.diff
    CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS" \
