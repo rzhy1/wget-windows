@@ -11,6 +11,8 @@ export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
 export LDFLAGS="-flto=$(nproc)" 
 export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -g0"
 export CXXFLAGS="$CFLAGS"
+export MSYS2_ARG_CONV_EXCL="--prefix"  # 防止路径转换问题
+export ACLOCAL_PATH="$INSTALL_PATH/share/aclocal"
 
 # 获取 GitHub Actions workflow 传递的 ssl 变量
 ssl_type="$SSL_TYPE"
@@ -222,6 +224,8 @@ start_time=$(date +%s.%N)
 if [ ! -f "$INSTALL_PATH"/lib/libiconv.a ]; then
   wget -O- https://ftp.gnu.org/gnu/libiconv/libiconv-1.18.tar.gz | tar xz
   cd libiconv-* || exit
+  sed -i '598s/^/#if defined(__GLIBC__) \&\& !defined(__UCLIBC__) \&\& !__GLIBC_PREREQ(2, 16)\n/' srclib/stdio.in.h
+  sed -i '600s/^/#endif\n/' srclib/stdio.in.h
   ./configure \
   --host=$WGET_MINGW_HOST \
   --disable-shared \
@@ -247,9 +251,14 @@ if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
   --host=$WGET_MINGW_HOST \
   --enable-static \
   --disable-shared \
+  --with-libiconv-prefix="$INSTALL_PATH" \ 
   --disable-doc \
   --disable-gcc-warnings \
-  --prefix="$INSTALL_PATH"
+  --prefix="$INSTALL_PATH" \
+  CPPFLAGS="-I$INSTALL_PATH/include -DIDN2_VERSION_NUMBER=0x020307" \  # 显式声明版本宏
+  LDFLAGS="-L$INSTALL_PATH/lib -liconv -lunistring"  # 强制链接顺序
+  # 处理新版API变更
+  sed -i 's/idn2_register_ul/idn2_register_ull/' src/idn2.c  # 适配函数名变更
   (($? != 0)) && { printf '%s\n' "[idn2] configure failed"; exit 1; }
   make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[idn2] make failed"; exit 1; }
@@ -435,6 +444,8 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
   cd wget-* || exit 1
   chmod +x configure
+  export C_INCLUDE_PATH="$INSTALL_PATH/include:$C_INCLUDE_PATH"
+  export LIBRARY_PATH="$INSTALL_PATH/lib:$LIBRARY_PATH"
   CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -flto=$(nproc)" \
    LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc $LDFLAGS" \
    GNUTLS_CFLAGS=$CFLAGS \
@@ -480,6 +491,8 @@ else
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
   cd wget-* || exit 1
   chmod +x configure
+  export C_INCLUDE_PATH="$INSTALL_PATH/include:$C_INCLUDE_PATH"
+  export LIBRARY_PATH="$INSTALL_PATH/lib:$LIBRARY_PATH"
   # cp ../windows-openssl.diff .
   # patch src/openssl.c < windows-openssl.diff
    CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS" \
