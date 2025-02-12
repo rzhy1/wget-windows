@@ -241,7 +241,7 @@ echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libidn2⭐⭐
 # -----------------------------------------------------------------------------
 start_time=$(date +%s.%N)
 if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
-  wget -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz | tar xz
+  wget -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz | tar xz
   cd libidn2-* || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
