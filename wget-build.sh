@@ -10,10 +10,7 @@ export WGET_ARCH=x86-64
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
 export LDFLAGS="-flto=$(nproc)" 
 export CXXFLAGS="$CFLAGS"
-export MSYS2_ARG_CONV_EXCL="--prefix"  # 防止路径转换问题
-export ACLOCAL_PATH="$INSTALL_PATH/share/aclocal"
-export INCLUDES="-I$INSTALL_PATH/include -idirafter /usr/include"
-export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -g0 $INCLUDES"
+export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -g0"
 
 # 获取 GitHub Actions workflow 传递的 ssl 变量
 ssl_type="$SSL_TYPE"
