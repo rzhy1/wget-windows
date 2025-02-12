@@ -254,12 +254,16 @@ if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
   --host=$WGET_MINGW_HOST \
   --enable-static \
   --disable-shared \
-  --with-libiconv-prefix="$INSTALL_PATH" \ 
+  --with-libiconv-prefix="$INSTALL_PATH" \
   --disable-doc \
   --disable-gcc-warnings \
   --prefix="$INSTALL_PATH"
   # 处理新版API变更
-  sed -i 's/idn2_register_ul/idn2_register_ull/' src/idn2.c  # 适配函数名变更
+  # 关键修复3：新版API适配（确认函数名变更）
+  sed -i 's/idn2_register_ul/idn2_register_ull/' src/idn2.c || {
+    echo "[!] 函数名替换失败，请检查libidn2版本是否为2.3.7"
+    exit 1
+  }
   (($? != 0)) && { printf '%s\n' "[idn2] configure failed"; exit 1; }
   make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[idn2] make failed"; exit 1; }
