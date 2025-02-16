@@ -8,8 +8,8 @@ export WGET_GCC=x86_64-w64-mingw32-gcc
 export WGET_MINGW_HOST=x86_64-w64-mingw32
 export WGET_ARCH=x86-64
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
-export LDFLAGS="-Wl,--gc-sections -flto=$(nproc)" 
-export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -ffunction-sections -fdata-sections -pipe -g0"
+export LDFLAGS="-flto=$(nproc)" 
+export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -flto=$(nproc) -pipe -g0"
 export CXXFLAGS="$CFLAGS"
 
 # 获取 GitHub Actions workflow 传递的 ssl 变量
