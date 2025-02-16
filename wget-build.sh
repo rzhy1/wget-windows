@@ -483,7 +483,7 @@ else
   # cp ../windows-openssl.diff .
   # patch src/openssl.c < windows-openssl.diff
    CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS" \
-   LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc" \
+   LDFLAGS="-L$INSTALL_PATH/lib -static -s -static-libgcc -Wl,--gc-sections" \
    OPENSSL_CFLAGS=$CFLAGS \
    OPENSSL_LIBS="-L$INSTALL_PATH/lib64 -lcrypto -lssl -lbcrypt -lz" \
    LIBPSL_CFLAGS=$CFLAGS \
