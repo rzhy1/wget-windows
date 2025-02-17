@@ -29,6 +29,8 @@ else
     export PATH="/opt/mingw64/bin:${PATH}"    
 fi
 
+echo "x86_64-w64-mingw32-gcc版本是："
+x86_64-w64-mingw32-gcc --version
 
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build zlib⭐⭐⭐⭐⭐⭐"
 # -----------------------------------------------------------------------------
