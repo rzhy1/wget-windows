@@ -15,6 +15,21 @@ export CXXFLAGS="$CFLAGS"
 # 获取 GitHub Actions workflow 传递的 ssl 变量
 ssl_type="$SSL_TYPE"
 
+echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - 下载最新版mingw-w64⭐⭐⭐⭐⭐⭐"
+USE_GCC15=1
+if [[ "$USE_GCC15" -eq 1 ]]; then
+    echo "使用最新版的 mingw-w64-x86_64-toolchain (GCC 15)..."
+    curl -SLf -o "/tmp/mingw-w64-x86_64-toolchain.tar.zst" "https://github.com/rzhy1/build-mingw-w64/releases/download/mingw-w64/mingw-w64-x86_64-toolchain.tar.zst"
+    sudo tar --zstd -xf "/tmp/mingw-w64-x86_64-toolchain.tar.zst" -C /usr/
+else
+    echo "使用相对成熟的 mingw-w64-x86_64-toolchain (GCC 14)..."
+    curl -SLf -o "/tmp/x86_64-w64-mingw32.tar.xz"  "https://github.com/rzhy1/musl-cross/releases/download/mingw-w64/x86_64-w64-mingw32.tar.xz"
+    mkdir -p /opt/mingw64
+    tar -xf "/tmp/x86_64-w64-mingw32.tar.xz" --strip-components=1 -C /opt/mingw64
+    export PATH="/opt/mingw64/bin:${PATH}"    
+fi
+
+
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build zlib⭐⭐⭐⭐⭐⭐"
 # -----------------------------------------------------------------------------
 start_time=$(date +%s.%N)
