@@ -438,16 +438,20 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
   cd wget-* || exit 1
   chmod +x configure
-  CFLAGS+="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -flto=$(nproc)" \
-   LDFLAGS+="-L$INSTALL_PATH/lib -static -static-libgcc" \
-   GNUTLS_LIBS="-L$INSTALL_PATH/lib -lgnutls -lbcrypt -lncrypt" \
-   LIBPSL_LIBS="-L$INSTALL_PATH/lib -lpsl" \
-   CARES_LIBS="-L$INSTALL_PATH/lib -lcares" \
-   PCRE2_LIBS="-L$INSTALL_PATH/lib -lpcre2-8"  \
-   METALINK_CFLAGS="-I$INSTALL_PATH/include" \
-   METALINK_LIBS="-L$INSTALL_PATH/lib -lmetalink -lexpat" \
-   LIBS="-L$INSTALL_PATH/lib -lhogweed -lnettle -lgmp -ltasn1 -lidn2 -lpsl -liphlpapi -lcares -lunistring -liconv -lpcre2-8 -lmetalink -lexpat -lgpgme -lassuan -lgpg-error -lz -lcrypt32 -lpthread" \
-   ./configure \
+  CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -flto=$(nproc)" \
+  LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc $LDFLAGS" \
+  GNUTLS_CFLAGS=$CFLAGS \
+  GNUTLS_LIBS="-L$INSTALL_PATH/lib -lgnutls -lbcrypt -lncrypt" \
+  LIBPSL_CFLAGS=$CFLAGS \
+  LIBPSL_LIBS="-L$INSTALL_PATH/lib -lpsl" \
+  CARES_CFLAGS=$CFLAGS \
+  CARES_LIBS="-L$INSTALL_PATH/lib -lcares" \
+  PCRE2_CFLAGS=$CFLAGS \
+  PCRE2_LIBS="-L$INSTALL_PATH/lib -lpcre2-8"  \
+  METALINK_CFLAGS="-I$INSTALL_PATH/include" \
+  METALINK_LIBS="-L$INSTALL_PATH/lib -lmetalink -lexpat" \
+  LIBS="-L$INSTALL_PATH/lib -lhogweed -lnettle -lgmp -ltasn1 -lidn2 -lpsl -liphlpapi -lcares -lunistring -liconv -lpcre2-8 -lmetalink -lexpat -lgpgme -lassuan -lgpg-error -lz -lcrypt32 -lpthread" \
+  ./configure \
    --host=$WGET_MINGW_HOST \
    --prefix="$INSTALL_PATH" \
    --disable-debug \
@@ -483,9 +487,13 @@ else
   # patch src/openssl.c < windows-openssl.diff
    CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS" \
    LDFLAGS="-L$INSTALL_PATH/lib -static -s -static-libgcc -Wl,--gc-sections" \
+   OPENSSL_CFLAGS=$CFLAGS \
    OPENSSL_LIBS="-L$INSTALL_PATH/lib64 -lcrypto -lssl -lbcrypt -lz" \
+   LIBPSL_CFLAGS=$CFLAGS \
    LIBPSL_LIBS="-L$INSTALL_PATH/lib -lpsl" \
+   CARES_CFLAGS=$CFLAGS \
    CARES_LIBS="-L$INSTALL_PATH/lib -lcares" \
+   PCRE2_CFLAGS=$CFLAGS \
    PCRE2_LIBS="-L$INSTALL_PATH/lib -lpcre2-8"  \
    METALINK_CFLAGS="-I$INSTALL_PATH/include" \
    METALINK_LIBS="-L$INSTALL_PATH/lib -lmetalink -lexpat" \
