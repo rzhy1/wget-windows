@@ -16,7 +16,7 @@ export CXXFLAGS="$CFLAGS"
 ssl_type="$SSL_TYPE"
 
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - 下载最新版mingw-w64⭐⭐⭐⭐⭐⭐"
-USE_GCC15=1
+USE_GCC15=2
 if [[ "$USE_GCC15" -eq 1 ]]; then
     echo "使用最新版的 mingw-w64-x86_64-toolchain (GCC 15)..."
     curl -SLf -o "/tmp/mingw-w64-x86_64-toolchain.tar.zst" "https://github.com/rzhy1/build-mingw-w64/releases/download/mingw-w64/mingw-w64-x86_64-toolchain.tar.zst"
@@ -452,15 +452,11 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
   cd wget-* || exit 1
   chmod +x configure
-  CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -flto=$(nproc)" \
-   LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc $LDFLAGS" \
-   GNUTLS_CFLAGS=$CFLAGS \
+  CFLAGS+="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -flto=$(nproc)" \
+   LDFLAGS+="-L$INSTALL_PATH/lib -static -static-libgcc" \
    GNUTLS_LIBS="-L$INSTALL_PATH/lib -lgnutls -lbcrypt -lncrypt" \
-   LIBPSL_CFLAGS=$CFLAGS \
    LIBPSL_LIBS="-L$INSTALL_PATH/lib -lpsl" \
-   CARES_CFLAGS=$CFLAGS \
    CARES_LIBS="-L$INSTALL_PATH/lib -lcares" \
-   PCRE2_CFLAGS=$CFLAGS \
    PCRE2_LIBS="-L$INSTALL_PATH/lib -lpcre2-8"  \
    METALINK_CFLAGS="-I$INSTALL_PATH/include" \
    METALINK_LIBS="-L$INSTALL_PATH/lib -lmetalink -lexpat" \
@@ -499,15 +495,11 @@ else
   chmod +x configure
   # cp ../windows-openssl.diff .
   # patch src/openssl.c < windows-openssl.diff
-   CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS" \
+   CFLAGS+="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG" \
    LDFLAGS="-L$INSTALL_PATH/lib -static -s -static-libgcc -Wl,--gc-sections" \
-   OPENSSL_CFLAGS=$CFLAGS \
    OPENSSL_LIBS="-L$INSTALL_PATH/lib64 -lcrypto -lssl -lbcrypt -lz" \
-   LIBPSL_CFLAGS=$CFLAGS \
    LIBPSL_LIBS="-L$INSTALL_PATH/lib -lpsl" \
-   CARES_CFLAGS=$CFLAGS \
    CARES_LIBS="-L$INSTALL_PATH/lib -lcares" \
-   PCRE2_CFLAGS=$CFLAGS \
    PCRE2_LIBS="-L$INSTALL_PATH/lib -lpcre2-8"  \
    METALINK_CFLAGS="-I$INSTALL_PATH/include" \
    METALINK_LIBS="-L$INSTALL_PATH/lib -lmetalink -lexpat" \
