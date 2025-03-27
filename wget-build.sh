@@ -244,7 +244,7 @@ echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libidn2⭐⭐
 # -----------------------------------------------------------------------------
 start_time=$(date +%s.%N)
 if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
-  wget -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz | tar xz
+  wget -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.8.tar.gz | tar xz
   cd libidn2-* || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
@@ -438,6 +438,26 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
   cd wget-* || exit 1
   chmod +x configure
+  # --- 应用针对 fcntl.c 的补丁 ---
+  FCNTL_FILE="lib/fcntl.c"
+  echo "正在为 MinGW 修补 $FCNTL_FILE..."
+  cp "$FCNTL_FILE" "$FCNTL_FILE.bak" # 备份
+  sed -i \
+      -e '/if (0 <= result && fcntl (fd, F_SETFD, flags) == -1)/i \
+  #if !defined(_WIN32) || defined(__CYGWIN__)' \
+      -e '/# if REPLACE_FCHDIR/i \
+  #endif' \
+      "$FCNTL_FILE"
+  if [ $? -ne 0 ]; then echo "错误：第一个 sed 命令失败。"; exit 1; fi
+  sed -i \
+      -e '/if (0 <= result && have_dupfd_cloexec == -1)/i \
+  #if !defined(_WIN32) || defined(__CYGWIN__)' \
+      -e '/\#endif \/\* HAVE_FCNTL \*\//i \
+  #endif' \
+      "$FCNTL_FILE"
+  if [ $? -ne 0 ]; then echo "错误：第二个 sed 命令失败。"; exit 1; fi
+  echo "文件 '$FCNTL_FILE' 已成功打补丁。"
+  # --- 补丁应用结束 ---
   CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -flto=$(nproc)" \
   LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc $LDFLAGS" \
   GNUTLS_CFLAGS=$CFLAGS \
