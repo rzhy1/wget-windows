@@ -244,7 +244,7 @@ echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libidn2⭐⭐
 # -----------------------------------------------------------------------------
 start_time=$(date +%s.%N)
 if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
-  wget -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.8.tar.gz | tar xz
+  wget -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz | tar xz
   cd libidn2-* || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
@@ -438,64 +438,6 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
   cd wget-* || exit 1
   chmod +x configure
-  # 定义要修改的文件路径
-  FCNTL_FILE="lib/fcntl.c"
-
-  # 备份原始文件（推荐）
-  cp "$FCNTL_FILE" "$FCNTL_FILE.bak"
-
-  echo "正在为 MinGW 修补 $FCNTL_FILE (使用 sed)..."
-
-  # --- 修改 case F_DUPFD: ---
-  # 定位到 'result = rpl_fcntl_DUPFD (fd, target);' 这一行
-  # 在它之前插入 #if 和 Windows 路径代码
-  # 将原始行包裹在 #else 和 #endif 之间
-  sed -i \
-      -e '/result = rpl_fcntl_DUPFD (fd, target);/ {
-  i \
-  #if defined _WIN32 && ! defined __CYGWIN__\
-          /* MinGW: Use the dedicated Windows helper function */\
-          result = dupfd (fd, target, 0);\
-  #else\
-          /* Other systems: Use the replacement/wrapper */
-  a \
-  #endif
-      }' \
-      "$FCNTL_FILE"
-
-  # 检查 sed 命令是否成功执行
-  if [ $? -ne 0 ]; then
-    echo "错误：修改 F_DUPFD 的 sed 命令失败。"
-    # 可以考虑恢复备份并退出： cp "$FCNTL_FILE.bak" "$FCNTL_FILE"; exit 1;
-    exit 1
-  fi
-
-  # --- 修改 case F_DUPFD_CLOEXEC: ---
-  # 定位到 'result = rpl_fcntl_DUPFD_CLOEXEC (fd, target);' 这一行
-  # 在它之前插入 #if 和 Windows 路径代码
-  # 将原始行包裹在 #else 和 #endif 之间
-  sed -i \
-      -e '/result = rpl_fcntl_DUPFD_CLOEXEC (fd, target);/ {
-  i \
-  #if defined _WIN32 && ! defined __CYGWIN__\
-          /* MinGW: Use the dedicated Windows helper function with O_CLOEXEC */\
-          result = dupfd (fd, target, O_CLOEXEC);\
-  #else\
-          /* Other systems: Use the replacement/wrapper */
-  a \
-  #endif
-      }' \
-      "$FCNTL_FILE"
-
-  # 检查 sed 命令是否成功执行
-  if [ $? -ne 0 ]; then
-    echo "错误：修改 F_DUPFD_CLOEXEC 的 sed 命令失败。"
-    # cp "$FCNTL_FILE.bak" "$FCNTL_FILE"; exit 1;
-    exit 1
-  fi
-
-  echo "文件 '$FCNTL_FILE' 已通过 sed 尝试修补。"
-  # --- 补丁应用结束 ---
   CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -flto=$(nproc)" \
   LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc $LDFLAGS" \
   GNUTLS_CFLAGS=$CFLAGS \
