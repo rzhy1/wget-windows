@@ -317,7 +317,7 @@ echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build expat⭐⭐�
 # -----------------------------------------------------------------------------
 start_time=$(date +%s.%N)
 if [ ! -f "$INSTALL_PATH"/lib/libexpat.a ]; then
-  wget -O- https://github.com/libexpat/libexpat/releases/download/R_2_7_0/expat-2.7.0.tar.gz | tar xz
+  wget -O- https://github.com/libexpat/libexpat/releases/download/R_2_7_1/expat-2.7.1.tar.gz | tar xz
   cd expat-* || exit
   ./configure \
   --host=$WGET_MINGW_HOST \
