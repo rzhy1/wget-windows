@@ -60,7 +60,7 @@ echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build nettle⭐⭐�
 # -----------------------------------------------------------------------------
 start_time=$(date +%s.%N)
 if [[ "$ssl_type" == "gnutls" ]] &&  [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
-  wget -O- https://ftp.gnu.org/gnu/nettle/nettle-3.10.1.tar.gz | tar xz
+  wget -O- https://ftp.gnu.org/gnu/nettle/nettle-3.10.2.tar.gz | tar xz
   cd nettle-* || exit
   CFLAGS="-I$INSTALL_PATH/include $CFLAGS -flto=$(nproc)" \
   LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS" \
