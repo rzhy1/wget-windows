@@ -30,6 +30,7 @@ jobs:
 
       - name: 安装依赖
         run: |
+          set -e  # 任何命令失败立即退出
           sudo apt-get update
           sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
           sudo apt-get install -y make m4 pkg-config automake gettext autopoint autoconf-archive gperf python3-dev python3-venv
@@ -37,22 +38,29 @@ jobs:
           source myenv/bin/activate
           pip3 install setuptools
           pip3 install --upgrade setuptools
-          x86_64-w64-mingw32-gcc --version
+          x86_64-w64-mingw32-gcc --version || { echo "编译器检查失败"; exit 1; }
           which x86_64-w64-mingw32-gcc
           whereis x86_64-w64-mingw32-gcc
 
       - name: 构建 wget 64位 (${{ matrix.ssl }})
-        id: build  # 添加ID用于后续判断
+        id: build_step
         run: |
+          set -eo pipefail  # 严格错误检查
           chmod +x wget-build.sh
-          # 同时输出到控制台和日志文件
+          # 记录开始时间
+          echo "::group::构建日志"
           ./wget-build.sh 2>&1 | tee build.log
-        continue-on-error: true  # 允许失败后继续
+          echo "::endgroup::"
+          # 显式检查退出状态
+          if [ ${PIPESTATUS[0]} -ne 0 ]; then
+            echo "::error::构建失败"
+            exit 1
+          fi
 
       - name: 收集失败日志
-        if: steps.build.outcome != 'success'
+        if: failure()
         run: |
-          echo "构建失败，正在收集诊断信息..."
+          echo "::group::收集诊断信息"
           mkdir -p failure_logs
           
           # 1. 保存构建日志
@@ -71,10 +79,11 @@ jobs:
           # 5. 保存目录结构
           ls -laR > failure_logs/directory_structure.txt
           
+          echo "::endgroup::"
           echo "诊断信息已保存至 failure_logs/"
 
       - name: 上传失败日志
-        if: steps.build.outcome != 'success'
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: 失败日志-${{ matrix.ssl }}-${{ github.run_id }}
@@ -82,14 +91,14 @@ jobs:
           retention-days: 7
 
       - name: 打包成品 (${{ matrix.ssl }})
-        if: steps.build.outcome == 'success'
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: wget-64bit-${{ matrix.ssl }}
           path: wget-${{ matrix.ssl }}/wget-${{ matrix.ssl }}-x64.exe
 
       - name: 创建发布 (${{ matrix.ssl }})
-        if: steps.build.outcome == 'success'
+        if: success()
         uses: ncipollo/release-action@v1 
         with:
           tag: 1.21.4
@@ -97,7 +106,3 @@ jobs:
           artifacts: "wget-${{ matrix.ssl }}/wget-${{ matrix.ssl }}-x64.exe"
           bodyFile: "RELEASE.md"
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: 标记构建失败
-        if: steps.build.outcome != 'success'
-        run: exit 1
