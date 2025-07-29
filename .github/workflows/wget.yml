@@ -26,9 +26,9 @@ jobs:
       SSL_TYPE: ${{ matrix.ssl }}
     steps:
       - uses: actions/checkout@v4
-        name: Checkout project
+        name: 检出代码
 
-      - name: Install prerequisites
+      - name: 安装依赖
         run: |
           sudo apt-get update
           sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
@@ -37,24 +37,59 @@ jobs:
           source myenv/bin/activate
           pip3 install setuptools
           pip3 install --upgrade setuptools
-          #curl -SLf -o "/tmp/x86_64-w64-mingw32.tar.xz" "https://github.com/rzhy1/musl-cross/releases/download/mingw-w64/x86_64-w64-mingw32.tar.xz"
-          #sudo tar -xf "/tmp/x86_64-w64-mingw32.tar.xz" --strip-components=1 -C /usr/
           x86_64-w64-mingw32-gcc --version
           which x86_64-w64-mingw32-gcc
           whereis x86_64-w64-mingw32-gcc
 
-      - name: Build wget 64-bit with ${{ matrix.ssl }}
+      - name: 构建 wget 64位 (${{ matrix.ssl }})
+        id: build  # 添加ID用于后续判断
         run: |
           chmod +x wget-build.sh
-          ./wget-build.sh
+          # 同时输出到控制台和日志文件
+          ./wget-build.sh 2>&1 | tee build.log
+        continue-on-error: true  # 允许失败后继续
 
-      - name: Archive ${{ matrix.ssl }}
+      - name: 收集失败日志
+        if: steps.build.outcome != 'success'
+        run: |
+          echo "构建失败，正在收集诊断信息..."
+          mkdir -p failure_logs
+          
+          # 1. 保存构建日志
+          [ -f build.log ] && mv build.log failure_logs/
+          
+          # 2. 保存系统信息
+          uname -a > failure_logs/system_info.txt
+          dpkg -l >> failure_logs/system_info.txt
+          
+          # 3. 保存环境变量
+          env > failure_logs/environment.txt
+          
+          # 4. 保存编译器信息
+          x86_64-w64-mingw32-gcc -v 2> failure_logs/compiler_info.txt
+          
+          # 5. 保存目录结构
+          ls -laR > failure_logs/directory_structure.txt
+          
+          echo "诊断信息已保存至 failure_logs/"
+
+      - name: 上传失败日志
+        if: steps.build.outcome != 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: 失败日志-${{ matrix.ssl }}-${{ github.run_id }}
+          path: failure_logs/
+          retention-days: 7
+
+      - name: 打包成品 (${{ matrix.ssl }})
+        if: steps.build.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: wget-64bit-${{ matrix.ssl }}
           path: wget-${{ matrix.ssl }}/wget-${{ matrix.ssl }}-x64.exe
 
-      - name: Create ${{ matrix.ssl }} Release  
+      - name: 创建发布 (${{ matrix.ssl }})
+        if: steps.build.outcome == 'success'
         uses: ncipollo/release-action@v1 
         with:
           tag: 1.21.4
@@ -62,3 +97,7 @@ jobs:
           artifacts: "wget-${{ matrix.ssl }}/wget-${{ matrix.ssl }}-x64.exe"
           bodyFile: "RELEASE.md"
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 标记构建失败
+        if: steps.build.outcome != 'success'
+        run: exit 1
