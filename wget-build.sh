@@ -263,6 +263,10 @@ fi
 end_time=$(date +%s.%N)
 duration11=$(echo "$end_time - $start_time" | bc | xargs printf "%.1f")
 # -----------------------------------------------------------------------------
+echo "---------- DEBUG: libidn2.pc content (version 2.3.8) ----------"
+# 假设 INSTALL_PATH 变量在脚本中已正确定义
+cat "$INSTALL_PATH/lib/pkgconfig/libidn2.pc" # 打印 .pc 文件内容
+echo "---------- DEBUG: End of libidn2.pc content ----------"
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libpsl⭐⭐⭐⭐⭐⭐"
 # -----------------------------------------------------------------------------
 start_time=$(date +%s.%N)
