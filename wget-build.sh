@@ -438,7 +438,8 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
   cd wget-* || exit 1
   chmod +x configure
-  CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -flto=$(nproc)" \
+  export CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -flto=$(nproc) -DF_SETFD=2 -DF_GETFD=1"
+  #CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -flto=$(nproc)"
   LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc $LDFLAGS" \
   GNUTLS_CFLAGS=$CFLAGS \
   GNUTLS_LIBS="-L$INSTALL_PATH/lib -lgnutls -lbcrypt -lncrypt" \
