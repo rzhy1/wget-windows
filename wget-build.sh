@@ -485,8 +485,7 @@ else
   rm -rf wget-*
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
   cd wget-* || exit 1
-  export CFLAGS="$CFLAGS -DF_DUPFD=0"
-  #sed -i '1i#ifdef F_DUPFD\n#undef F_DUPFD\n#endif\n#define F_DUPFD 0\n' lib/fcntl.c
+  export CFLAGS="$CFLAGS -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2"
   chmod +x configure
   # cp ../windows-openssl.diff .
   # patch src/openssl.c < windows-openssl.diff
