@@ -438,7 +438,7 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
   cd wget-* || exit 1
   export CFLAGS="$CFLAGS -DF_DUPFD=0"
-  #sed -i '1i#ifdef F_DUPFD\n#undef F_DUPFD\n#endif\n#define F_DUPFD 0\n' lib/fcntl.c
+  sed -i '1i#include "error.h"' lib/openat-die.c
   chmod +x configure
   export CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -flto=$(nproc) -DF_SETFD=2 -DF_GETFD=1"
   #CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -flto=$(nproc)"
@@ -486,6 +486,7 @@ else
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
   cd wget-* || exit 1
   export CFLAGS="$CFLAGS -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2"
+  sed -i '1i#include "error.h"' lib/openat-die.c
   chmod +x configure
   # cp ../windows-openssl.diff .
   # patch src/openssl.c < windows-openssl.diff
