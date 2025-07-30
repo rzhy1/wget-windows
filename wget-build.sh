@@ -430,6 +430,7 @@ fi
 end_time=$(date +%s.%N)
 duration17=$(echo "$end_time - $start_time" | bc | xargs printf "%.1f")
 # -----------------------------------------------------------------------------
+find / 
 if [[ "$ssl_type" == "gnutls" ]]; then
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (gnuTLS)⭐⭐⭐⭐⭐⭐"
   # -----------------------------------------------------------------------------
@@ -437,7 +438,6 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   rm -rf wget-*
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
   cd wget-* || exit 1
-  sed -i '/#include <config.h>/a #include <stdlib.h>\n#include <error.h>' lib/openat-die.c
   chmod +x configure
   CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -flto=$(nproc) -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2" \
   LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc $LDFLAGS" \
@@ -467,7 +467,7 @@ if [[ "$ssl_type" == "gnutls" ]]; then
    --with-gpgme-prefix="$INSTALL_PATH"
   (($? != 0)) && { printf '%s\n' "[wget gnutls] configure failed"; exit 1; }
   make clean
-  make -j4
+  make
   (($? != 0)) && { printf '%s\n' "[wget gnutls] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[wget gnutls] make install"; exit 1; }
@@ -483,7 +483,6 @@ else
   rm -rf wget-*
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
   cd wget-* || exit 1
-  sed -i '/#include <config.h>/a #include <stdlib.h>\n#include <error.h>' lib/openat-die.c
   chmod +x configure
   # cp ../windows-openssl.diff .
   # patch src/openssl.c < windows-openssl.diff
@@ -514,7 +513,7 @@ else
    --with-metalink \
    --with-gpgme-prefix="$INSTALL_PATH"
   (($? != 0)) && { printf '%s\n' "[wget openssl] configure failed"; exit 1; }
-  make -j4
+  make
   (($? != 0)) && { printf '%s\n' "[wget openssl] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[wget openssl] make install"; exit 1; }
