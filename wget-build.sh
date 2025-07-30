@@ -437,17 +437,15 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   rm -rf wget-*
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
   cd wget-* || exit 1
-  export CFLAGS="$CFLAGS -DF_DUPFD=0"
   echo "---------- DEBUG: lib/openat-die.c content 修改前----------"
   cat lib/openat-die.c
   echo "---------- DEBUG: End of lib/openat-die.c content ----------"
-  sed -i '1i#include <config.h>\n#include "error.h"' lib/openat-die.c
+  sed -i '/#include <config.h>/a #include "error.h"' lib/openat-die.c
   echo "---------- DEBUG: lib/openat-die.c content 修改后----------"
   cat lib/openat-die.c
   echo "---------- DEBUG: End of lib/openat-die.c content ----------"
   chmod +x configure
-  export CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -flto=$(nproc) -DF_SETFD=2 -DF_GETFD=1"
-  #CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -flto=$(nproc)"
+  export CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -flto=$(nproc) -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2"
   LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc $LDFLAGS" \
   GNUTLS_CFLAGS=$CFLAGS \
   GNUTLS_LIBS="-L$INSTALL_PATH/lib -lgnutls -lbcrypt -lncrypt" \
@@ -491,18 +489,17 @@ else
   rm -rf wget-*
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
   cd wget-* || exit 1
-  export CFLAGS="$CFLAGS -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2"
   echo "---------- DEBUG: lib/openat-die.c content 修改前----------"
   cat lib/openat-die.c
   echo "---------- DEBUG: End of lib/openat-die.c content ----------"
-  sed -i '1i#include <config.h>\n#include "error.h"' lib/openat-die.c
+  sed -i '/#include <config.h>/a #include "error.h"' lib/openat-die.c
   echo "---------- DEBUG: lib/openat-die.c content 修改后----------"
   cat lib/openat-die.c
   echo "---------- DEBUG: End of lib/openat-die.c content ----------"
   chmod +x configure
   # cp ../windows-openssl.diff .
   # patch src/openssl.c < windows-openssl.diff
-   CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS" \
+   CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2" \
    LDFLAGS="-L$INSTALL_PATH/lib -static -s -static-libgcc -Wl,--gc-sections" \
    OPENSSL_CFLAGS=$CFLAGS \
    OPENSSL_LIBS="-L$INSTALL_PATH/lib64 -lcrypto -lssl -lbcrypt -lz" \
