@@ -435,8 +435,9 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   # -----------------------------------------------------------------------------
   start_time=$(date +%s.%N)
   rm -rf wget-*
-  wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
+  wget -O- https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
   cd wget-* || exit 1
+  sed -i '/#include <stdlib.h>/a #include "error.h"' lib/openat-die.c
   chmod +x configure
   CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -flto=$(nproc) -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2" \
   LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc $LDFLAGS" \
@@ -480,8 +481,9 @@ else
   # -----------------------------------------------------------------------------
   start_time=$(date +%s.%N)
   rm -rf wget-*
-  wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
+  wget -O- https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
   cd wget-* || exit 1
+  sed -i '/#include <stdlib.h>/a #include "error.h"' lib/openat-die.c
   chmod +x configure
   # cp ../windows-openssl.diff .
   # patch src/openssl.c < windows-openssl.diff
