@@ -263,10 +263,6 @@ fi
 end_time=$(date +%s.%N)
 duration11=$(echo "$end_time - $start_time" | bc | xargs printf "%.1f")
 # -----------------------------------------------------------------------------
-echo "---------- DEBUG: libidn2.pc content (version 2.3.8) ----------"
-# 假设 INSTALL_PATH 变量在脚本中已正确定义
-cat "$INSTALL_PATH/lib/pkgconfig/libidn2.pc" # 打印 .pc 文件内容
-echo "---------- DEBUG: End of libidn2.pc content ----------"
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libpsl⭐⭐⭐⭐⭐⭐"
 # -----------------------------------------------------------------------------
 start_time=$(date +%s.%N)
@@ -441,7 +437,8 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   rm -rf wget-*
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
   cd wget-* || exit 1
-  sed -i '1i#ifdef F_DUPFD\n#undef F_DUPFD\n#endif\n#define F_DUPFD 0\n' lib/fcntl.c
+  export CFLAGS="$CFLAGS -DF_DUPFD=0"
+  #sed -i '1i#ifdef F_DUPFD\n#undef F_DUPFD\n#endif\n#define F_DUPFD 0\n' lib/fcntl.c
   chmod +x configure
   export CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -flto=$(nproc) -DF_SETFD=2 -DF_GETFD=1"
   #CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -flto=$(nproc)"
@@ -488,7 +485,8 @@ else
   rm -rf wget-*
   wget -O- https://ftp.gnu.org/gnu/wget/wget-1.21.4.tar.gz | tar xz
   cd wget-* || exit 1
-  sed -i '1i#ifdef F_DUPFD\n#undef F_DUPFD\n#endif\n#define F_DUPFD 0\n' lib/fcntl.c
+  export CFLAGS="$CFLAGS -DF_DUPFD=0"
+  #sed -i '1i#ifdef F_DUPFD\n#undef F_DUPFD\n#endif\n#define F_DUPFD 0\n' lib/fcntl.c
   chmod +x configure
   # cp ../windows-openssl.diff .
   # patch src/openssl.c < windows-openssl.diff
