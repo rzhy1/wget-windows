@@ -101,7 +101,7 @@ jobs:
         if: success()
         uses: ncipollo/release-action@v1 
         with:
-          tag: 1.21.4
+          tag: 1.25.0
           allowUpdates: true
           artifacts: "wget-${{ matrix.ssl }}/wget-${{ matrix.ssl }}-x64.exe"
           bodyFile: "RELEASE.md"
