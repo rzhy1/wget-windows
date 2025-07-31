@@ -410,12 +410,13 @@ echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build openssl⭐⭐
 # -----------------------------------------------------------------------------
 start_time=$(date +%s.%N)
 if [[ "$ssl_type" == "openssl" ]] && [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
-  wget -O- https://github.com/openssl/openssl/releases/download/openssl-3.5.1/openssl-3.5.1.tar.gz | tar xz
-  #wget -O- https://openssl.org/source/old/1.1.1/openssl-1.1.1w.tar.gz | tar xz
+  #wget -O- https://github.com/openssl/openssl/releases/download/openssl-3.5.1/openssl-3.5.1.tar.gz | tar xz
+  wget -O- https://openssl.org/source/old/1.1.1/openssl-1.1.1w.tar.gz | tar xz
   cd openssl-* || exit
   ./Configure \
   -static \
   --prefix="$INSTALL_PATH" \
+  --libdir=lib \
   --cross-compile-prefix=x86_64-w64-mingw32- \
   mingw64 \
   no-shared \
@@ -443,17 +444,16 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   chmod +x configure
   CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -flto=$(nproc) -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2" \
   LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc $LDFLAGS" \
-  GNUTLS_CFLAGS=$CFLAGS \
-  GNUTLS_LIBS="-L$INSTALL_PATH/lib -lgnutls -lbcrypt -lncrypt" \
-  LIBPSL_CFLAGS=$CFLAGS \
+  GNUTLS_CFLAGS="-I$INSTALL_PATH/include" \
+  GNUTLS_LIBS="-L$INSTALL_PATH/lib -lgnutls -lhogweed -lnettle -lgmp -ltasn1 -lbcrypt -lncrypt" \
+  LIBPSL_CFLAGS="-I$INSTALL_PATH/include" \
   LIBPSL_LIBS="-L$INSTALL_PATH/lib -lpsl" \
-  CARES_CFLAGS=$CFLAGS \
+  CARES_CFLAGS="-I$INSTALL_PATH/include" \
   CARES_LIBS="-L$INSTALL_PATH/lib -lcares" \
-  PCRE2_CFLAGS=$CFLAGS \
+  PCRE2_CFLAGS="-I$INSTALL_PATH/include" \
   PCRE2_LIBS="-L$INSTALL_PATH/lib -lpcre2-8"  \
   METALINK_CFLAGS="-I$INSTALL_PATH/include" \
   METALINK_LIBS="-L$INSTALL_PATH/lib -lmetalink -lexpat" \
-  LIBS="-L$INSTALL_PATH/lib -lhogweed -lnettle -lgmp -ltasn1 -lidn2 -lpsl -liphlpapi -lcares -lunistring -liconv -lpcre2-8 -lmetalink -lexpat -lgpgme -lassuan -lgpg-error -lz -lcrypt32 -lpthread" \
   ./configure \
    --host=$WGET_MINGW_HOST \
    --prefix="$INSTALL_PATH" \
