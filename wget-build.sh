@@ -35,71 +35,72 @@ fi
 end_time=$(date +%s.%N)
 duration1=$(echo "$end_time - $start_time" | bc | xargs printf "%.1f")
 # -----------------------------------------------------------------------------
-echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gmp⭐⭐⭐⭐⭐⭐" 
-# -----------------------------------------------------------------------------
-start_time=$(date +%s.%N)
-if [[ "$ssl_type" == "gnutls" ]] &&  [ ! -f "$INSTALL_PATH"/lib/libgmp.a ]; then
-  wget -nv -O- https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz | tar x --xz
-  cd gmp-* || exit
-  ./configure \
-   --host=$WGET_MINGW_HOST \
-   --disable-shared \
-   --prefix="$INSTALL_PATH"
-  (($? != 0)) && { printf '%s\n' "[gmp] configure failed"; exit 1; }
-  make -j$(nproc)
-  (($? != 0)) && { printf '%s\n' "[gmp] make failed"; exit 1; }
-  make install
-  (($? != 0)) && { printf '%s\n' "[gmp] make install"; exit 1; }
-  cd ..
+if [[ "$ssl_type" == "gnutls" ]]; then
+  echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gmp⭐⭐⭐⭐⭐⭐" 
+  start_time=$(date +%s.%N)
+  if [ ! -f "$INSTALL_PATH"/lib/libgmp.a ]; then
+    wget -nv -O- https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz | tar x --xz
+    cd gmp-* || exit
+    ./configure \
+     --host=$WGET_MINGW_HOST \
+     --disable-shared \
+     --prefix="$INSTALL_PATH"
+    (($? != 0)) && { printf '%s\n' "[gmp] configure failed"; exit 1; }
+    make -j$(nproc)
+    (($? != 0)) && { printf '%s\n' "[gmp] make failed"; exit 1; }
+    make install
+    (($? != 0)) && { printf '%s\n' "[gmp] make install"; exit 1; }
+    cd ..
+  fi
+  end_time=$(date +%s.%N)
+  duration2=$(echo "$end_time - $start_time" | bc | xargs printf "%.1f")
 fi
-end_time=$(date +%s.%N)
-duration2=$(echo "$end_time - $start_time" | bc | xargs printf "%.1f")
 # -----------------------------------------------------------------------------
-start_time=$(date +%s.%N)
-echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build nettle⭐⭐⭐⭐⭐⭐" 
-# -----------------------------------------------------------------------------
-start_time=$(date +%s.%N)
-if [[ "$ssl_type" == "gnutls" ]] &&  [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
-  wget -O- https://ftp.gnu.org/gnu/nettle/nettle-3.10.2.tar.gz | tar xz
-  cd nettle-* || exit
-  CFLAGS="-I$INSTALL_PATH/include $CFLAGS -flto=$(nproc)" \
-  LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS" \
-  ./configure \
-  --host=$WGET_MINGW_HOST \
-  --disable-shared \
-  --disable-documentation \
-  --libdir=$INSTALL_PATH/lib \
-  --prefix="$INSTALL_PATH"
-  (($? != 0)) && { printf '%s\n' "[nettle] configure failed"; exit 1; }
-  make -j$(nproc)
-  (($? != 0)) && { printf '%s\n' "[nettle] make failed"; exit 1; }
-  make install
-  (($? != 0)) && { printf '%s\n' "[nettle] make install"; exit 1; }
-  cd ..
+if [[ "$ssl_type" == "gnutls" ]]; then
+  echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build nettle⭐⭐⭐⭐⭐⭐" 
+  start_time=$(date +%s.%N)
+  if [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
+    wget -O- https://ftp.gnu.org/gnu/nettle/nettle-3.10.2.tar.gz | tar xz
+    cd nettle-* || exit
+    CFLAGS="-I$INSTALL_PATH/include $CFLAGS -flto=$(nproc)" \
+    LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS" \
+    ./configure \
+    --host=$WGET_MINGW_HOST \
+    --disable-shared \
+    --disable-documentation \
+    --libdir=$INSTALL_PATH/lib \
+    --prefix="$INSTALL_PATH"
+    (($? != 0)) && { printf '%s\n' "[nettle] configure failed"; exit 1; }
+    make -j$(nproc)
+    (($? != 0)) && { printf '%s\n' "[nettle] make failed"; exit 1; }
+    make install
+    (($? != 0)) && { printf '%s\n' "[nettle] make install"; exit 1; }
+    cd ..
+  fi
+  end_time=$(date +%s.%N)
+  duration3=$(echo "$end_time - $start_time" | bc | xargs printf "%.1f")
 fi
-end_time=$(date +%s.%N)
-duration3=$(echo "$end_time - $start_time" | bc | xargs printf "%.1f")
-# -----------------------------------------------------------------------------
-echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libtasn1⭐⭐⭐⭐⭐⭐"
-# -----------------------------------------------------------------------------
-start_time=$(date +%s.%N)
-if [[ "$ssl_type" == "gnutls" ]] &&  [ ! -f "$INSTALL_PATH"/lib/libtasn1.a ]; then
-  wget -O- https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.20.0.tar.gz | tar xz
-  cd libtasn1-* || exit
-  ./configure \
-   --host=$WGET_MINGW_HOST \
-   --disable-shared \
-   --disable-doc \
-   --prefix="$INSTALL_PATH"
-  (($? != 0)) && { printf '%s\n' "[tasn] configure failed"; exit 1; }
-  make -j$(nproc)
-  (($? != 0)) && { printf '%s\n' "[tasn] make failed"; exit 1; }
-  make install
-  (($? != 0)) && { printf '%s\n' "[tasn] make install"; exit 1; }
-  cd ..
+if [[ "$ssl_type" == "gnutls" ]]; then
+  echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libtasn1⭐⭐⭐⭐⭐⭐"
+  start_time=$(date +%s.%N)
+  if [ ! -f "$INSTALL_PATH"/lib/libtasn1.a ]; then
+    wget -O- https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.20.0.tar.gz | tar xz
+    cd libtasn1-* || exit
+    ./configure \
+     --host=$WGET_MINGW_HOST \
+     --disable-shared \
+     --disable-doc \
+     --prefix="$INSTALL_PATH"
+    (($? != 0)) && { printf '%s\n' "[tasn] configure failed"; exit 1; }
+    make -j$(nproc)
+    (($? != 0)) && { printf '%s\n' "[tasn] make failed"; exit 1; }
+    make install
+    (($? != 0)) && { printf '%s\n' "[tasn] make install"; exit 1; }
+    cd ..
+  fi
+  end_time=$(date +%s.%N)
+  duration4=$(echo "$end_time - $start_time" | bc | xargs printf "%.1f")
 fi
-end_time=$(date +%s.%N)
-duration4=$(echo "$end_time - $start_time" | bc | xargs printf "%.1f")
 # -----------------------------------------------------------------------------
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libunistring⭐⭐⭐⭐⭐⭐" 
 # -----------------------------------------------------------------------------
@@ -443,8 +444,7 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' lib/error.in.h
   chmod +x configure
   CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -flto=$(nproc) -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2" \
-  LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc $LDFLAGS \
--lmetalink -lexpat -lcares -lpcre2-8 -lgnutls -lhogweed -lnettle -lgmp -ltasn1 -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lbcrypt -lncrypt -lcrypt32 -lpthread -lws2_32 -liphlpapi" \
+  LDFLAGS="-L$INSTALL_PATH/lib -static -static-libgcc $LDFLAGS" \
   GNUTLS_CFLAGS="-I$INSTALL_PATH/include" \
   GNUTLS_LIBS="-L$INSTALL_PATH/lib -lgnutls" \
   LIBPSL_CFLAGS="-I$INSTALL_PATH/include" \
@@ -455,6 +455,7 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   PCRE2_LIBS="-L$INSTALL_PATH/lib -lpcre2-8"  \
   METALINK_CFLAGS="-I$INSTALL_PATH/include" \
   METALINK_LIBS="-L$INSTALL_PATH/lib -lmetalink -lexpat" \
+  LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lgnutls -lhogweed -lnettle -lgmp -ltasn1 -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lbcrypt -lncrypt -lcrypt32 -lpthread -lws2_32 -liphlpapi" \
   ./configure \
    --host=$WGET_MINGW_HOST \
    --prefix="$INSTALL_PATH" \
@@ -492,8 +493,7 @@ else
   # cp ../windows-openssl.diff .
   # patch src/openssl.c < windows-openssl.diff
    CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2" \
-   LDFLAGS="-L$INSTALL_PATH/lib -static -s -static-libgcc -Wl,--gc-sections \
--lmetalink -lexpat -lcares -lpcre2-8 -lssl -lcrypto -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lbcrypt -lcrypt32 -lws2_32 -liphlpapi" \
+   LDFLAGS="-L$INSTALL_PATH/lib -static -s -static-libgcc -Wl,--gc-sections" \
    OPENSSL_CFLAGS="-I$INSTALL_PATH/include" \
    OPENSSL_LIBS="-L$INSTALL_PATH/lib -lssl -lcrypto" \
    LIBPSL_CFLAGS="-I$INSTALL_PATH/include" \
@@ -504,6 +504,7 @@ else
    PCRE2_LIBS="-L$INSTALL_PATH/lib -lpcre2-8"  \
    METALINK_CFLAGS="-I$INSTALL_PATH/include" \
    METALINK_LIBS="-L$INSTALL_PATH/lib -lmetalink -lexpat" \
+   LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lssl -lcrypto -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lbcrypt -lcrypt32 -lws2_32 -liphlpapi" \
   ./configure \
    --host=$WGET_MINGW_HOST \
    --prefix="$INSTALL_PATH" \
