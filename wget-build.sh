@@ -397,7 +397,7 @@ if [[ "$ssl_type" == "gnutls" ]] && [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; th
   --disable-shared \
   --enable-static 
   (($? != 0)) && { printf '%s\n' "[gnutls] configure failed"; exit 1; }
-  make -j4
+  make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[gnutls] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[gnutls] make install"; exit 1; }
@@ -469,7 +469,7 @@ if [[ "$ssl_type" == "gnutls" ]]; then
    --with-gpgme-prefix="$INSTALL_PATH"
   (($? != 0)) && { printf '%s\n' "[wget gnutls] configure failed"; exit 1; }
   make clean
-  make
+  make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[wget gnutls] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[wget gnutls] make install"; exit 1; }
@@ -492,17 +492,16 @@ else
   # patch src/openssl.c < windows-openssl.diff
    CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG $CFLAGS -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2" \
    LDFLAGS="-L$INSTALL_PATH/lib -static -s -static-libgcc -Wl,--gc-sections" \
-   OPENSSL_CFLAGS=$CFLAGS \
-   OPENSSL_LIBS="-L$INSTALL_PATH/lib64 -lcrypto -lssl -lbcrypt -lz" \
-   LIBPSL_CFLAGS=$CFLAGS \
+   OPENSSL_CFLAGS="-I$INSTALL_PATH/include" \
+   OPENSSL_LIBS="-L$INSTALL_PATH/lib -lssl -lcrypto -lbcrypt -lz" \
+   LIBPSL_CFLAGS="-I$INSTALL_PATH/include" \
    LIBPSL_LIBS="-L$INSTALL_PATH/lib -lpsl" \
-   CARES_CFLAGS=$CFLAGS \
+   CARES_CFLAGS="-I$INSTALL_PATH/include" \
    CARES_LIBS="-L$INSTALL_PATH/lib -lcares" \
-   PCRE2_CFLAGS=$CFLAGS \
+   PCRE2_CFLAGS="-I$INSTALL_PATH/include" \
    PCRE2_LIBS="-L$INSTALL_PATH/lib -lpcre2-8"  \
    METALINK_CFLAGS="-I$INSTALL_PATH/include" \
    METALINK_LIBS="-L$INSTALL_PATH/lib -lmetalink -lexpat" \
-   LIBS="-L$INSTALL_PATH/lib -liconv -lunistring -lidn2 -lpsl -liphlpapi -lcares -lpcre2-8 -lmetalink -lexpat -lgpgme -lassuan -lgpg-error  -lcrypto -lssl -lz -lcrypt32" \
   ./configure \
    --host=$WGET_MINGW_HOST \
    --prefix="$INSTALL_PATH" \
@@ -517,7 +516,7 @@ else
    --with-metalink \
    --with-gpgme-prefix="$INSTALL_PATH"
   (($? != 0)) && { printf '%s\n' "[wget openssl] configure failed"; exit 1; }
-  make
+  make -j$(nproc)
   (($? != 0)) && { printf '%s\n' "[wget openssl] make failed"; exit 1; }
   make install
   (($? != 0)) && { printf '%s\n' "[wget openssl] make install"; exit 1; }
