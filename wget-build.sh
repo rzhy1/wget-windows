@@ -3,11 +3,7 @@
 #
 # wget build script for Windows environment
 # Author: rzhy1
-# 2024/6/12
-#
-# Optimized with Gemini
 # 2025/7/31
-#
 
 set -e # 如果任何命令失败，立即退出脚本
 
@@ -18,19 +14,14 @@ export WGET_MINGW_HOST=x86_64-w64-mingw32
 export WGET_ARCH=x86-64
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
 
-# --- 核心编译参数定义 ---
-# LDFLAGS: -s 会 strip 程序，和最后的 strip 命令功能重叠，保留一个即可。-static-libgcc 确保GCC运行时静态链接。
 export LDFLAGS="-static -static-libgcc -Wl,--gc-sections -flto=$(nproc)" 
 export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -ffunction-sections -fdata-sections -pipe -g0"
 export CXXFLAGS="$CFLAGS"
 
-# 获取 GitHub Actions workflow 传递的 ssl 变量
 ssl_type="$SSL_TYPE"
 
 echo "x86_64-w64-mingw32-gcc版本是："
 x86_64-w64-mingw32-gcc --version
-
-# --- 依赖库编译 ---
 
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build zlib⭐⭐⭐⭐⭐⭐"
 start_time=$(date +%s.%N)
@@ -62,6 +53,8 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   if [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
     wget -O- https://ftp.gnu.org/gnu/nettle/nettle-3.10.2.tar.gz | tar xz
     cd nettle-* || exit
+    CFLAGS="-I$INSTALL_PATH/include $CFLAGS" \
+    LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS" \
     ./configure --host=$WGET_MINGW_HOST --disable-shared --disable-documentation --libdir="$INSTALL_PATH/lib" --prefix="$INSTALL_PATH"
     (($? != 0)) && { printf '%s\n' "[nettle] configure failed"; exit 1; }
     make -j$(nproc) && make install && cd ..
@@ -284,7 +277,6 @@ else
   
   WGET_CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2"
   WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lssl -lcrypto -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lbcrypt -lcrypt32 -lws2_32 -liphlpapi"
-
   ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" --disable-debug --enable-iri --enable-pcre2 --with-ssl=openssl --with-included-libunistring --with-cares --with-libpsl --with-metalink --with-gpgme-prefix="$INSTALL_PATH" \
     CFLAGS="$WGET_CFLAGS" \
     LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS" \
