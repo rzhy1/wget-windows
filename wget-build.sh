@@ -55,6 +55,7 @@ if [[ "$ssl_type" == "gnutls" ]]; then
     cd nettle-* || exit
     CFLAGS="-I$INSTALL_PATH/include $CFLAGS" \
     LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS" \
+    CFLAGS="-I$INSTALL_PATH/include $CFLAGS -flto=$(nproc)" \
     ./configure --host=$WGET_MINGW_HOST --disable-shared --disable-documentation --libdir="$INSTALL_PATH/lib" --prefix="$INSTALL_PATH"
     (($? != 0)) && { printf '%s\n' "[nettle] configure failed"; exit 1; }
     make -j$(nproc) && make install && cd ..
@@ -213,6 +214,19 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   if [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; then
     wget -O- https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.10.tar.xz | tar x --xz
     cd gnutls-* || exit
+    PKG_CONFIG_PATH="$INSTALL_PATH/lib/pkgconfig" \
+    CFLAGS="-I$INSTALL_PATH/include $CFLAGS" \
+    LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS" \
+    GMP_LIBS="-L$INSTALL_PATH/lib -lgmp" \
+    NETTLE_LIBS="-L$INSTALL_PATH/lib -lnettle -lgmp" \
+    HOGWEED_LIBS="-L$INSTALL_PATH/lib -lhogweed -lnettle -lgmp" \
+    LIBTASN1_LIBS="-L$INSTALL_PATH/lib -ltasn1" \
+    LIBIDN2_LIBS="-L$INSTALL_PATH/lib -lidn2" \
+    GMP_CFLAGS=$CFLAGS \
+    LIBTASN1_CFLAGS=$CFLAGS \
+    NETTLE_CFLAGS=$CFLAGS \
+    HOGWEED_CFLAGS=$CFLAGS \
+    LIBIDN2_CFLAGS=$CFLAGS \
     ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" --with-included-unistring --disable-openssl-compatibility --disable-hardware-acceleration --without-p11-kit --disable-tests --disable-doc --disable-full-test-suite --disable-tools --disable-cxx --disable-maintainer-mode --disable-libdane --disable-shared --enable-static 
     (($? != 0)) && { printf '%s\n' "[gnutls] configure failed"; exit 1; }
     make -j$(nproc) && make install && cd ..
