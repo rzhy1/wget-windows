@@ -25,7 +25,7 @@ jobs:
     env:
       SSL_TYPE: ${{ matrix.ssl }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         name: 检出代码
 
       - name: 安装依赖
