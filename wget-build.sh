@@ -229,7 +229,17 @@ if [[ "$ssl_type" == "openssl" ]]; then
     cd openssl-* || exit
     # 优化后的禁用列表
     DISABLED_FEATURES=(
-      no-err no-tests
+      no-fips no-deprecated no-autoalginit
+      no-engine no-dso no-dynamic-engine no-async
+      no-ui-console no-afalgeng no-devcryptoeng
+      no-comp no-err no-tests no-unit-test no-uplink
+      no-ssl3 no-tls1 no-tls1_1 no-dtls no-dtls1 no-dtls1_2
+      no-sctp no-ct no-ocsp no-psk no-srp no-srtp no-cms
+      no-ts no-rfc3779
+      no-aria no-bf no-blake2 no-camellia no-cast no-chacha
+      no-cmac no-dh no-dsa no-ec2m no-ecdh no-ecdsa
+      no-gost no-idea no-rc2 no-rc4 no-rc5 no-rmd160 no-scrypt no-seed
+      no-siphash no-siv no-sm2 no-sm3 no-sm4 no-whirlpool
     )
     CFLAGS="-march=tigerlake -mtune=tigerlake -O0 -ffunction-sections -fdata-sections -pipe -g0" \
     LDFLAGS="-Wl,--gc-sections -static -static-libgcc" \
@@ -289,19 +299,24 @@ else
   sed -i 's/__gl_error_call (error,/__gl_error_call ((error),/' lib/error.in.h
   sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' lib/error.in.h
 
-  # 应用OpenSSL 3.x兼容性补丁
+  # 修复 OpenSSL 3.x API 变更
   sed -i 's/RAND_screen/RAND_poll/g' src/openssl.c
   sed -i 's/SSL_get_peer_certificate/SSL_get1_peer_certificate/g' src/openssl.c
   
-  # 修复NTLM模块的legacy函数问题
-  sed -i \
-    -e '/#include "ntlm\.h"/a \
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L\
-#include <openssl/des.h>\
-#include <openssl/md4.h>\
-#include <openssl/objects.h>\
-#endif' \
-    src/http-ntlm.c
+  # 修复 NTLM 模块的 OpenSSL 3.x 兼容性问题
+  sed -i -e '/#include "ntlm\.h"/i \
+#ifdef HAVE_OPENSSL \
+# include <openssl/des.h> \
+# include <openssl/md4.h> \
+# if OPENSSL_VERSION_NUMBER >= 0x30000000L \
+#  define DES_key_schedule DES_ks \
+#  define DES_cblock const_DES_cblock \
+#  define DES_set_odd_parity DES_set_odd_parity \
+#  define DES_set_key DES_set_key_unchecked \
+#  define DES_ecb_encrypt(input, output, ks, enc) \
+          DES_ecb_encrypt((input), (output), (ks), (enc)) \
+# endif \
+#endif' src/http-ntlm.c
   
   WGET_CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2"
   WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS"
