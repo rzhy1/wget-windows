@@ -229,17 +229,44 @@ if [[ "$ssl_type" == "openssl" ]]; then
     cd openssl-* || exit
     # 优化后的禁用列表
     DISABLED_FEATURES=(
-      no-fips no-deprecated no-autoalginit
-      no-engine no-dso no-dynamic-engine no-async
-      no-ui-console no-afalgeng no-devcryptoeng
-      no-comp no-err no-tests no-unit-test no-uplink
-      no-ssl3 no-tls1 no-tls1_1 no-dtls no-dtls1 no-dtls1_2
-      no-sctp no-ct no-ocsp no-psk no-srp no-srtp no-cms
-      no-ts no-rfc3779
-      no-aria no-bf no-blake2 no-camellia no-cast no-chacha
-      no-cmac no-dh no-dsa no-ec2m no-ecdh no-ecdsa
-      no-gost no-idea no-rc2 no-rc4 no-rc5 no-rmd160 no-scrypt no-seed
-      no-siphash no-siv no-sm2 no-sm3 no-sm4 no-whirlpool
+      # --- 架构与框架选项 (最大化减小体积) ---
+      no-err                    # 移除详细的错误字符串，效果最显著
+      no-dso                    # 静态编译所必需
+      no-engine                 # 禁用整个 ENGINE 框架 (会自动禁用所有引擎)
+      no-async                  # 禁用异步模式
+      no-autoalginit            # 禁用提供者的自动初始化
+    
+      # --- 禁用不必要的协议 (Wget 只需 TLS) ---
+      no-dtls                   # 禁用 DTLS (用于UDP)
+      no-sctp                   # 禁用 SCTP
+      no-ssl3                   # 禁用古老且不安全的 SSLv3
+      no-tls1                   # 禁用 TLSv1.0
+      no-tls1_1                 # 禁用 TLSv1.1
+    
+      # --- 禁用不必要的功能模块 ---
+      no-comp                   # 禁用 TLS 压缩 (安全要求)
+      no-deprecated             # 禁用所有已标记为“弃用”的 API
+      no-ts                     # 禁用时间戳
+      no-ocsp                   # 禁用在线证书状态协议
+      no-ct                     # 禁用证书透明度
+      no-cms                    # 禁用加密消息语法
+      no-psk                    # 禁用预共享密钥
+      no-srp                    # 禁用安全远程密码
+      no-srtp                   # 禁用 SRTP (用于 RTP 媒体流)
+      no-rfc3779                # 禁用 RFC3779 相关的证书扩展
+    
+      # --- 禁用提供者 ---
+      no-legacy                 # 禁用 legacy provider (包含大量老旧弱算法)
+      no-fips                   # 禁用 FIPS provider
+    
+      # --- 禁用非主流或 Wget 不需要的老旧/弱加密算法 ---
+      no-aria no-bf no-blake2 no-camellia no-cast no-cmac no-dh no-dsa
+      no-ec2m no-gost no-idea no-rc2 no-rc4 no-rc5 no-rmd160 no-scrypt
+      no-seed no-siphash no-siv no-sm2 no-sm3 no-sm4 no-whirlpool
+    
+      # --- 确保不编译多余内容 ---
+      no-tests                  # 禁用所有测试代码
+      no-apps                   # 不编译 openssl 命令行工具
     )
     CFLAGS="-march=tigerlake -mtune=tigerlake -O0 -ffunction-sections -fdata-sections -pipe -g0" \
     LDFLAGS="-Wl,--gc-sections -static -static-libgcc" \
@@ -252,7 +279,6 @@ if [[ "$ssl_type" == "openssl" ]]; then
       --with-zlib-lib="$INSTALL_PATH/lib/libz.a" \
       "${DISABLED_FEATURES[@]}"
     make -j$(nproc) && make install_sw && cd .. && rm -rf openssl-*
-    # 先对静态库做一次精简，减少最终可执行文件体积
     $MINGW_STRIP_TOOL --strip-unneeded "$INSTALL_PATH"/lib/libcrypto.a || true
     $MINGW_STRIP_TOOL --strip-unneeded "$INSTALL_PATH"/lib/libssl.a || true
   fi
@@ -298,31 +324,12 @@ else
   # 为 gnulib 在 MinGW-w64 下的 bug 打补丁
   sed -i 's/__gl_error_call (error,/__gl_error_call ((error),/' lib/error.in.h
   sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' lib/error.in.h
-
-  # 修复 OpenSSL 3.x API 变更
-  sed -i 's/RAND_screen/RAND_poll/g' src/openssl.c
-  sed -i 's/SSL_get_peer_certificate/SSL_get1_peer_certificate/g' src/openssl.c
-  
-  # 修复 NTLM 模块的 OpenSSL 3.x 兼容性问题
-  sed -i -e '/#include "ntlm\.h"/i \
-#ifdef HAVE_OPENSSL \
-# include <openssl/des.h> \
-# include <openssl/md4.h> \
-# if OPENSSL_VERSION_NUMBER >= 0x30000000L \
-#  define DES_key_schedule DES_ks \
-#  define DES_cblock const_DES_cblock \
-#  define DES_set_odd_parity DES_set_odd_parity \
-#  define DES_set_key DES_set_key_unchecked \
-#  define DES_ecb_encrypt(input, output, ks, enc) \
-          DES_ecb_encrypt((input), (output), (ks), (enc)) \
-# endif \
-#endif' src/http-ntlm.c
   
   WGET_CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2"
   WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS"
   WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lssl -lcrypto -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lbcrypt -lcrypt32 -lws2_32 -liphlpapi"
 
-  ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" --disable-debug --disable-nls --enable-iri --enable-pcre2 --with-ssl=openssl --with-included-libunistring --with-cares --with-libpsl --with-metalink --with-gpgme-prefix="$INSTALL_PATH" \
+  ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" --disable-debug --enable-iri --enable-pcre2 --with-ssl=openssl --with-included-libunistring --with-cares --with-libpsl --with-metalink --with-gpgme-prefix="$INSTALL_PATH" \
     CFLAGS="$WGET_CFLAGS" LDFLAGS="$WGET_LDFLAGS" LIBS="$WGET_LIBS"
 
   make -j$(nproc) && make install
