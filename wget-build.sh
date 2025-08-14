@@ -229,7 +229,7 @@ if [[ "$ssl_type" == "openssl" ]]; then
     cd openssl-* || exit
     # 优化后的禁用列表
     DISABLED_FEATURES=(
-      no-legacy no-fips no-deprecated no-autoalginit
+      no-fips no-deprecated no-autoalginit
       no-engine no-dso no-dynamic-engine no-async
       no-ui-console no-afalgeng no-devcryptoeng
       no-comp no-err no-tests no-unit-test no-uplink
@@ -237,13 +237,14 @@ if [[ "$ssl_type" == "openssl" ]]; then
       no-sctp no-ct no-ocsp no-psk no-srp no-srtp no-cms
       no-ts no-rfc3779
       no-aria no-bf no-blake2 no-camellia no-cast no-chacha
-      no-cmac no-des no-dh no-dsa no-ec2m no-ecdh no-ecdsa
-      no-gost no-idea no-md2 no-md4 no-mdc2 no-poly1305
-      no-rc2 no-rc4 no-rc5 no-rmd160 no-scrypt no-seed
+      no-cmac no-dh no-dsa no-ec2m no-ecdh no-ecdsa
+      no-gost no-idea no-rc2 no-rc4 no-rc5 no-rmd160 no-scrypt no-seed
       no-siphash no-siv no-sm2 no-sm3 no-sm4 no-whirlpool
+      # 保留DES和MD4支持
     )
-    export CFLAGS_OPENSSL="-Os -ffunction-sections -fdata-sections"
-    CFLAGS="$CFLAGS_OPENSSL" ./Configure -static \
+    CFLAGS="-march=tigerlake -mtune=tigerlake -O0 -ffunction-sections -fdata-sections -pipe -g0" \
+    LDFLAGS="-Wl,--gc-sections -static -static-libgcc" \
+    ./Configure -static \
       --prefix="$INSTALL_PATH" \
       --libdir=lib \
       --cross-compile-prefix=x86_64-w64-mingw32- \
@@ -298,6 +299,32 @@ else
   # 为 gnulib 在 MinGW-w64 下的 bug 打补丁
   sed -i 's/__gl_error_call (error,/__gl_error_call ((error),/' lib/error.in.h
   sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' lib/error.in.h
+
+  # 应用OpenSSL 3.x兼容性补丁
+  sed -i 's/RAND_screen/RAND_poll/g' src/openssl.c
+  sed -i 's/SSL_get_peer_certificate/SSL_get1_peer_certificate/g' src/openssl.c
+  
+  # 应用NTLM模块legacy函数补丁
+  cat << 'EOT' > http-ntlm.patch
+diff --git a/src/http-ntlm.c b/src/http-ntlm.c
+index 5d5a8c8..e9a0b8d 100644
+--- a/src/http-ntlm.c
++++ b/src/http-ntlm.c
+@@ -40,6 +40,12 @@ as that of the covered work.  */
+ #include "utils.h"
+ #include "ntlm.h"
+ 
++#if OPENSSL_VERSION_NUMBER >= 0x30000000L
++#include <openssl/des.h>
++#include <openssl/md4.h>
++#include <openssl/objects.h>
++#endif
++
+ /* Use the NTLMSSP Security Provider. */
+ #ifdef USE_WINDOWS_SSPI
+ 
+EOT
+  patch -p1 < http-ntlm.patch
   
   WGET_CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2"
   WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS"
