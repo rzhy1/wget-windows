@@ -245,7 +245,6 @@ if [[ "$ssl_type" == "openssl" ]]; then
     
       # --- 禁用不必要的功能模块 ---
       no-comp                   # 禁用 TLS 压缩 (安全要求)
-      no-deprecated             # 禁用所有已标记为“弃用”的 API
       no-ts                     # 禁用时间戳
       no-ocsp                   # 禁用在线证书状态协议
       no-ct                     # 禁用证书透明度
@@ -256,7 +255,6 @@ if [[ "$ssl_type" == "openssl" ]]; then
       no-rfc3779                # 禁用 RFC3779 相关的证书扩展
     
       # --- 禁用提供者 ---
-      #no-legacy                 # 禁用 legacy provider (包含大量老旧弱算法)
       no-fips                   # 禁用 FIPS provider
     
       # --- 禁用非主流或 Wget 不需要的老旧/弱加密算法 ---
