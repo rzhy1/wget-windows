@@ -229,18 +229,7 @@ if [[ "$ssl_type" == "openssl" ]]; then
     cd openssl-* || exit
     # 优化后的禁用列表
     DISABLED_FEATURES=(
-      no-fips no-deprecated no-autoalginit
-      no-engine no-dso no-dynamic-engine no-async
-      no-ui-console no-afalgeng no-devcryptoeng
-      no-comp no-err no-tests no-unit-test no-uplink
-      no-ssl3 no-tls1 no-tls1_1 no-dtls no-dtls1 no-dtls1_2
-      no-sctp no-ct no-ocsp no-psk no-srp no-srtp no-cms
-      no-ts no-rfc3779
-      no-aria no-bf no-blake2 no-camellia no-cast no-chacha
-      no-cmac no-dh no-dsa no-ec2m no-ecdh no-ecdsa
-      no-gost no-idea no-rc2 no-rc4 no-rc5 no-rmd160 no-scrypt no-seed
-      no-siphash no-siv no-sm2 no-sm3 no-sm4 no-whirlpool
-      # 保留DES和MD4支持
+      no-err no-tests
     )
     CFLAGS="-march=tigerlake -mtune=tigerlake -O0 -ffunction-sections -fdata-sections -pipe -g0" \
     LDFLAGS="-Wl,--gc-sections -static -static-libgcc" \
