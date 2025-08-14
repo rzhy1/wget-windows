@@ -252,6 +252,9 @@ if [[ "$ssl_type" == "openssl" ]]; then
       --with-zlib-lib="$INSTALL_PATH/lib/libz.a" \
       "${DISABLED_FEATURES[@]}"
     make -j$(nproc) && make install_sw && cd .. && rm -rf openssl-*
+    # 先对静态库做一次精简，减少最终可执行文件体积
+    $MINGW_STRIP_TOOL --strip-unneeded "$INSTALL_PATH"/lib/libcrypto.a || true
+    $MINGW_STRIP_TOOL --strip-unneeded "$INSTALL_PATH"/lib/libssl.a || true
   fi
   end_time=$(date +%s.%N)
   duration17=$(echo "$end_time - $start_time" | bc | xargs printf "%.1f")
