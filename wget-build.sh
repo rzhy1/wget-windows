@@ -304,27 +304,15 @@ else
   sed -i 's/RAND_screen/RAND_poll/g' src/openssl.c
   sed -i 's/SSL_get_peer_certificate/SSL_get1_peer_certificate/g' src/openssl.c
   
-  # 应用NTLM模块legacy函数补丁
-  cat << 'EOT' > http-ntlm.patch
-diff --git a/src/http-ntlm.c b/src/http-ntlm.c
-index 5d5a8c8..e9a0b8d 100644
---- a/src/http-ntlm.c
-+++ b/src/http-ntlm.c
-@@ -40,6 +40,12 @@ as that of the covered work.  */
- #include "utils.h"
- #include "ntlm.h"
- 
-+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
-+#include <openssl/des.h>
-+#include <openssl/md4.h>
-+#include <openssl/objects.h>
-+#endif
-+
- /* Use the NTLMSSP Security Provider. */
- #ifdef USE_WINDOWS_SSPI
- 
-EOT
-  patch -p1 < http-ntlm.patch
+  # 修复NTLM模块的legacy函数问题
+  sed -i \
+    -e '/#include "ntlm\.h"/a \
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L\
+#include <openssl/des.h>\
+#include <openssl/md4.h>\
+#include <openssl/objects.h>\
+#endif' \
+    src/http-ntlm.c
   
   WGET_CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2"
   WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS"
