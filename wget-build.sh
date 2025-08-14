@@ -227,9 +227,30 @@ if [[ "$ssl_type" == "openssl" ]]; then
   if [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
     wget -q -O- https://github.com/openssl/openssl/releases/download/openssl-3.5.1/openssl-3.5.1.tar.gz | tar xz
     cd openssl-* || exit
-    # OpenSSL's Configure script is Perl, not a standard autotools script.
-    # It directly uses CFLAGS/LDFLAGS from the environment.
-    ./Configure -static --prefix="$INSTALL_PATH" --libdir=lib --cross-compile-prefix=x86_64-w64-mingw32- mingw64 no-shared no-tests --with-zlib-include="$INSTALL_PATH/include" --with-zlib-lib="$INSTALL_PATH/lib/libz.a"
+    # 优化后的禁用列表
+    DISABLED_FEATURES=(
+      no-legacy no-fips no-deprecated no-autoalginit
+      no-engine no-dso no-dynamic-engine no-async
+      no-ui-console no-afalgeng no-devcryptoeng
+      no-comp no-err no-tests no-unit-test no-uplink
+      no-ssl3 no-tls1 no-tls1_1 no-dtls no-dtls1 no-dtls1_2
+      no-sctp no-ct no-ocsp no-psk no-srp no-srtp no-cms
+      no-ts no-rfc3779
+      no-aria no-bf no-blake2 no-camellia no-cast no-chacha
+      no-cmac no-des no-dh no-dsa no-ec2m no-ecdh no-ecdsa
+      no-gost no-idea no-md2 no-md4 no-mdc2 no-poly1305
+      no-rc2 no-rc4 no-rc5 no-rmd160 no-scrypt no-seed
+      no-siphash no-siv no-sm2 no-sm3 no-sm4 no-whirlpool
+    )
+    export CFLAGS_OPENSSL="-Os -ffunction-sections -fdata-sections"
+    CFLAGS="$CFLAGS_OPENSSL" ./Configure -static \
+      --prefix="$INSTALL_PATH" \
+      --libdir=lib \
+      --cross-compile-prefix=x86_64-w64-mingw32- \
+      mingw64 no-shared \
+      --with-zlib-include="$INSTALL_PATH/include" \
+      --with-zlib-lib="$INSTALL_PATH/lib/libz.a" \
+      "${DISABLED_FEATURES[@]}"
     make -j$(nproc) && make install_sw && cd .. && rm -rf openssl-*
   fi
   end_time=$(date +%s.%N)
@@ -279,7 +300,7 @@ else
   WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS"
   WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lssl -lcrypto -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lbcrypt -lcrypt32 -lws2_32 -liphlpapi"
 
-  ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" --disable-debug --enable-iri --enable-pcre2 --with-ssl=openssl --with-included-libunistring --with-cares --with-libpsl --with-metalink --with-gpgme-prefix="$INSTALL_PATH" \
+  ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" --disable-debug --disable-nls --enable-iri --enable-pcre2 --with-ssl=openssl --with-included-libunistring --with-cares --with-libpsl --with-metalink --with-gpgme-prefix="$INSTALL_PATH" \
     CFLAGS="$WGET_CFLAGS" LDFLAGS="$WGET_LDFLAGS" LIBS="$WGET_LIBS"
 
   make -j$(nproc) && make install
