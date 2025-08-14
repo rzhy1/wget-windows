@@ -256,7 +256,7 @@ if [[ "$ssl_type" == "openssl" ]]; then
       no-rfc3779                # 禁用 RFC3779 相关的证书扩展
     
       # --- 禁用提供者 ---
-      no-legacy                 # 禁用 legacy provider (包含大量老旧弱算法)
+      #no-legacy                 # 禁用 legacy provider (包含大量老旧弱算法)
       no-fips                   # 禁用 FIPS provider
     
       # --- 禁用非主流或 Wget 不需要的老旧/弱加密算法 ---
@@ -329,7 +329,7 @@ else
   WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS"
   WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lssl -lcrypto -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lbcrypt -lcrypt32 -lws2_32 -liphlpapi"
 
-  ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" --disable-debug --disable-ntlm --enable-iri --enable-pcre2 --with-ssl=openssl --with-included-libunistring --with-cares --with-libpsl --with-metalink --with-gpgme-prefix="$INSTALL_PATH" \
+  ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" --disable-debug --enable-iri --enable-pcre2 --with-ssl=openssl --with-included-libunistring --with-cares --with-libpsl --with-metalink --with-gpgme-prefix="$INSTALL_PATH" \
     CFLAGS="$WGET_CFLAGS" LDFLAGS="$WGET_LDFLAGS" LIBS="$WGET_LIBS"
 
   make -j$(nproc) && make install
