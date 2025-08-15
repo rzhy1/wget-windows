@@ -1,4 +1,4 @@
-# Windows binaries of GNU Wget 1.21.4
+# Windows binaries of GNU Wget 1.25.0
 
 This is a command-line tool that can be used to retrieve files via the HTTP, HTTPS, and FTP protocols.
 
