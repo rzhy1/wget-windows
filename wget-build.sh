@@ -266,8 +266,8 @@ if [[ "$ssl_type" == "openssl" ]]; then
       no-tests                  # 禁用所有测试代码
       no-apps                   # 不编译 openssl 命令行工具
     )
-    CFLAGS="-march=tigerlake -mtune=tigerlake -O0 -ffunction-sections -fdata-sections -pipe -g0" \
-    LDFLAGS="-Wl,--gc-sections -static -static-libgcc" \
+    CFLAGS="-march=tigerlake -mtune=tigerlake -Os -ffunction-sections -fdata-sections -pipe -g0 $LTO_FLAGS" \
+    LDFLAGS="-Wl,--gc-sections -static -static-libgcc $LTO_FLAGS" \
     ./Configure -static \
       --prefix="$INSTALL_PATH" \
       --libdir=lib \
