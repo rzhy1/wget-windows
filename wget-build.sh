@@ -225,7 +225,7 @@ if [[ "$ssl_type" == "openssl" ]]; then
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build openssl⭐⭐⭐⭐⭐⭐"
   start_time=$(date +%s.%N)
   if [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
-    wget -q -O- https://github.com/openssl/openssl/releases/download/openssl-3.5.1/openssl-3.5.1.tar.gz | tar xz
+    wget -q -O- https://github.com/openssl/openssl/releases/download/openssl-3.5.2/openssl-3.5.2.tar.gz | tar xz
     cd openssl-* || exit
     # 优化后的禁用列表
     DISABLED_FEATURES=(
