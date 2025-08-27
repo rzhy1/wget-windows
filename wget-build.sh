@@ -178,7 +178,7 @@ duration12=$(echo "$end_time - $start_time" | bc | xargs printf "%.1f")
 echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build pcre2⭐⭐⭐⭐⭐⭐"
 start_time=$(date +%s.%N)
 if [ ! -f "$INSTALL_PATH"/lib/libpcre2-8.a ]; then
-  wget -q -O- https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.45/pcre2-10.45.tar.gz | tar xz
+  wget -q -O- https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.46/pcre2-10.46.tar.gz | tar xz
   cd pcre2-* || exit
   LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static
   make -j$(nproc) && make install && cd .. && rm -rf pcre2-*
