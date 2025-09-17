@@ -204,7 +204,7 @@ build_expat() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build expat⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libexpat.a ]; then
-      wget -q -O- https://github.com/libexpat/libexpat/releases/download/R_2_7_1/expat-2.7.1.tar.gz | tar xz
+      wget -q -O- https://github.com/libexpat/libexpat/releases/download/R_2_7_2/expat-2.7.2.tar.gz | tar xz
       cd expat-* || exit
       LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --without-docbook --without-tests
       make -j$(nproc) && make install
@@ -240,7 +240,7 @@ build_openssl() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build openssl⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
-      wget -q -O- https://github.com/openssl/openssl/releases/download/openssl-3.5.2/openssl-3.5.2.tar.gz | tar xz
+      wget -q -O- https://github.com/openssl/openssl/releases/download/openssl-3.5.3/openssl-3.5.3.tar.gz | tar xz
       cd openssl-* || exit
       # 优化后的禁用列表
       DISABLED_FEATURES=(
