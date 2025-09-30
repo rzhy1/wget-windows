@@ -235,7 +235,7 @@ build_openssl() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build openssl⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
-      wget -q -O- https://github.com/openssl/openssl/releases/download/openssl-3.5.3/openssl-3.5.3.tar.gz | tar xz
+      wget -q -O- https://github.com/openssl/openssl/releases/download/openssl-3.5.4/openssl-3.5.4.tar.gz | tar xz
       cd openssl-* || exit
       # 优化后的禁用列表
       DISABLED_FEATURES=(
