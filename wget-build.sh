@@ -277,12 +277,10 @@ build_wget_gnutls() {
     sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' lib/error.in.h
     
     #WGET_CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2"
-    WGET_CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2 -flto=$(nproc) -DHAVE_QUICK_EXIT=1 -D_QUICK_EXIT"
+    WGET_CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2 -flto=$(nproc) -DSO_LINGER=0 -DTCP_LINGER2=0 -D_DISABLE_CLOSE_WAIT"
     #WGET_CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2 -flto=$(nproc)"
-    WGET_LDFLAGS="-L$INSTALL_PATH/lib -static -s -flto=$(nproc) -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive -Wl,--gc-sections"
-    #WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS"
-    WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lgnutls -lhogweed -lnettle -lgmp -ltasn1 -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lbcrypt -lncrypt -lcrypt32 -lpthread -lws2_32 -liphlpapi"
-
+    WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS"
+    WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lgnutls -lhogweed -lnettle -lgmp -ltasn1 -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive -lbcrypt -lncrypt -lcrypt32 -lws2_32 -liphlpapi"
     ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" --disable-debug --enable-iri --enable-pcre2 --with-ssl=gnutls --with-included-libunistring --with-cares --with-libpsl --with-metalink --with-gpgme-prefix="$INSTALL_PATH" \
       CFLAGS="$WGET_CFLAGS" LDFLAGS="$WGET_LDFLAGS" LIBS="$WGET_LIBS"
 
