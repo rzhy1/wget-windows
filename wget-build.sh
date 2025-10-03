@@ -277,23 +277,6 @@ build_wget_gnutls() {
     # 为 gnulib 在 MinGW-w64 下的 bug 打补丁
     sed -i 's/__gl_error_call (error,/__gl_error_call ((error),/' lib/error.in.h
     sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' lib/error.in.h
-
-    # --- 修复 gnutls 旧 API ---
-    patch -p1 <<'EOF'
---- a/src/gnutls.c
-+++ b/src/gnutls.c
-@@
--    err = gnutls_protocol_set_priority(session, protocols);
-+    err = gnutls_priority_set_direct(session, "NORMAL", NULL);
-+    if (err < 0)
-+      {
-+        logprintf (LOG_NOTQUIET,
-+                   _("GnuTLS: failed to set priority string: %s\n"),
-+                   gnutls_strerror(err));
-+        gnutls_deinit(session);
-+        return NULL;
-+      }
-EOF
     
     #WGET_CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2"
     WGET_CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2 -flto=$(nproc) -DSO_LINGER=0 -DTCP_LINGER2=0 -D_DISABLE_CLOSE_WAIT"
@@ -323,8 +306,7 @@ build_wget_openssl() {
     
     WGET_CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2"
     WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS"
-    #WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -Wl,--whole-archive -lssl -lcrypto -Wl,--no-whole-archive -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lbcrypt -lcrypt32 -lws2_32 -liphlpapi"
-    WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -Wl,--whole-archive -lssl -lcrypto -Wl,--no-whole-archive -lz -lidn2 -lunistring -liconv -lpsl -lgpgme -lassuan -lgpg-error -lbcrypt -lcrypt32 -lws2_32 -liphlpapi"
+    WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -Wl,--whole-archive -lssl -lcrypto -Wl,--no-whole-archive -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lbcrypt -lcrypt32 -lws2_32 -liphlpapi"
 
     ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" --disable-debug --enable-iri --enable-pcre2 --with-ssl=openssl --with-included-libunistring --with-cares --with-libpsl --with-metalink --with-gpgme-prefix="$INSTALL_PATH" \
       CFLAGS="$WGET_CFLAGS" LDFLAGS="$WGET_LDFLAGS" LIBS="$WGET_LIBS"
