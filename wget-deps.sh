@@ -364,22 +364,47 @@ if [[ "$ssl_type" == "gnutls" ]]; then
 fi
 wait
 
+# --- FINAL STAGE: 打包依赖和构建结果 ---
+echo ">>> 打包依赖和构建结果..."
+cd "$INSTALL_PATH" || { echo "❌ 路径无效: $INSTALL_PATH"; exit 1; }
+
 if [[ "$ssl_type" == "gnutls" ]]; then
   PACKAGE_NAME="wget-gnutls-deps.tar.zst"
 else
   PACKAGE_NAME="wget-openssl-deps.tar.zst"
 fi
 
-echo ">>> 打包依赖和构建结果..."
-cd "$INSTALL_PATH" || { echo "❌ 路径无效: $INSTALL_PATH"; exit 1; }
+# 创建一个临时打包目录，确保结构统一
+TMPDIR=$(mktemp -d)
+mkdir -p "$TMPDIR/include" "$TMPDIR/lib" "$TMPDIR/pkgconfig"
 
-# 打包 include / lib / pkgconfig / wget-gnutls|openssl
-tar -I zstd -cf "${PACKAGE_NAME}" include lib pkgconfig wget-${ssl_type}
+# 复制存在的核心目录
+for d in include lib pkgconfig; do
+  if [ -d "$INSTALL_PATH/$d" ]; then
+    cp -a "$INSTALL_PATH/$d" "$TMPDIR/" 2>/dev/null || true
+  fi
+done
 
-# 拷贝到 GitHub Actions 工作区以供上传
-cp -fv "${PACKAGE_NAME}" "${GITHUB_WORKSPACE}/" || { echo "❌ 复制包失败"; exit 1; }
+# 复制 wget 可执行文件目录（如果存在）
+if [ -d "$INSTALL_PATH/wget-$ssl_type" ]; then
+  cp -a "$INSTALL_PATH/wget-$ssl_type" "$TMPDIR/"
+else
+  echo "⚠️ 未找到 wget-$ssl_type 目录，跳过该部分"
+fi
 
-echo ">>> 打包完成，生成文件:"
+echo ">>> 打包内容预览："
+find "$TMPDIR" -maxdepth 2 -type f | sort | head -n 30
+
+# 打包成 .tar.zst
+tar -I zstd -cf "$PACKAGE_NAME" -C "$TMPDIR" .
+
+# 拷贝到工作区以供上传
+cp -fv "$PACKAGE_NAME" "${GITHUB_WORKSPACE}/" || { echo "❌ 复制包失败"; exit 1; }
+
+echo ">>> 打包完成，生成文件："
 ls -lh "${GITHUB_WORKSPACE}/${PACKAGE_NAME}"
+
+# 清理临时目录
+rm -rf "$TMPDIR"
 
 echo "🎉 最终构建完成并已打包：${PACKAGE_NAME}"
