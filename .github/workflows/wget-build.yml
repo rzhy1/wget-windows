@@ -3,14 +3,10 @@ name: Build wget
 on:
   workflow_dispatch:
   push:
-    branches:
-      - "*"
-  pull_request:
-    branches:
-      - "*"
-  create:
-    tags:
-      - v*
+    branches: [ master ]
+    paths:
+      - '.github/workflows/wget-build.yml'
+      - 'wget-build.sh'
   schedule:
     - cron: "0 0 * * *"
 
