@@ -6,7 +6,7 @@ on:
     branches: [ master ]
     paths:
       - '.github/workflows/wget-deps.yml'
-      - 'wget.deps.sh'
+      - 'wget-deps.sh'
 
 jobs:
   build:
