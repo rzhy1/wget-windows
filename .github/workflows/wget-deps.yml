@@ -15,7 +15,7 @@ jobs:
         ssl: [gnutls, openssl]
       fail-fast: false
     runs-on: ubuntu-24.04
-    name: Build wget with ${{ matrix.ssl }}
+    name: Build wget-deps with ${{ matrix.ssl }}
     env:
       SSL_TYPE: ${{ matrix.ssl }}
     steps:
@@ -36,7 +36,7 @@ jobs:
           which x86_64-w64-mingw32-gcc
           whereis x86_64-w64-mingw32-gcc
 
-      - name: 构建 wget 64位 (${{ matrix.ssl }})
+      - name: 构建 wget-deps 64位 (${{ matrix.ssl }})
         id: build_step
         run: |
           set -eo pipefail  # 严格错误检查
