@@ -42,10 +42,10 @@ jobs:
         id: build_step
         run: |
           set -eo pipefail  # 严格错误检查
-          chmod +x wget-build1.sh
+          chmod +x wget-build.sh
           # 记录开始时间
           echo "::group::构建日志"
-          ./wget-build1.sh 2>&1 | tee build.log
+          ./wget-build.sh 2>&1 | tee build.log
           echo "::endgroup::"
           # 显式检查退出状态
           if [ ${PIPESTATUS[0]} -ne 0 ]; then
