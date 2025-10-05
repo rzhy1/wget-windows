@@ -1,36 +1,32 @@
 #!/bin/bash
-
 #
-# wget build script for Windows environment
-# Author: rzhy1
-# Refactored for parallel execution
-# 2025/08/30
+# wget dependency build script for Windows (deps only)
+# Author: rzhy1 + optimized
+# 2025/10/05
 #
 
-# --- 脚本行为设置 ---
-# 如果任何命令执行失败，立即退出脚本
 set -e
 
-# --- 全局环境变量定义 ---
+# --- 全局环境变量 ---
 export INSTALL_PATH=$PWD
 export PKG_CONFIG_PATH="$INSTALL_PATH/lib/pkgconfig"
-export WGET_GCC=x86_64-w64-mingw32-gcc
 export WGET_MINGW_HOST=x86_64-w64-mingw32
-export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
+export WGET_GCC=$WGET_MINGW_HOST-gcc
+export AR="$WGET_GCC-ar"
+export RANLIB="$WGET_GCC-ranlib"
+export STRIP_TOOL="$WGET_MINGW_HOST-strip"
 
-# --- 核心编译参数定义 ---
-# CFLAGS: 针对目标CPU进行优化，并启用代码/数据段拆分以便链接器进行"垃圾回收"。
-export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -ffunction-sections -fdata-sections -pipe -g0 -fvisibility=hidden"
+# --- 优化编译参数 ---
+export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -g0 \
+  -ffunction-sections -fdata-sections -fvisibility=hidden -fvisibility-inlines-hidden \
+  -flto -fuse-linker-plugin"
+
 export CXXFLAGS="$CFLAGS"
+export LDFLAGS_DEPS="-static -static-libgcc -Wl,--gc-sections -Wl,--icf=safe -Wl,--strip-all"
 
-# LDFLAGS for dependencies: 不包含LTO，以确保所有configure测试都能通过。
-export LDFLAGS_DEPS="-static -static-libgcc -Wl,--gc-sections -Wl,-S"
-
-# LTO_FLAGS: 单独定义LTO参数，只在编译wget主程序时使用。
-export LTO_FLAGS="-flto=$(nproc) -fuse-linker-plugin"
-
-# 获取外部传入的SSL类型变量
 ssl_type="$SSL_TYPE"
+echo ">>> GCC Info:"
+$WGET_GCC -v
 
 echo "Using GCC version:"
 x86_64-w64-mingw32-gcc --version
@@ -266,60 +262,6 @@ build_openssl() {
     fi
   )
 }
-
-build_wget_gnutls() {
-  echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (gnuTLS)⭐⭐⭐⭐⭐⭐"
-  (
-    rm -rf wget-*
-    wget -q -O- https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
-    cd wget-* || exit 1
-    
-    # 为 gnulib 在 MinGW-w64 下的 bug 打补丁
-    sed -i 's/__gl_error_call (error,/__gl_error_call ((error),/' lib/error.in.h
-    sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' lib/error.in.h
-    
-    WGET_CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2 -flto=$(nproc) -DSO_LINGER=0 -DTCP_LINGER2=0 -D_DISABLE_CLOSE_WAIT"
-    WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS"
-    WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lgnutls -lhogweed -lnettle -lgmp -ltasn1 -lz -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lwinpthread -lws2_32 -liphlpapi -lcrypt32 -lbcrypt -lncrypt"
-    ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" --disable-debug --enable-iri --enable-pcre2 --with-ssl=gnutls --with-included-libunistring --with-cares --with-libpsl --with-metalink --with-gpgme-prefix="$INSTALL_PATH" \
-      CFLAGS="$WGET_CFLAGS" LDFLAGS="$WGET_LDFLAGS" LIBS="$WGET_LIBS"
-
-    make -j$(nproc) && make install
-    
-    mkdir -p "$INSTALL_PATH"/wget-gnutls
-    cp "$INSTALL_PATH"/bin/wget.exe "$INSTALL_PATH"/wget-gnutls/wget-gnutls-x64.exe
-    $MINGW_STRIP_TOOL "$INSTALL_PATH"/wget-gnutls/wget-gnutls-x64.exe
-  )
-}
-
-build_wget_openssl() {
-  echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (openssl)⭐⭐⭐⭐⭐⭐"
-  (
-    rm -rf wget-*
-    wget -q -O- https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
-    cd wget-* || exit 1
-
-    # 为 gnulib 在 MinGW-w64 下的 bug 打补丁
-    sed -i 's/__gl_error_call (error,/__gl_error_call ((error),/' lib/error.in.h
-    sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' lib/error.in.h
-    
-    WGET_CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2"
-    WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS"
-    WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -Wl,--whole-archive -lssl -lcrypto -Wl,--no-whole-archive -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lbcrypt -lcrypt32 -lws2_32 -liphlpapi"
-
-    ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" --disable-debug --enable-iri --enable-pcre2 --with-ssl=openssl --with-included-libunistring --with-cares --with-libpsl --with-metalink --with-gpgme-prefix="$INSTALL_PATH" \
-      CFLAGS="$WGET_CFLAGS" LDFLAGS="$WGET_LDFLAGS" LIBS="$WGET_LIBS"
-
-    make -j$(nproc) && make install
-    
-    mkdir -p "$INSTALL_PATH"/wget-openssl
-    cp "$INSTALL_PATH"/bin/wget.exe "$INSTALL_PATH"/wget-openssl/wget-openssl-x64.exe
-    $MINGW_STRIP_TOOL "$INSTALL_PATH"/wget-openssl/wget-openssl-x64.exe
-  )
-}
-
-
-# --- 主执行流程 ---
 
 # STAGE 1: 编译没有内部依赖或只依赖zlib的基础库
 echo "--- LAUNCHING STAGE 1 BUILDS ---"
