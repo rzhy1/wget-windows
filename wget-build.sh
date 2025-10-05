@@ -55,7 +55,7 @@ build_gmp() {
     if [ ! -f "$INSTALL_PATH"/lib/libgmp.a ]; then
       wget -nv -O- https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz | tar x --xz
       cd gmp-* || exit
-      LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --enable-mini-gmp --disable-shared --prefix="$INSTALL_PATH"
+      LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH"
       make -j$(nproc) && make install
     fi
   )
@@ -69,7 +69,7 @@ build_nettle() {
       cd nettle-* || exit
       # 明确传递包含gmp的路径，以确保nettle能找到它并构建libhogweed
       LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" CFLAGS="-I$INSTALL_PATH/include $CFLAGS" \
-      ./configure --host=$WGET_MINGW_HOST --disable-shared --disable-documentation --prefix="$INSTALL_PATH" --enable-mini-gmp=no
+      ./configure --host=$WGET_MINGW_HOST --disable-shared --disable-documentation --prefix="$INSTALL_PATH" --enable-mini-gmp
       make -j$(nproc) && make install
     fi
   )
@@ -274,11 +274,14 @@ build_openssl() {
         no-err no-dso no-engine no-async no-autoalginit
         no-dtls no-sctp no-ssl3 no-tls1 no-tls1_1
         no-comp no-ts no-ocsp no-ct no-cms no-psk no-srp no-srtp no-rfc3779
-        no-fips
+        no-fips no-asm no-threads no-shared
         no-aria no-bf no-blake2 no-camellia no-cast no-cmac no-dh no-dsa
         no-ec2m no-gost no-idea no-rc2 no-rc4 no-rc5 no-rmd160 no-scrypt
         no-seed no-siphash no-siv no-sm2 no-sm3 no-sm4 no-whirlpool
-        no-tests no-apps
+        no-poly1305 no-chacha
+        no-tests no-apps no-docs no-capieng
+        no-legacy no-deprecated no-autoload-config no-ui-console
+        no-zlib no-zlib-dynamic no-stdio
       )
       CFLAGS="-march=tigerlake -mtune=tigerlake -Os -ffunction-sections -fdata-sections -pipe -g0 $LTO_FLAGS" \
       LDFLAGS="-Wl,--gc-sections -static -static-libgcc $LTO_FLAGS" \
@@ -362,7 +365,6 @@ build_pcre2 &
 build_expat &
 
 if [[ "$ssl_type" == "gnutls" ]]; then
-  build_gmp &
   build_libtasn1 &
 fi
 wait
