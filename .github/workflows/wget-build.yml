@@ -6,7 +6,7 @@ on:
     branches: [ master ]
     paths:
       - '.github/workflows/wget-build.yml'
-      - 'wget-build1.sh'
+      - 'wget-build.sh'
   schedule:
     - cron: "0 0 * * *"
 
