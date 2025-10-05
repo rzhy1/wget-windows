@@ -10,23 +10,21 @@
 # --- 脚本行为设置 ---
 set -e  # 任意命令失败立即退出
 
-# --- 全局环境变量定义 ---
+# --- 全局环境变量 ---
 export INSTALL_PATH=$PWD
 export PKG_CONFIG_PATH="$INSTALL_PATH/lib/pkgconfig"
 export WGET_GCC=x86_64-w64-mingw32-gcc
 export WGET_MINGW_HOST=x86_64-w64-mingw32
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
+export AR="x86_64-w64-mingw32-ar"
+export RANLIB="x86_64-w64-mingw32-ranlib"
 
-## --- 核心编译参数定义 ---
-# CFLAGS: 针对目标CPU进行优化，并启用代码/数据段拆分以便链接器进行"垃圾回收"。
-export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -ffunction-sections -fdata-sections -pipe -g0 -fvisibility=hidden"
-export CXXFLAGS="$CFLAGS"
+# --- 优化编译参数 ---
 
-# LDFLAGS for dependencies: 不包含LTO，以确保所有configure测试都能通过。
+export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -g0 \
+  -ffunction-sections -fdata-sections -fvisibility=hidden -flto -fuse-linker-plugin"
+export CXXFLAGS="$CFLAGS -fvisibility-inlines-hidden"
 export LDFLAGS_DEPS="-static -static-libgcc -Wl,--gc-sections -Wl,-S"
-
-# 主程序链接优化参数（含 LTO、段回收与符号剥离）
-export LTO_FLAGS="-flto=$(nproc) -fuse-linker-plugin -Wl,--gc-sections -Wl,--strip-all"
 
 # SSL 类型（外部传入）
 ssl_type="$SSL_TYPE"
