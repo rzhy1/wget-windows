@@ -229,6 +229,7 @@ build_gnutls() {
       LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST \
         --prefix="$INSTALL_PATH" \
         --with-included-unistring \
+        --with-nettle-mini \
         --disable-nls \
         --disable-shared \
         --enable-static \
