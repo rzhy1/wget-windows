@@ -226,15 +226,37 @@ build_gnutls() {
       rm -rf gnutls-*
       wget -q -O- https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.10.tar.xz | tar x --xz
       cd gnutls-* || exit
-      LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" ./configure \
-        --host=$WGET_MINGW_HOST \
+      LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST \
         --prefix="$INSTALL_PATH" \
-        --disable-openssl-compatibility \
-        --disable-cxx --disable-doc --disable-tools --disable-dane \
-        --disable-full-test-suite --disable-libdane \
+        --with-included-unistring \
+        --disable-nls \
+        --disable-shared \
+        --enable-static \
+        --disable-doc \
+        --disable-tools \
+        --disable-cxx \
+        --disable-tests \
+        --disable-maintainer-mode \
         --disable-hardware-acceleration \
-        --with-included-libtasn1 --with-included-unistring=no \
-        --disable-guile --enable-mini-gmp --disable-nls --disable-tests
+        --disable-padlock \
+        --disable-ocsp \
+        --disable-dsa \
+        --disable-dhe \
+        --disable-ecdhe \
+        --disable-gost \
+        --disable-anon-authentication \
+        --disable-psk-authentication \
+        --disable-srp-authentication \
+        --disable-alpn-support \
+        --without-p11-kit \
+        --without-tpm2 \
+        --without-tpm \
+        --without-idn \
+        --without-brotli \
+        --without-zstd \
+        --disable-full-test-suite \
+        --disable-valgrind-tests \
+        --disable-seccomp-tests
       make -j$(nproc) && make install
     fi
   )
@@ -378,9 +400,6 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   build_wget_gnutls
 else # Default to openssl
   build_wget_openssl
-fi
-
-echo "编译完成"
 fi
 
 echo "编译完成"
