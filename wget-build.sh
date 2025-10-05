@@ -364,7 +364,48 @@ if [[ "$ssl_type" == "gnutls" ]]; then
 fi
 wait
 
-# FINAL STAGE: 编译Wget
+echo "--- All dependencies have been built. ---"
+
+# =================================================================
+#                     第二阶段：环境隔离和净化
+# =================================================================
+echo ">>> Phase 2: Isolating build environment for wget..."
+
+# 2.1: 创建一个临时目录来备份编译产物
+echo "   --> Backing up essential artifacts (include, lib, pkgconfig)..."
+mkdir -p /tmp/wget_clean_deps
+# 使用 cp -a 保持文件属性
+cp -a "$INSTALL_PATH/include" /tmp/wget_clean_deps/
+cp -a "$INSTALL_PATH/lib" /tmp/wget_clean_deps/
+# pkgconfig 目录对于 ./configure 脚本找到库至关重要
+cp -a "$INSTALL_PATH/lib/pkgconfig" /tmp/wget_clean_deps/
+
+# 2.2: 清理工作目录。删除所有依赖库的源码和编译目录，
+# 只留下备份的产物和本脚本。
+echo "   --> Cleaning the workspace, removing all source and build directories..."
+# 遍历当前目录下的所有文件和文件夹
+for item in *; do
+    # 如果不是我们创建的临时备份目录，就删除它
+    if [ "$item" != "tmp" ] && [ "$item" != "$(basename "$0")" ]; then
+        rm -rf "$item"
+    fi
+done
+
+# 2.3: 将纯净的产物从临时目录恢复回来
+echo "   --> Restoring clean artifacts..."
+mkdir -p "$INSTALL_PATH/lib"
+cp -a /tmp/wget_clean_deps/include "$INSTALL_PATH/"
+cp -a /tmp/wget_clean_deps/lib/* "$INSTALL_PATH/lib/"
+cp -a /tmp/wget_clean_deps/pkgconfig "$INSTALL_PATH/lib/"
+
+# 2.4: 删除临时备份目录
+rm -rf /tmp/wget_clean_deps
+
+echo ">>> Environment isolation complete."
+
+# =================================================================
+#               第三阶段：在纯净环境下编译 Wget
+# =================================================================
 echo "--- LAUNCHING FINAL BUILD (wget) ---"
 if [[ "$ssl_type" == "gnutls" ]]; then
   build_wget_gnutls
