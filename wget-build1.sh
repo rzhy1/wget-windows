@@ -17,13 +17,13 @@ export WGET_GCC=x86_64-w64-mingw32-gcc
 export WGET_MINGW_HOST=x86_64-w64-mingw32
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
 
-# --- 核心优化参数定义 ---
-# 针对目标 CPU 优化，并启用函数/数据分节，便于链接器进行“死代码回收”
-export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -ffunction-sections -fdata-sections -pipe -fvisibility=hidden -flto"
+## --- 核心编译参数定义 ---
+# CFLAGS: 针对目标CPU进行优化，并启用代码/数据段拆分以便链接器进行"垃圾回收"。
+export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -ffunction-sections -fdata-sections -pipe -g0 -fvisibility=hidden"
 export CXXFLAGS="$CFLAGS"
 
-# 静态链接选项
-export LDFLAGS_STATIC="-static -static-libgcc -static-libstdc++"
+# LDFLAGS for dependencies: 不包含LTO，以确保所有configure测试都能通过。
+export LDFLAGS_DEPS="-static -static-libgcc -Wl,--gc-sections -Wl,-S"
 
 # 主程序链接优化参数（含 LTO、段回收与符号剥离）
 export LTO_FLAGS="-flto=$(nproc) -fuse-linker-plugin -Wl,--gc-sections -Wl,--strip-all"
@@ -49,12 +49,9 @@ build_wget_gnutls() {
     sed -i 's/__gl_error_call (error,/__gl_error_call ((error),/' lib/error.in.h
     sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' lib/error.in.h
 
-    WGET_CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG"
-    WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_STATIC $LTO_FLAGS"
-    WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lgnutls -lhogweed -lnettle -lgmp -ltasn1 -lz \
-               -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error \
-               -lwinpthread -lws2_32 -liphlpapi -lcrypt32 -lbcrypt -lncrypt"
-
+    WGET_CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2 -flto=$(nproc) -DSO_LINGER=0 -DTCP_LINGER2=0 -D_DISABLE_CLOSE_WAIT"
+    WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS"
+    WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lgnutls -lhogweed -lnettle -lgmp -ltasn1 -lz -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lwinpthread -lws2_32 -liphlpapi -lcrypt32 -lbcrypt -lncrypt"
     ./configure \
       --host=$WGET_MINGW_HOST \
       --prefix="$INSTALL_PATH" \
@@ -89,13 +86,9 @@ build_wget_openssl() {
     sed -i 's/__gl_error_call (error,/__gl_error_call ((error),/' lib/error.in.h
     sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' lib/error.in.h
 
-    WGET_CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG"
-    WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_STATIC $LTO_FLAGS"
-    WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 \
-               -Wl,--whole-archive -lssl -lcrypto -Wl,--no-whole-archive \
-               -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error \
-               -lz -lbcrypt -lcrypt32 -lws2_32 -liphlpapi"
-
+    WGET_CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2"
+    WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS"
+    WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -Wl,--whole-archive -lssl -lcrypto -Wl,--no-whole-archive -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lbcrypt -lcrypt32 -lws2_32 -liphlpapi"
     ./configure \
       --host=$WGET_MINGW_HOST \
       --prefix="$INSTALL_PATH" \
