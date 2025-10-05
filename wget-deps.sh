@@ -10,11 +10,11 @@ set -e
 # --- 全局环境变量 ---
 export INSTALL_PATH=$PWD
 export PKG_CONFIG_PATH="$INSTALL_PATH/lib/pkgconfig"
+export WGET_GCC=x86_64-w64-mingw32-gcc
 export WGET_MINGW_HOST=x86_64-w64-mingw32
-export WGET_GCC=$WGET_MINGW_HOST-gcc
-export AR="$WGET_GCC-ar"
-export RANLIB="$WGET_GCC-ranlib"
-export STRIP_TOOL="$WGET_MINGW_HOST-strip"
+export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
+export AR="x86_64-w64-mingw32-ar"
+export RANLIB="x86_64-w64-mingw32-ranlib"
 
 # --- 优化编译参数 ---
 export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -g0 \
