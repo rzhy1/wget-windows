@@ -27,7 +27,7 @@ export CXXFLAGS="$CFLAGS"
 export LDFLAGS_DEPS="-static -static-libgcc -Wl,--gc-sections -Wl,-S"
 
 # LTO_FLAGS: 单独定义LTO参数，只在编译wget主程序时使用。
-export LTO_FLAGS="-flto=$(nproc)"
+export LTO_FLAGS="-flto=$(nproc) -fuse-linker-plugin"
 
 # 获取外部传入的SSL类型变量
 ssl_type="$SSL_TYPE"
