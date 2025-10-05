@@ -276,8 +276,8 @@ build_openssl() {
         no-dtls no-sctp no-ssl3 no-tls1 no-tls1_1
         no-comp no-ts no-ocsp no-ct no-cms no-psk no-srp no-srtp no-rfc3779
         no-fips no-asm no-threads no-shared
-        no-aria no-bf no-blake2 no-camellia no-cast no-cmac no-dh no-dsa
-        no-ec2m no-gost no-idea no-rc2 no-rc4 no-rc5 no-rmd160 no-scrypt
+        no-aria no-bf no-blake2 no-camellia no-cast no-cmac
+        no-dh no-dsa no-ec2m no-gost no-idea no-rc2 no-rc4 no-rc5 no-rmd160 no-scrypt
         no-seed no-siphash no-siv no-sm2 no-sm3 no-sm4 no-whirlpool
         no-poly1305 no-chacha
         no-tests no-apps no-docs no-capieng
