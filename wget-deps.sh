@@ -17,9 +17,12 @@ export AR="x86_64-w64-mingw32-ar"
 export RANLIB="x86_64-w64-mingw32-ranlib"
 
 # --- 优化编译参数 ---
-export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -ffunction-sections -fdata-sections -pipe -g0 -fvisibility=hidden"
+
+export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -g0 \
+  -ffunction-sections -fdata-sections -fvisibility=hidden -fvisibility-inlines-hidden \
+  -flto -fuse-linker-plugin"
 export CXXFLAGS="$CFLAGS"
-export LDFLAGS_DEPS="-static -static-libgcc -Wl,--gc-sections -Wl,--icf=safe -Wl,--strip-all"
+export LDFLAGS_DEPS="-static -static-libgcc -Wl,--gc-sections -Wl,-S"
 
 ssl_type="$SSL_TYPE"
 echo ">>> GCC Info:"
