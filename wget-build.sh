@@ -93,7 +93,7 @@ build_libunistring() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libunistring⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
-      wget -q -O- https://ftp.gnu.org/gnu/libunistring/libunistring-1.4.tar.gz | tar xz
+      wget -q -O- https://ftp.gnu.org/gnu/libunistring/libunistring-1.4.1.tar.gz | tar xz
       cd libunistring-* || exit
       LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH"
       make -j$(nproc) && make install
