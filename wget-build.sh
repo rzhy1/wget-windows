@@ -71,7 +71,7 @@ build_nettle() {
       cd nettle-* || exit
       # 明确传递包含gmp的路径，以确保nettle能找到它并构建libhogweed
       LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" CFLAGS="-I$INSTALL_PATH/include $CFLAGS" \
-      ./configure --host=$WGET_MINGW_HOST --disable-shared --disable-documentation --prefix="$INSTALL_PATH" --enable-mini-gmp=no
+      ./configure --host=$WGET_MINGW_HOST --disable-shared --disable-documentation --prefix="$INSTALL_PATH" --enable-mini-gmp=yes
       make -j$(nproc) && make install
     fi
   )
@@ -322,7 +322,7 @@ build_wget_gnutls() {
     
     mkdir -p "$INSTALL_PATH"/wget-gnutls
     cp "$INSTALL_PATH"/bin/wget.exe "$INSTALL_PATH"/wget-gnutls/wget-gnutls-x64.exe
-    $MINGW_STRIP_TOOL "$INSTALL_PATH"/wget-gnutls/wget-gnutls-x64.exe
+    $MINGW_STRIP_TOOL --strip-all "$INSTALL_PATH"/wget-gnutls/wget-gnutls-x64.exe
   )
 }
 
@@ -348,7 +348,7 @@ build_wget_openssl() {
     
     mkdir -p "$INSTALL_PATH"/wget-openssl
     cp "$INSTALL_PATH"/bin/wget.exe "$INSTALL_PATH"/wget-openssl/wget-openssl-x64.exe
-    $MINGW_STRIP_TOOL "$INSTALL_PATH"/wget-openssl/wget-openssl-x64.exe
+    $MINGW_STRIP_TOOL --strip-all "$INSTALL_PATH"/wget-openssl/wget-openssl-x64.exe
   )
 }
 
@@ -397,10 +397,6 @@ if [[ "$ssl_type" == "gnutls" ]]; then
   build_gnutls &
 fi
 wait
-
-# Strip 所有静态库
-echo "⭐ 全局清理静态库符号"
-find "$INSTALL_PATH/lib" -name "*.a" -exec $MINGW_STRIP_TOOL --strip-debug {} \; || true
 
 # FINAL STAGE: 编译Wget
 echo "--- LAUNCHING FINAL BUILD (wget) ---"
