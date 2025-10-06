@@ -398,6 +398,10 @@ if [[ "$ssl_type" == "gnutls" ]]; then
 fi
 wait
 
+# Strip 所有静态库
+echo "⭐ 全局清理静态库符号"
+find "$INSTALL_PATH/lib" -name "*.a" -exec $MINGW_STRIP_TOOL --strip-debug {} \; || true
+
 # FINAL STAGE: 编译Wget
 echo "--- LAUNCHING FINAL BUILD (wget) ---"
 if [[ "$ssl_type" == "gnutls" ]]; then
