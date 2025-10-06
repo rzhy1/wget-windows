@@ -274,10 +274,11 @@ build_openssl() {
         no-err no-dso no-engine no-async no-autoalginit
         no-dtls no-sctp no-ssl3 no-tls1 no-tls1_1
         no-comp no-ts no-ocsp no-ct no-cms no-psk no-srp no-srtp no-rfc3779
-        no-fips
-        no-aria no-bf no-blake2 no-camellia no-cast no-cmac no-dh no-dsa
-        no-ec2m no-gost no-idea no-rc2 no-rc4 no-rc5 no-rmd160 no-scrypt
-        no-seed no-siphash no-siv no-sm2 no-sm3 no-sm4 no-whirlpool
+        no-fips no-acvp-tests no-docs no-stdio no-ui-console
+        no-afalgeng no-ssl-trace no-filenames
+        no-aria no-bf no-blake2 no-camellia no-cast no-cmac
+        no-dh no-dsa no-ec2m no-gost no-idea no-rc2 no-rc4 no-rc5 no-rmd160
+        no-scrypt no-seed no-siphash no-siv no-sm2 no-sm3 no-sm4 no-whirlpool
         no-tests no-apps
       )
       CFLAGS="-march=tigerlake -mtune=tigerlake -Os -ffunction-sections -fdata-sections -pipe -g0 $LTO_FLAGS" \
