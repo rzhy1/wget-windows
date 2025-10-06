@@ -20,7 +20,9 @@ export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
 
 # --- 核心编译参数定义 ---
 # CFLAGS: 针对目标CPU进行优化，并启用代码/数据段拆分以便链接器进行"垃圾回收"。
-export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -ffunction-sections -fdata-sections -pipe -g0 -fvisibility=hidden"
+#export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -ffunction-sections -fdata-sections -pipe -g0 -fvisibility=hidden"
+export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -ffunction-sections -fdata-sections -fuse-linker-plugin -fvisibility=hidden -fno-stack-protector -fomit-frame-pointer -DNDEBUG"
+
 export CXXFLAGS="$CFLAGS"
 
 # LDFLAGS for dependencies: 不包含LTO，以确保所有configure测试都能通过。
@@ -281,8 +283,9 @@ build_openssl() {
         no-scrypt no-seed no-siphash no-siv no-sm2 no-sm3 no-sm4 no-whirlpool
         no-tests no-apps
       )
-      CFLAGS="-march=tigerlake -mtune=tigerlake -Os -ffunction-sections -fdata-sections -pipe -g0 $LTO_FLAGS" \
-      LDFLAGS="-Wl,--gc-sections -static -static-libgcc $LTO_FLAGS" \
+      #CFLAGS="-march=tigerlake -mtune=tigerlake -Os -ffunction-sections -fdata-sections -pipe -g0 $LTO_FLAGS" \
+      CFLAGS="-march=tigerlake -mtune=tigerlake -Os -ffunction-sections -fdata-sections -pipe -g0 -fvisibility=hidden $LTO_FLAGS" \
+      LDFLAGS="-Wl,--gc-sections -Wl,--icf=all -static -static-libgcc $LTO_FLAGS" \
       ./Configure -static \
         --prefix="$INSTALL_PATH" \
         --libdir=lib \
