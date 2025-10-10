@@ -67,7 +67,7 @@ build_nettle() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build nettle⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
-      wget -q -O- https://ftp.gnu.org/gnu/nettle/nettle-3.10.2.tar.gz | tar xz
+      wget -q -O- https://mirrors.kernel.org/gnu/nettle/nettle-3.10.2.tar.gz | tar xz
       cd nettle-* || exit
       # 明确传递包含gmp的路径，以确保nettle能找到它并构建libhogweed
       LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" CFLAGS="-I$INSTALL_PATH/include $CFLAGS" \
@@ -81,7 +81,7 @@ build_libtasn1() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libtasn1⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libtasn1.a ]; then
-      wget -q -O- https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.20.0.tar.gz | tar xz
+      wget -q -O- https://mirrors.kernel.org/gnu/libtasn1/libtasn1-4.20.0.tar.gz | tar xz
       cd libtasn1-* || exit
       LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --disable-doc --prefix="$INSTALL_PATH"
       make -j$(nproc) && make install
@@ -93,7 +93,7 @@ build_libunistring() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libunistring⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
-      wget -q -O- https://ftp.gnu.org/gnu/libunistring/libunistring-1.4.1.tar.gz | tar xz
+      wget -q -O- https://mirrors.kernel.org/gnu/libunistring/libunistring-1.4.1.tar.gz | tar xz
       cd libunistring-* || exit
       LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH"
       make -j$(nproc) && make install
@@ -153,7 +153,7 @@ build_libiconv() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libiconv⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libiconv.a ]; then
-      wget -q -O- https://ftp.gnu.org/gnu/libiconv/libiconv-1.18.tar.gz | tar xz
+      wget -q -O- https://mirrors.kernel.org/gnu/libiconv/libiconv-1.18.tar.gz | tar xz
       cd libiconv-* || exit
       LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static
       make -j$(nproc) && make install
@@ -165,7 +165,7 @@ build_libidn2() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libidn2⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
-      wget -q -O- https://ftp.gnu.org/gnu/libidn/libidn2-2.3.8.tar.gz | tar xz
+      wget -q -O- https://mirrors.kernel.org/gnu/libidn/libidn2-2.3.8.tar.gz | tar xz
       cd libidn2-* || exit
       LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --enable-static --disable-shared --disable-doc --prefix="$INSTALL_PATH"
       make -j$(nproc) && make install
@@ -305,7 +305,7 @@ build_wget_gnutls() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (gnuTLS)⭐⭐⭐⭐⭐⭐"
   (
     rm -rf wget-*
-    wget -q -O- https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
+    wget -q -O- https://mirrors.kernel.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
     cd wget-* || exit 1
     
     # 为 gnulib 在 MinGW-w64 下的 bug 打补丁
@@ -330,7 +330,7 @@ build_wget_openssl() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (openssl)⭐⭐⭐⭐⭐⭐"
   (
     rm -rf wget-*
-    wget -q -O- https://ftp.gnu.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
+    wget -q -O- https://mirrors.kernel.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
     cd wget-* || exit 1
 
     # 为 gnulib 在 MinGW-w64 下的 bug 打补丁
