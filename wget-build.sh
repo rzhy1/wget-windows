@@ -189,7 +189,7 @@ build_pcre2() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build pcre2⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libpcre2-8.a ]; then
-      wget -q -O- https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.46/pcre2-10.46.tar.gz | tar xz
+      wget -q -O- https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.gz | tar xz
       cd pcre2-* || exit
       LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static
       make -j$(nproc) && make install
