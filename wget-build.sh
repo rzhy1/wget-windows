@@ -227,7 +227,7 @@ build_gnutls() {
   (
     if [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; then
       rm -rf gnutls-*
-      wget -q -O- https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.10.tar.xz | tar x --xz
+      wget -q -O- https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.11.tar.xz | tar x --xz
       cd gnutls-* || exit
       LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST \
         --prefix="$INSTALL_PATH" \
