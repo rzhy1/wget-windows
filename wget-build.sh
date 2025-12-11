@@ -107,10 +107,7 @@ build_gpg_error() {
     if [ ! -f "$INSTALL_PATH"/lib/libgpg-error.a ]; then
       wget -q -O- https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.57.tar.gz | tar xz
       cd libgpg-error-* || exit
-      sed -i 's/^\s*leave:/leave:;/' src/w32-utils.c
-      if grep -q "leave: *$" src/w32-utils.c; then
-          sed -i 's/leave: *$/leave:;/' src/w32-utils.c
-      fi
+      sed -i '162s/\)\.$/);/' src/w32-utils.c
       LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --disable-doc
       make -j$(nproc) && make install
     fi
