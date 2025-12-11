@@ -358,9 +358,9 @@ build_wget_openssl() {
 
 # STAGE 1: 编译没有内部依赖或只依赖zlib的基础库
 echo "--- LAUNCHING STAGE 1 BUILDS ---"
+build_gpg_error
 build_zlib &
 build_libunistring &
-build_gpg_error &
 build_c_ares &
 build_libiconv &
 build_pcre2 &
