@@ -6,7 +6,7 @@
 | openssl       |   /                  | 3.6.0                 |
 | gmp           | 6.3.0                |   /                   |
 | nettle        | 3.10.2               |   /                   |
-| libtasn1      | 4.20.0               |   /                   |
+| libtasn1      | 4.21.0               |   /                   |
 | libidn2       | 2.3.8                | 2.3.8                 |
 | libunistring  | 1.4.1                | 1.4.1                 |
 | cares         | 1.34.6               | 1.34.6                |
