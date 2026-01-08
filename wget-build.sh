@@ -81,7 +81,7 @@ build_libtasn1() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libtasn1⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libtasn1.a ]; then
-      wget -q -O- https://mirrors.kernel.org/gnu/libtasn1/libtasn1-4.20.0.tar.gz | tar xz
+      wget -q -O- https://mirrors.kernel.org/gnu/libtasn1/libtasn1-4.21.0.tar.gz | tar xz
       cd libtasn1-* || exit
       LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --disable-doc --prefix="$INSTALL_PATH"
       make -j$(nproc) && make install
