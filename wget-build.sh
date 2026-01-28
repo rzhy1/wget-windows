@@ -270,7 +270,7 @@ build_openssl() {
   (
     if [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
       rm -rf openssl-*
-      wget -q -O- https://github.com/openssl/openssl/releases/download/openssl-3.6.0/openssl-3.6.0.tar.gz | tar xz
+      wget -q -O- https://github.com/openssl/openssl/releases/download/openssl-3.6.1/openssl-3.6.1.tar.gz | tar xz
       cd openssl-* || exit
       # 优化后的禁用列表
       DISABLED_FEATURES=(
