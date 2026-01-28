@@ -381,8 +381,9 @@ build_libmetalink &   # Depends on expat
 if [[ "$ssl_type" == "gnutls" ]]; then
   build_nettle &      # Depends on gmp
 fi
+wait
 if [[ "$ssl_type" == "openssl" ]]; then
-  build_openssl &     # Depends on zlib
+  build_openssl     # Depends on zlib
 fi
 wait
 
