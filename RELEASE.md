@@ -3,7 +3,7 @@
 | library       | GnuTLS based version | OpenSSL based version |
 |---------------| ---------------------|-----------------------|
 | gnutls        | 3.8.11               |   /                   |
-| openssl       |   /                  | 3.6.0                 |
+| openssl       |   /                  | 3.6.1                 |
 | gmp           | 6.3.0                |   /                   |
 | nettle        | 3.10.2               |   /                   |
 | libtasn1      | 4.21.0               |   /                   |
