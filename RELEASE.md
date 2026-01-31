@@ -16,6 +16,6 @@
 | libgpg-error  | 1.57                 | 1.57                  |
 | libassuan     | 3.0.2                | 3.0.2                 |
 | gpgme         | 2.0.1                | 2.0.1                 |
-| expat         | 2.7.3                | 2.7.3                 |
+| expat         | 2.7.4                | 2.7.4                 |
 | libmetalink   | 0.1.3                | 0.1.3                 |
 | zlib          | 1.3.1                | 1.3.1                 |
