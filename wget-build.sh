@@ -67,7 +67,7 @@ build_nettle() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build nettle⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
-      wget -q -O- https://mirrors.kernel.org/gnu/nettle/nettle-3.10.2.tar.gz | tar xz
+      wget -q -O- https://mirrors.kernel.org/gnu/nettle/nettle-4.0.tar.gz | tar xz
       cd nettle-* || exit
       # 明确传递包含gmp的路径，以确保nettle能找到它并构建libhogweed
       LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" CFLAGS="-I$INSTALL_PATH/include $CFLAGS" \
@@ -359,27 +359,27 @@ build_wget_openssl() {
 # STAGE 1: 编译没有内部依赖或只依赖zlib的基础库
 echo "--- LAUNCHING STAGE 1 BUILDS ---"
 build_gpg_error
-build_zlib &
-build_libunistring &
-build_c_ares &
-build_libiconv &
-build_pcre2 &
-build_expat &
+build_zlib
+build_libunistring
+build_c_ares
+build_libiconv
+build_pcre2
+build_expat
 
 if [[ "$ssl_type" == "gnutls" ]]; then
-  build_gmp &
-  build_libtasn1 &
+  build_gmp
+  build_libtasn1
 fi
 wait
 
 # STAGE 2: 编译依赖于STAGE 1库的库
 echo "--- LAUNCHING STAGE 2 BUILDS ---"
-build_libidn2 &       # Depends on libunistring
-build_libassuan &     # Depends on gpg-error
-build_libmetalink &   # Depends on expat
+build_libidn2      # Depends on libunistring
+build_libassuan     # Depends on gpg-error
+build_libmetalink   # Depends on expat
 
 if [[ "$ssl_type" == "gnutls" ]]; then
-  build_nettle &      # Depends on gmp
+  build_nettle      # Depends on gmp
 fi
 wait
 if [[ "$ssl_type" == "openssl" ]]; then
@@ -389,14 +389,14 @@ wait
 
 # STAGE 3: 编译依赖于STAGE 2库的库
 echo "--- LAUNCHING STAGE 3 BUILDS ---"
-build_libpsl &        # Depends on libidn2, libiconv
-build_gpgme &         # Depends on libassuan, gpg-error
+build_libpsl        # Depends on libidn2, libiconv
+build_gpgme         # Depends on libassuan, gpg-error
 wait
 
 # STAGE 4: 编译GnuTLS (如果需要)
 if [[ "$ssl_type" == "gnutls" ]]; then
   echo "--- LAUNCHING STAGE 4 BUILD (gnutls) ---"
-  build_gnutls &
+  build_gnutls
 fi
 wait
 
