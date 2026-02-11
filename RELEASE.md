@@ -2,7 +2,7 @@
 
 | library       | GnuTLS based version | OpenSSL based version |
 |---------------| ---------------------|-----------------------|
-| gnutls        | 3.8.11               |   /                   |
+| gnutls        | 3.8.12               |   /                   |
 | openssl       |   /                  | 3.6.1                 |
 | gmp           | 6.3.0                |   /                   |
 | nettle        | 3.10.2               |   /                   |
