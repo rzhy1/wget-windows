@@ -41,11 +41,8 @@ x86_64-w64-mingw32-gcc --version
 select_fastest_gnu_mirror() {
     local candidates=(
         "https://mirrors.aliyun.com/gnu"
-        "https://mirrors.tuna.tsinghua.edu.cn/gnu"
-        "https://mirrors.huaweicloud.com/gnu"
         "https://ftp.gnu.org/gnu"
         "http://mirrors.kernel.org/gnu"
-        "https://ftp.jaist.ac.jp/pub/GNU"
     )
     local fastest_url=""
     local fastest_time=999
@@ -78,8 +75,8 @@ select_fastest_gnu_mirror() {
         echo "[选择] 最快镜像: ${fastest_url} (${fastest_time} 秒)" >&2
         echo "$fastest_url"
     else
-        echo "[警告] 所有镜像均不可用，使用默认镜像 http://mirrors.kernel.org/gnu" >&2
-        echo "http://mirrors.kernel.org/gnu"
+        echo "[警告] 所有镜像均不可用，使用默认镜像 https://ftp.gnu.org/gnu" >&2
+        echo "https://ftp.gnu.org/gnu"
     fi
 }
 
