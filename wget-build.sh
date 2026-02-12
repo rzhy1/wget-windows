@@ -84,8 +84,8 @@ select_fastest_gnu_mirror() {
 if command -v bc &>/dev/null && ( command -v curl &>/dev/null || command -v wget &>/dev/null ); then
     GNU_MIRROR=$(select_fastest_gnu_mirror)
 else
-    echo "警告: 缺少 bc 或 curl/wget，使用默认镜像 http://mirrors.kernel.org/gnu" >&2
-    GNU_MIRROR="http://mirrors.kernel.org/gnu"
+    echo "警告: 缺少 bc 或 curl/wget，使用默认镜像 https://ftp.gnu.org/gnu" >&2
+    GNU_MIRROR="https://ftp.gnu.org/gnu"
 fi
 export GNU_MIRROR
 echo "使用镜像源: $GNU_MIRROR" >&2
