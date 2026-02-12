@@ -37,6 +37,62 @@ ssl_type="$SSL_TYPE"
 echo "Using GCC version:"
 x86_64-w64-mingw32-gcc --version
 
+# --- 镜像自动测速选择 ---
+select_fastest_gnu_mirror() {
+    local candidates=(
+        "https://mirrors.aliyun.com/gnu"
+        "https://mirrors.tuna.tsinghua.edu.cn/gnu"
+        "https://mirrors.huaweicloud.com/gnu"
+        "https://ftp.gnu.org/gnu"
+        "http://mirrors.kernel.org/gnu"
+        "https://ftp.jaist.ac.jp/pub/GNU"
+    )
+    local fastest_url=""
+    local fastest_time=999
+    local tmp_time
+    
+    echo "[测速] 正在测试 GNU 镜像响应速度..." >&2
+    for mirror in "${candidates[@]}"; do
+        if command -v curl &>/dev/null; then
+            tmp_time=$(curl -o /dev/null -s -w '%{time_total}' --connect-timeout 3 --max-time 5 "${mirror}/" 2>/dev/null)
+        elif command -v wget &>/dev/null; then
+            tmp_time=$(wget --spider --timeout=3 --tries=1 -O /dev/null "${mirror}/" 2>&1 | grep -oE '[0-9.]+' | tail -1)
+        else
+            echo "错误: 需要 curl 或 wget" >&2
+            return 1
+        fi
+        
+        if [ -n "$tmp_time" ] && [ "$tmp_time" != "0" ]; then
+            printf "  %-40s %.3f 秒\n" "${mirror}" "${tmp_time}" >&2
+            if (( $(echo "$tmp_time < $fastest_time" | bc -l 2>/dev/null) )) || [ -z "$fastest_url" ]; then
+                fastest_time=$tmp_time
+                fastest_url=$mirror
+            fi
+        else
+            printf "  %-40s 失败\n" "${mirror}" >&2
+        fi
+    done
+    
+    echo >&2
+    if [ -n "$fastest_url" ]; then
+        echo "[选择] 最快镜像: ${fastest_url} (${fastest_time} 秒)" >&2
+        echo "$fastest_url"
+    else
+        echo "[警告] 所有镜像均不可用，使用默认镜像 http://mirrors.kernel.org/gnu" >&2
+        echo "http://mirrors.kernel.org/gnu"
+    fi
+}
+
+# 检测依赖并执行测速
+if command -v bc &>/dev/null && ( command -v curl &>/dev/null || command -v wget &>/dev/null ); then
+    GNU_MIRROR=$(select_fastest_gnu_mirror)
+else
+    echo "警告: 缺少 bc 或 curl/wget，使用默认镜像 http://mirrors.kernel.org/gnu" >&2
+    GNU_MIRROR="http://mirrors.kernel.org/gnu"
+fi
+export GNU_MIRROR
+echo "使用镜像源: $GNU_MIRROR" >&2
+
 # --- 依赖库编译函数定义 ---
 
 build_zlib() {
@@ -67,7 +123,7 @@ build_nettle() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build nettle⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
-      wget -q -O- https://mirrors.kernel.org/gnu/nettle/nettle-3.10.2.tar.gz | tar xz
+      wget -q -O- ${GNU_MIRROR}/nettle/nettle-3.10.2.tar.gz | tar xz
       cd nettle-* || exit
       # 明确传递包含gmp的路径，以确保nettle能找到它并构建libhogweed
       LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" CFLAGS="-I$INSTALL_PATH/include $CFLAGS" \
@@ -81,7 +137,7 @@ build_libtasn1() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libtasn1⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libtasn1.a ]; then
-      wget -q -O- https://mirrors.kernel.org/gnu/libtasn1/libtasn1-4.21.0.tar.gz | tar xz
+      wget -q -O- ${GNU_MIRROR}/libtasn1/libtasn1-4.21.0.tar.gz | tar xz
       cd libtasn1-* || exit
       LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --disable-doc --prefix="$INSTALL_PATH"
       make -j$(nproc) && make install
@@ -93,7 +149,7 @@ build_libunistring() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libunistring⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
-      wget -q -O- https://mirrors.kernel.org/gnu/libunistring/libunistring-1.4.1.tar.gz | tar xz
+      wget -q -O- ${GNU_MIRROR}/libunistring/libunistring-1.4.1.tar.gz | tar xz
       cd libunistring-* || exit
       LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH"
       make -j$(nproc) && make install
@@ -154,7 +210,7 @@ build_libiconv() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libiconv⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libiconv.a ]; then
-      wget -q -O- https://mirrors.kernel.org/gnu/libiconv/libiconv-1.18.tar.gz | tar xz
+      wget -q -O- ${GNU_MIRROR}/libiconv/libiconv-1.18.tar.gz | tar xz
       cd libiconv-* || exit
       LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static
       make -j$(nproc) && make install
@@ -166,7 +222,7 @@ build_libidn2() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libidn2⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
-      wget -q -O- https://mirrors.kernel.org/gnu/libidn/libidn2-2.3.8.tar.gz | tar xz
+      wget -q -O- ${GNU_MIRROR}/libidn/libidn2-2.3.8.tar.gz | tar xz
       cd libidn2-* || exit
       LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --enable-static --disable-shared --disable-doc --prefix="$INSTALL_PATH"
       make -j$(nproc) && make install
@@ -306,7 +362,7 @@ build_wget_gnutls() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (gnuTLS)⭐⭐⭐⭐⭐⭐"
   (
     rm -rf wget-*
-    wget -q -O- https://mirrors.kernel.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
+    wget -q -O- ${GNU_MIRROR}/wget/wget-1.25.0.tar.gz | tar xz
     cd wget-* || exit 1
     
     # 为 gnulib 在 MinGW-w64 下的 bug 打补丁
@@ -331,7 +387,7 @@ build_wget_openssl() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (openssl)⭐⭐⭐⭐⭐⭐"
   (
     rm -rf wget-*
-    wget -q -O- https://mirrors.kernel.org/gnu/wget/wget-1.25.0.tar.gz | tar xz
+    wget -q -O- ${GNU_MIRROR}/wget/wget-1.25.0.tar.gz | tar xz
     cd wget-* || exit 1
 
     # 为 gnulib 在 MinGW-w64 下的 bug 打补丁
