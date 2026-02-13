@@ -39,7 +39,7 @@ x86_64-w64-mingw32-gcc --version
 
 # --- 镜像自动测速选择 ---
 select_fastest_gnu_mirror() {
-    # 候选镜像列表（按国内→官方顺序，确保至少一个可用）
+    # 候选镜像列表（第一个将作为全局 fallback）
     local candidates=(
         "https://mirrors.aliyun.com/gnu"
         "https://mirrors.tuna.tsinghua.edu.cn/gnu"
@@ -47,35 +47,30 @@ select_fastest_gnu_mirror() {
         "https://mirrors.ustc.edu.cn/gnu"
         "https://ftp.gnu.org/gnu"
         "https://ftp.jaist.ac.jp/pub/GNU"
-        "http://mirrors.kernel.org/gnu"  # 已失效，保留作为最后备选
     )
     
-    local fastest_url=""
+    local fastest_url="${candidates[0]}"   # ⚡ 预先设置为第一个镜像，确保永远有值
     local fastest_time=999999
     local tmp_time http_code
     
-    # 测速信息全部输出到 stderr（不影响 stdout 捕获）
     echo "[测速] 正在测试 GNU 镜像响应速度..." >&2
     
     for mirror in "${candidates[@]}"; do
-        # ---------- 优先使用 curl（最准确）----------
+        # ---------- 优先使用 curl ----------
         if command -v curl &>/dev/null; then
-            # 同时获取 HTTP 状态码和总耗时
             http_code=$(curl -o /dev/null -s -w '%{http_code}' --connect-timeout 3 --max-time 5 "${mirror}/" 2>/dev/null)
             tmp_time=$(curl -o /dev/null -s -w '%{time_total}' --connect-timeout 3 --max-time 5 "${mirror}/" 2>/dev/null)
             
-            # 校验：状态码为 2xx 或 3xx，且耗时不为空非零
-            if [[ "$http_code" -ge 200 && "$http_code" -lt 400 ]] && [[ -n "$tmp_time" && "$tmp_time" != "0"* ]]; then
+            # 严格校验：必须返回 2xx/3xx，且耗时是有效正数
+            if [[ "$http_code" =~ ^[0-9]+$ ]] && [[ "$http_code" -ge 200 && "$http_code" -lt 400 ]] && [[ -n "$tmp_time" && "$tmp_time" != "0"* ]]; then
                 printf "  %-45s %.3f 秒 (HTTP %s)\n" "${mirror}" "$tmp_time" "$http_code" >&2
-                
-                # 浮点数比较：兼容 bc 和 awk
+                # 浮点数比较（兼容 bc 和 awk）
                 if command -v bc &>/dev/null; then
                     if (( $(echo "$tmp_time < $fastest_time" | bc -l) )); then
                         fastest_time=$tmp_time
                         fastest_url=$mirror
                     fi
                 else
-                    # 使用 awk 比较（几乎任何环境都有 awk）
                     if awk -v t1="$tmp_time" -v t2="$fastest_time" 'BEGIN{exit !(t1+0 < t2+0)}'; then
                         fastest_time=$tmp_time
                         fastest_url=$mirror
@@ -84,13 +79,10 @@ select_fastest_gnu_mirror() {
             else
                 printf "  %-45s 失败 (HTTP %s)\n" "${mirror}" "$http_code" >&2
             fi
-        
-        # ---------- 备选：使用 wget ----------
+        # ---------- 备选：wget ----------
         elif command -v wget &>/dev/null; then
-            # wget 没有直接输出状态码的简单方式，我们同时检查退出码和耗时
             tmp_time=$(wget --spider --timeout=3 --tries=1 -O /dev/null "${mirror}/" 2>&1 | grep -oE '[0-9.]+' | tail -1)
-            wget --spider --timeout=3 --tries=1 -O /dev/null "${mirror}/" 2>&1 | grep -E "HTTP/.* 200|HTTP/.* 301" -q
-            if [ $? -eq 0 ] && [ -n "$tmp_time" ] && [ "$tmp_time" != "0" ]; then
+            if wget --spider --timeout=3 --tries=1 -O /dev/null "${mirror}/" 2>&1 | grep -E "HTTP/.* 200|HTTP/.* 301" -q; then
                 printf "  %-45s %.3f 秒 (wget)\n" "${mirror}" "$tmp_time" >&2
                 if command -v bc &>/dev/null; then
                     if (( $(echo "$tmp_time < $fastest_time" | bc -l) )); then
@@ -107,23 +99,15 @@ select_fastest_gnu_mirror() {
                 printf "  %-45s 失败\n" "${mirror}" >&2
             fi
         else
-            echo "错误: 系统中既没有 curl 也没有 wget，无法测速！" >&2
-            # 输出默认镜像（重要！确保 stdout 有输出）
-            echo "https://ftp.gnu.org/gnu"
-            return 1
+            echo "错误: 系统中没有 curl 或 wget，无法测速！" >&2
+            break
         fi
     done
     
     echo >&2
-    
-    # 最终结果：输出到 stdout（被脚本捕获），诊断信息到 stderr
-    if [ -n "$fastest_url" ]; then
-        echo "[选择] 最快镜像: ${fastest_url} (${fastest_time} 秒)" >&2
-        echo "$fastest_url"   # ← 这是唯一输出到 stdout 的内容
-    else
-        echo "[警告] 所有镜像均不可用，使用默认镜像 https://ftp.gnu.org/gnu" >&2
-        echo "https://ftp.gnu.org/gnu"   # ← 确保 stdout 有默认值
-    fi
+    echo "[选择] 最快镜像: ${fastest_url} (${fastest_time} 秒)" >&2
+    # ⚡⚡⚡ 关键：唯一输出到 stdout 的内容，绝对有值 ⚡⚡⚡
+    echo "$fastest_url"
 }
 export GNU_MIRROR
 echo "使用镜像源: $GNU_MIRROR" >&2
