@@ -46,27 +46,42 @@ select_fastest_gnu_mirror() {
     )
     local fastest_url=""
     local fastest_time=999
-    local tmp_time
+    local tmp_time http_code
     
     echo "[测速] 正在测试 GNU 镜像响应速度..." >&2
     for mirror in "${candidates[@]}"; do
+        # 1. 使用 curl 同时获取响应时间和 HTTP 状态码
         if command -v curl &>/dev/null; then
+            http_code=$(curl -o /dev/null -s -w '%{http_code}' --connect-timeout 3 --max-time 5 "${mirror}/" 2>/dev/null)
             tmp_time=$(curl -o /dev/null -s -w '%{time_total}' --connect-timeout 3 --max-time 5 "${mirror}/" 2>/dev/null)
+            
+            # 2. 只接受 2xx 或 3xx 状态码（成功/重定向）
+            if [[ $http_code -ge 200 && $http_code -lt 400 ]] && [ -n "$tmp_time" ] && [ "$tmp_time" != "0" ]; then
+                printf "  %-40s %.3f 秒 (HTTP %s)\n" "${mirror}" "${tmp_time}" "$http_code" >&2
+                if (( $(echo "$tmp_time < $fastest_time" | bc -l 2>/dev/null) )) || [ -z "$fastest_url" ]; then
+                    fastest_time=$tmp_time
+                    fastest_url=$mirror
+                fi
+            else
+                printf "  %-40s 失败 (HTTP %s)\n" "${mirror}" "$http_code" >&2
+            fi
+        
+        # 3. 降级方案：使用 wget 并检查返回码
         elif command -v wget &>/dev/null; then
             tmp_time=$(wget --spider --timeout=3 --tries=1 -O /dev/null "${mirror}/" 2>&1 | grep -oE '[0-9.]+' | tail -1)
+            wget --spider --timeout=3 --tries=1 -O /dev/null "${mirror}/" 2>&1 | grep -q "200 OK" || wget --spider --timeout=3 --tries=1 -O /dev/null "${mirror}/" 2>&1 | grep -q "301"
+            if [ $? -eq 0 ] && [ -n "$tmp_time" ] && [ "$tmp_time" != "0" ]; then
+                printf "  %-40s %.3f 秒\n" "${mirror}" "${tmp_time}" >&2
+                if (( $(echo "$tmp_time < $fastest_time" | bc -l 2>/dev/null) )) || [ -z "$fastest_url" ]; then
+                    fastest_time=$tmp_time
+                    fastest_url=$mirror
+                fi
+            else
+                printf "  %-40s 失败\n" "${mirror}" >&2
+            fi
         else
             echo "错误: 需要 curl 或 wget" >&2
             return 1
-        fi
-        
-        if [ -n "$tmp_time" ] && [ "$tmp_time" != "0" ]; then
-            printf "  %-40s %.3f 秒\n" "${mirror}" "${tmp_time}" >&2
-            if (( $(echo "$tmp_time < $fastest_time" | bc -l 2>/dev/null) )) || [ -z "$fastest_url" ]; then
-                fastest_time=$tmp_time
-                fastest_url=$mirror
-            fi
-        else
-            printf "  %-40s 失败\n" "${mirror}" >&2
         fi
     done
     
@@ -79,14 +94,6 @@ select_fastest_gnu_mirror() {
         echo "https://ftp.gnu.org/gnu"
     fi
 }
-
-# 检测依赖并执行测速
-if command -v bc &>/dev/null && ( command -v curl &>/dev/null || command -v wget &>/dev/null ); then
-    GNU_MIRROR=$(select_fastest_gnu_mirror)
-else
-    echo "警告: 缺少 bc 或 curl/wget，使用默认镜像 https://ftp.gnu.org/gnu" >&2
-    GNU_MIRROR="https://ftp.gnu.org/gnu"
-fi
 export GNU_MIRROR
 echo "使用镜像源: $GNU_MIRROR" >&2
 
