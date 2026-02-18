@@ -183,7 +183,7 @@ build_gpg_error() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gpg-error⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libgpg-error.a ]; then
-      wget -q -O- https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.57.tar.gz | tar xz
+      wget -q -O- https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.59.tar.gz | tar xz
       cd libgpg-error-* || exit
       sed -i 's/w32_utils_init ()\./w32_utils_init ();/' src/w32-utils.c
       LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --disable-doc
