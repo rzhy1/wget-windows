@@ -13,7 +13,7 @@
 | libiconv      | 1.18                 | 1.18                  |
 | libpsl        | 0.21.5               | 0.21.5                |
 | pcre2         | 10.47                | 10.47                 |
-| libgpg-error  | 1.57                 | 1.57                  |
+| libgpg-error  | 1.59                 | 1.59                  |
 | libassuan     | 3.0.2                | 3.0.2                 |
 | gpgme         | 2.0.1                | 2.0.1                 |
 | expat         | 2.7.4                | 2.7.4                 |
