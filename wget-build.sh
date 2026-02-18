@@ -121,7 +121,7 @@ build_zlib() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build zlib⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libz.a ]; then
-      wget -q -O- https://zlib.net/zlib-1.3.1.tar.gz | tar xz
+      wget -q -O- https://zlib.net/zlib-1.3.2.tar.gz | tar xz
       cd zlib-* || exit
       CC=$WGET_GCC LDFLAGS="$LDFLAGS_DEPS" ./configure --64 --static --prefix="$INSTALL_PATH"
       make -j$(nproc) && make install
