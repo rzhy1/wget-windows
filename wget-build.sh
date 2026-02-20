@@ -135,7 +135,7 @@ build_gmp() {
     if [ ! -f "$INSTALL_PATH"/lib/libgmp.a ]; then
       wget -nv -O- ${GNU_MIRROR}/gmp/gmp-6.3.0.tar.xz | tar x --xz
       cd gmp-* || exit
-      LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --enable-mini-gmp --disable-shared --prefix="$INSTALL_PATH"
+      LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH"
       make -j$(nproc) && make install
     fi
   )
@@ -305,7 +305,7 @@ build_gnutls() {
   (
     if [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; then
       rm -rf gnutls-*
-      wget -q -O- https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.12.tar.xz | tar x --xz
+      wget -q -O- https://gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.12.tar.xz | tar x --xz
       cd gnutls-* || exit
       LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST \
         --prefix="$INSTALL_PATH" \
