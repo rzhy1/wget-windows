@@ -9,7 +9,7 @@
 
 # --- 脚本行为设置 ---
 # 如果任何命令执行失败，立即退出脚本
-set -e
+set -o pipefail
 
 # --- 全局环境变量定义 ---
 export INSTALL_PATH=$PWD
@@ -210,7 +210,7 @@ build_gpgme() {
     if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
       wget -q -O- https://gnupg.org/ftp/gcrypt/gpgme/gpgme-2.0.1.tar.bz2 | tar xj
       cd gpgme-* || exit
-      env PYTHON=/usr/bin/python3.12 LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --with-libgpg-error-prefix="$INSTALL_PATH" --disable-gpg-test --disable-g13-test --disable-gpgsm-test --disable-gpgconf-test --disable-glibtest --with-libassuan-prefix="$INSTALL_PATH"
+      env PYTHON="$(command -v python3 || command -v python)" LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --with-libgpg-error-prefix="$INSTALL_PATH" --disable-gpg-test --disable-g13-test --disable-gpgsm-test --disable-gpgconf-test --disable-glibtest --with-libassuan-prefix="$INSTALL_PATH"
       make -j$(nproc) && make install
     fi
   )
