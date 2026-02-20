@@ -133,7 +133,7 @@ build_gmp() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gmp⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libgmp.a ]; then
-      wget -nv -O- https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz | tar x --xz
+      wget -nv -O- ${GNU_MIRROR}/gmp/gmp-6.3.0.tar.xz | tar x --xz
       cd gmp-* || exit
       LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --enable-mini-gmp --disable-shared --prefix="$INSTALL_PATH"
       make -j$(nproc) && make install
