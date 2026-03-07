@@ -10,7 +10,7 @@
 | libidn2       | 2.3.8                | 2.3.8                 |
 | libunistring  | 1.4.1                | 1.4.1                 |
 | cares         | 1.34.6               | 1.34.6                |
-| libiconv      | 1.18                 | 1.18                  |
+| libiconv      | 1.19                 | 1.19                  |
 | libpsl        | 0.21.5               | 0.21.5                |
 | pcre2         | 10.47                | 10.47                 |
 | libgpg-error  | 1.59                 | 1.59                  |
