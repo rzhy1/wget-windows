@@ -280,7 +280,7 @@ build_expat() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build expat⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libexpat.a ]; then
-      wget -q -O- https://github.com/libexpat/libexpat/releases/download/R_2_7_4/expat-2.7.4.tar.gz | tar xz
+      wget -q -O- https://github.com/libexpat/libexpat/releases/download/R_2_7_5/expat-2.7.5.tar.gz | tar xz
       cd expat-* || exit
       LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --without-docbook --without-tests
       make -j$(nproc) && make install
