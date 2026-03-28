@@ -145,7 +145,7 @@ build_nettle() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build nettle⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
-      wget -q -O- ${GNU_MIRROR}/nettle/nettle-3.10.2.tar.gz | tar xz
+      wget -q -O- ${GNU_MIRROR}/nettle/nettle-4.0.tar.gz | tar xz
       cd nettle-* || exit
       # 明确传递包含gmp的路径，以确保nettle能找到它并构建libhogweed
       LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" CFLAGS="-I$INSTALL_PATH/include $CFLAGS" \
@@ -307,6 +307,11 @@ build_gnutls() {
       rm -rf gnutls-*
       wget -q -O- https://gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.12.tar.xz | tar x --xz
       cd gnutls-* || exit
+      
+      # 下载并应用 Nettle 4.0 兼容性补丁
+      echo "Applying Nettle 4.0 compatibility patch..."
+      wget -q -O- https://www.linuxfromscratch.org/patches/blfs/svn/gnutls-3.8.12-nettle4_fixes-1.patch | patch -Np1
+      
       LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST \
         --prefix="$INSTALL_PATH" \
         --with-included-unistring \
