@@ -5,7 +5,7 @@
 | gnutls        | 3.8.12               |   /                   |
 | openssl       |   /                  | 3.6.1                 |
 | gmp           | 6.3.0                |   /                   |
-| nettle        | 4.0                  |   /                   |
+| nettle        | 3.8.12               |   /                   |
 | libtasn1      | 4.21.0               |   /                   |
 | libidn2       | 2.3.8                | 2.3.8                 |
 | libunistring  | 1.4.1                | 1.4.1                 |
