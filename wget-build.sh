@@ -145,7 +145,7 @@ build_nettle() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build nettle⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
-      wget -q -O- ${GNU_MIRROR}/nettle/nettle-3.8.12.tar.gz | tar xz
+      wget -q -O- ${GNU_MIRROR}/nettle/nettle-3.10.2.tar.gz | tar xz
       cd nettle-* || exit
       # 明确传递包含gmp的路径，以确保nettle能找到它并构建libhogweed
       LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" CFLAGS="-I$INSTALL_PATH/include $CFLAGS" \
