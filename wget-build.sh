@@ -149,7 +149,7 @@ build_nettle() {
       cd nettle-* || exit
       # 明确传递包含gmp的路径，以确保nettle能找到它并构建libhogweed
       LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" CFLAGS="-I$INSTALL_PATH/include $CFLAGS" \
-      ./configure --host=$WGET_MINGW_HOST --disable-shared --enable-static --disable-documentation --prefix="$INSTALL_PATH" --enable-mini-gmp=yes
+      ./configure --host=$WGET_MINGW_HOST --disable-shared --enable-static --disable-documentation --prefix="$INSTALL_PATH"
       make -j$(nproc) && make install
     fi
   )
