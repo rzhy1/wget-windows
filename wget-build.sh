@@ -391,19 +391,54 @@ build_wget_gnutls() {
     rm -rf wget-*
     wget -q -O- ${GNU_MIRROR}/wget/wget-1.25.0.tar.gz | tar xz
     cd wget-* || exit 1
-    
-    # 为 gnulib 在 MinGW-w64 下的 bug 打补丁
+
+    # ========== 修复 Nettle 4.0 API 不兼容问题 ==========
+    echo "正在修复 http-ntlm.c 以兼容 Nettle 4.0..."
+    cat > nettle4-ntlm.patch << 'EOF'
+--- a/src/http-ntlm.c
++++ b/src/http-ntlm.c
+@@ -322,7 +322,11 @@ mkhash (const char *text, size_t len, char hash[21])
+       n = 2 * len;
+     }
+   nettle_md4_update (&MD4, len, buf);
+-  nettle_md4_digest (&MD4, MD4_DIGEST_SIZE, ntbuffer);
++  /* Nettle 4.0: md4_digest now takes only ctx and digest buffer */
++  uint8_t digest[MD4_DIGEST_SIZE];
++  nettle_md4_digest (&MD4, digest);
++  memcpy (ntbuffer, digest, MD4_DIGEST_SIZE);
++
+   memset (&MD4, 0, sizeof (MD4));
+   xfree (buf);
+EOF
+
+    # 尝试用 patch 命令打补丁，失败则用 sed 直接修改
+    if command -v patch >/dev/null 2>&1; then
+      patch -p1 < nettle4-ntlm.patch || {
+        echo "补丁应用失败，使用 sed 手动修改..."
+        sed -i.bak 's/nettle_md4_digest (&MD4, MD4_DIGEST_SIZE, ntbuffer);/do { uint8_t _d[MD4_DIGEST_SIZE]; nettle_md4_digest(\&MD4, _d); memcpy(ntbuffer, _d, MD4_DIGEST_SIZE); } while(0)/' src/http-ntlm.c
+      }
+    else
+      echo "未找到 patch 命令，使用 sed 修改..."
+      sed -i.bak 's/nettle_md4_digest (&MD4, MD4_DIGEST_SIZE, ntbuffer);/do { uint8_t _d[MD4_DIGEST_SIZE]; nettle_md4_digest(\&MD4, _d); memcpy(ntbuffer, _d, MD4_DIGEST_SIZE); } while(0)/' src/http-ntlm.c
+    fi
+    # ================================================
+
+    # 修复 gnulib 在 MinGW-w64 下的 bug
     sed -i 's/__gl_error_call (error,/__gl_error_call ((error),/' lib/error.in.h
     sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' lib/error.in.h
-    
+
     WGET_CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2 -flto=$(nproc) -DSO_LINGER=0 -DTCP_LINGER2=0 -D_DISABLE_CLOSE_WAIT"
     WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS"
     WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lgnutls -lhogweed -lnettle -lgmp -ltasn1 -lz -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lwinpthread -lws2_32 -liphlpapi -lcrypt32 -lbcrypt -lncrypt"
-    ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" --disable-debug --enable-iri --enable-pcre2 --with-ssl=gnutls --with-included-libunistring=no --with-cares --with-libpsl --with-metalink --with-gpgme-prefix="$INSTALL_PATH" \
+
+    ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" \
+      --disable-debug --enable-iri --enable-pcre2 --with-ssl=gnutls \
+      --with-included-libunistring=no --with-cares --with-libpsl --with-metalink \
+      --with-gpgme-prefix="$INSTALL_PATH" \
       CFLAGS="$WGET_CFLAGS" LDFLAGS="$WGET_LDFLAGS" LIBS="$WGET_LIBS"
 
     make -j$(nproc) && make install
-    
+
     mkdir -p "$INSTALL_PATH"/wget-gnutls
     cp "$INSTALL_PATH"/bin/wget.exe "$INSTALL_PATH"/wget-gnutls/wget-gnutls-x64.exe
     $MINGW_STRIP_TOOL --strip-all "$INSTALL_PATH"/wget-gnutls/wget-gnutls-x64.exe
