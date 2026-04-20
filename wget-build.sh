@@ -392,34 +392,53 @@ build_wget_gnutls() {
     wget -q -O- ${GNU_MIRROR}/wget/wget-1.25.0.tar.gz | tar xz
     cd wget-* || exit 1
 
-    # ========== 修复 Nettle 4.0 API 不兼容问题 ==========
-    echo "正在修复 http-ntlm.c 以兼容 Nettle 4.0..."
-    cat > nettle4-ntlm.patch << 'EOF'
---- a/src/http-ntlm.c
-+++ b/src/http-ntlm.c
-@@ -322,7 +322,11 @@ mkhash (const char *text, size_t len, char hash[21])
-       n = 2 * len;
-     }
-   nettle_md4_update (&MD4, len, buf);
--  nettle_md4_digest (&MD4, MD4_DIGEST_SIZE, ntbuffer);
-+  /* Nettle 4.0: md4_digest now takes only ctx and digest buffer */
-+  uint8_t digest[MD4_DIGEST_SIZE];
-+  nettle_md4_digest (&MD4, digest);
-+  memcpy (ntbuffer, digest, MD4_DIGEST_SIZE);
-+
-   memset (&MD4, 0, sizeof (MD4));
-   xfree (buf);
+    # ========== 强制修复 http-ntlm.c 中的 Nettle 4.0 API 问题 ==========
+    echo "正在强制修复 http-ntlm.c 以兼容 Nettle 4.0..."
+    
+    # 方法1：直接替换整个函数调用（最可靠）
+    cat > /tmp/fix_ntlm.sed << 'EOF'
+/nettle_md4_digest(&MD4, MD4_DIGEST_SIZE, ntbuffer);/ {
+    c\
+    {\
+      uint8_t digest[MD4_DIGEST_SIZE];\
+      nettle_md4_digest(&MD4, digest);\
+      memcpy(ntbuffer, digest, MD4_DIGEST_SIZE);\
+    }
+}
 EOF
-
-    # 尝试用 patch 命令打补丁，失败则用 sed 直接修改
-    if command -v patch >/dev/null 2>&1; then
-      patch -p1 < nettle4-ntlm.patch || {
-        echo "补丁应用失败，使用 sed 手动修改..."
-        sed -i.bak 's/nettle_md4_digest (&MD4, MD4_DIGEST_SIZE, ntbuffer);/do { uint8_t _d[MD4_DIGEST_SIZE]; nettle_md4_digest(\&MD4, _d); memcpy(ntbuffer, _d, MD4_DIGEST_SIZE); } while(0)/' src/http-ntlm.c
-      }
+    
+    # 应用 sed 脚本
+    sed -i -f /tmp/fix_ntlm.sed src/http-ntlm.c || {
+        echo "sed 脚本失败，尝试备用方法..."
+        
+        # 备用方法：使用 Perl（如果可用）
+        if command -v perl >/dev/null 2>&1; then
+            perl -i -pe 's/nettle_md4_digest\(&MD4,\s*MD4_DIGEST_SIZE,\s*ntbuffer\);/{\n      uint8_t digest[MD4_DIGEST_SIZE];\n      nettle_md4_digest(\&MD4, digest);\n      memcpy(ntbuffer, digest, MD4_DIGEST_SIZE);\n    }/' src/http-ntlm.c
+        else
+            # 最后手段：直接用 echo 重写相关部分
+            awk '
+            /nettle_md4_digest\(&MD4, MD4_DIGEST_SIZE, ntbuffer\);/ {
+                print "    {"
+                print "      uint8_t digest[MD4_DIGEST_SIZE];"
+                print "      nettle_md4_digest(&MD4, digest);"
+                print "      memcpy(ntbuffer, digest, MD4_DIGEST_SIZE);"
+                print "    }"
+                next
+            }
+            { print }
+            ' src/http-ntlm.c > src/http-ntlm.c.tmp && mv src/http-ntlm.c.tmp src/http-ntlm.c
+        fi
+    }
+    
+    # 验证修补是否成功
+    echo "验证修补结果..."
+    if grep -q "nettle_md4_digest(&MD4, MD4_DIGEST_SIZE, ntbuffer)" src/http-ntlm.c; then
+        echo "错误：修补失败，旧代码仍然存在！"
+        echo "显示相关代码："
+        grep -n -A2 -B2 "nettle_md4_digest" src/http-ntlm.c
+        exit 1
     else
-      echo "未找到 patch 命令，使用 sed 修改..."
-      sed -i.bak 's/nettle_md4_digest (&MD4, MD4_DIGEST_SIZE, ntbuffer);/do { uint8_t _d[MD4_DIGEST_SIZE]; nettle_md4_digest(\&MD4, _d); memcpy(ntbuffer, _d, MD4_DIGEST_SIZE); } while(0)/' src/http-ntlm.c
+        echo "修补成功！"
     fi
     # ================================================
 
