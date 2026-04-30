@@ -305,12 +305,12 @@ build_gnutls() {
   (
     if [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; then
       rm -rf gnutls-*
-      wget -q -O- https://gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.12.tar.xz | tar x --xz
+      wget -q -O- https://gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.13.tar.xz | tar x --xz
       cd gnutls-* || exit
       
       # 下载并应用 Nettle 4.0 兼容性补丁
-      echo "Applying Nettle 4.0 compatibility patch..."
-      wget -q -O- https://www.linuxfromscratch.org/patches/blfs/svn/gnutls-3.8.12-nettle4_fixes-1.patch | patch -Np1
+      #echo "Applying Nettle 4.0 compatibility patch..."
+      #wget -q -O- https://www.linuxfromscratch.org/patches/blfs/svn/gnutls-3.8.12-nettle4_fixes-1.patch | patch -Np1
       
       LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST \
         --prefix="$INSTALL_PATH" \
