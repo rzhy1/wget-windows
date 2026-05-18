@@ -208,7 +208,7 @@ build_gpgme() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gpgme⭐⭐⭐⭐⭐⭐"
   (
     if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
-      wget -q -O- https://gnupg.org/ftp/gcrypt/gpgme/gpgme-2.0.1.tar.bz2 | tar xj
+      wget -q -O- https://gnupg.org/ftp/gcrypt/gpgme/gpgme-2.1.0.tar.bz2 | tar xj
       cd gpgme-* || exit
       env PYTHON="$(command -v python3 || command -v python)" LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --with-libgpg-error-prefix="$INSTALL_PATH" --disable-gpg-test --disable-g13-test --disable-gpgsm-test --disable-gpgconf-test --disable-glibtest --with-libassuan-prefix="$INSTALL_PATH"
       make -j$(nproc) && make install
