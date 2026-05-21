@@ -2,13 +2,9 @@
 
 #
 # wget build script for Windows environment
-# Author: rzhy1
-# Refactored for parallel execution
-# 2025/08/30
+# Refactored for real parallel execution & optimized safety
 #
 
-# --- 脚本行为设置 ---
-# 如果任何命令执行失败，立即退出脚本
 set -o pipefail
 
 # --- 全局环境变量定义 ---
@@ -18,28 +14,26 @@ export WGET_GCC=x86_64-w64-mingw32-gcc
 export WGET_MINGW_HOST=x86_64-w64-mingw32
 export MINGW_STRIP_TOOL=x86_64-w64-mingw32-strip
 
+# 安全获取 CPU 核心数
+if command -v nproc >/dev/null 2>&1; then
+    export NPROC=$(nproc)
+else
+    export NPROC=${NUMBER_OF_PROCESSORS:-4}
+fi
+
 # --- 核心编译参数定义 ---
-# CFLAGS: 针对目标CPU进行优化，并启用代码/数据段拆分以便链接器进行"垃圾回收"。
-#export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -ffunction-sections -fdata-sections -pipe -g0 -fvisibility=hidden"
 export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -ffunction-sections -fdata-sections -fuse-linker-plugin -fvisibility=hidden -fno-stack-protector -fomit-frame-pointer -DNDEBUG"
-
 export CXXFLAGS="$CFLAGS"
-
-# LDFLAGS for dependencies: 不包含LTO，以确保所有configure测试都能通过。
 export LDFLAGS_DEPS="-static -static-libgcc -Wl,--gc-sections -Wl,-S"
+export LTO_FLAGS="-flto=$NPROC"
 
-# LTO_FLAGS: 单独定义LTO参数，只在编译wget主程序时使用。
-export LTO_FLAGS="-flto=$(nproc)"
-
-# 获取外部传入的SSL类型变量
 ssl_type="$SSL_TYPE"
 
 echo "Using GCC version:"
 x86_64-w64-mingw32-gcc --version
 
-# ========== 镜像测速选择函数（纯 Shell）==========
+# ========== 并行镜像测速选择函数 ==========
 select_fastest_gnu_mirror() {
-    # 候选镜像列表（按推荐顺序，阿里云为首要默认）
     local candidates=(
         "https://mirrors.aliyun.com/gnu"
         "https://mirrors.tuna.tsinghua.edu.cn/gnu"
@@ -51,497 +45,429 @@ select_fastest_gnu_mirror() {
         "http://mirrors.kernel.org/gnu"
     )
 
-    # 默认最快镜像设为阿里云（保证总有输出）
+    local tmp_dir
+    tmp_dir=$(mktemp -d)
+    local pids=()
+
+    echo "[测速] 正在并行测试 GNU 镜像响应速度..." >&2
+
+    # 并行发起连接测试
+    for i in "${!candidates[@]}"; do
+        local mirror="${candidates[i]}"
+        (
+            if command -v curl >/dev/null 2>&1; then
+                local curl_output
+                curl_output=$(curl -o /dev/null -s -w '%{http_code} %{time_total}' \
+                    --connect-timeout 2 --max-time 4 "${mirror}/" 2>/dev/null)
+                local http_code=$(echo "$curl_output" | awk '{print $1}')
+                local tmp_time=$(echo "$curl_output" | awk '{print $2}')
+
+                if [[ "$http_code" =~ ^[23][0-9][0-9]$ ]] && \
+                   awk -v t="$tmp_time" 'BEGIN{exit !(t > 0)}' 2>/dev/null; then
+                    echo "$tmp_time $mirror" > "$tmp_dir/$i"
+                fi
+            elif command -v wget >/dev/null 2>&1; then
+                if wget --spider --timeout=2 --tries=1 -O /dev/null "${mirror}/" >/dev/null 2>&1; then
+                    echo "1.0 $mirror" > "$tmp_dir/$i"
+                fi
+            fi
+        ) &
+        pids+=($!)
+    done
+
+    # 等待所有测速子进程结束
+    wait "${pids[@]}" 2>/dev/null
+
+    # 评估最快镜像
     local fastest_url="${candidates[0]}"
     local fastest_time=999999
-    local mirror http_code tmp_time curl_output
 
-    echo "[测速] 正在测试 GNU 镜像响应速度..." >&2
-
-    for mirror in "${candidates[@]}"; do
-        # ---------- 优先使用 curl（最准确）----------
-        if command -v curl >/dev/null 2>&1; then
-            # 获取 HTTP 状态码和总耗时（单位：秒）
-            curl_output=$(curl -o /dev/null -s -w '%{http_code} %{time_total}' \
-                --connect-timeout 3 --max-time 5 "${mirror}/" 2>/dev/null)
-            http_code=$(echo "$curl_output" | awk '{print $1}')
-            tmp_time=$(echo "$curl_output" | awk '{print $2}')
-
-            # 严格校验：状态码为 2xx/3xx，且耗时是有效正数
-            if echo "$http_code" | grep -qE '^[0-9]+$' && \
-               [ "$http_code" -ge 200 ] && [ "$http_code" -lt 400 ] && \
-               echo "$tmp_time" | grep -qE '^[0-9]+(\.[0-9]+)?$' && \
-               awk -v t="$tmp_time" 'BEGIN{exit !(t > 0)}' 2>/dev/null; then
-                
-                printf "  %-45s %.3f 秒 (HTTP %s)\n" "$mirror" "$tmp_time" "$http_code" >&2
-                
-                # 比较浮点时间（纯 awk，无 bc 依赖）
-                if awk -v t1="$tmp_time" -v t2="$fastest_time" 'BEGIN{exit !(t1 < t2)}' 2>/dev/null; then
-                    fastest_time=$tmp_time
-                    fastest_url=$mirror
-                fi
-            else
-                printf "  %-45s 失败 (HTTP %s)\n" "$mirror" "$http_code" >&2
+    for i in "${!candidates[@]}"; do
+        if [ -f "$tmp_dir/$i" ]; then
+            read -r t m < "$tmp_dir/$i"
+            printf "  %-45s %.3f 秒\n" "$m" "$t" >&2
+            if awk -v t1="$t" -v t2="$fastest_time" 'BEGIN{exit !(t1 < t2)}' 2>/dev/null; then
+                fastest_time=$t
+                fastest_url=$m
             fi
-
-        # ---------- 备选：wget（仅简单检测）----------
-        elif command -v wget >/dev/null 2>&1; then
-            if wget --spider --timeout=3 --tries=1 -O /dev/null "${mirror}/" 2>&1 | \
-               grep -qE "HTTP/.* 200|HTTP/.* 301"; then
-                # wget 无法精确获取耗时，统一标记为 1.0 秒（仅作连通性判断）
-                tmp_time=1.0
-                printf "  %-45s 可用 (wget)\n" "$mirror" >&2
-                # 简单比较：只要比当前最快小就选（实际是 1.0 vs 999999）
-                if awk -v t1="$tmp_time" -v t2="$fastest_time" 'BEGIN{exit !(t1 < t2)}' 2>/dev/null; then
-                    fastest_time=$tmp_time
-                    fastest_url=$mirror
-                fi
-            else
-                printf "  %-45s 失败 (wget)\n" "$mirror" >&2
-            fi
-        else
-            echo "[错误] 系统中既没有 curl 也没有 wget，无法测速！" >&2
-            break
         fi
     done
 
-    echo >&2
+    rm -rf "$tmp_dir"
     echo "[选择] 最快镜像: ${fastest_url} (${fastest_time}s)" >&2
-
-    # ★★★ 唯一输出到 stdout 的内容，供变量捕获 ★★★
     echo "$fastest_url"
 }
+
 GNU_MIRROR=$(select_fastest_gnu_mirror)
 export GNU_MIRROR
 echo "使用镜像源: $GNU_MIRROR" >&2
+
+
+# ========== 并行执行辅助管理器 ==========
+# 用于并行运行构建函数，在隔离的日志中打印输出，若有错误立即报错退出
+run_parallel() {
+    local pids=()
+    local cmds=("$@")
+    local log_dir
+    log_dir=$(mktemp -d)
+
+    for cmd in "${cmds[@]}"; do
+        # 在后台执行构建函数，并将输出重定向至独立日志中
+        ( $cmd > "$log_dir/${cmd}.log" 2>&1 ) &
+        pids+=($!)
+    done
+
+    local failed=0
+    for i in "${!pids[@]}"; do
+        if ! wait "${pids[i]}"; then
+            echo "错误: 任务 [${cmds[i]}] 编译失败！输出日志如下：" >&2
+            cat "$log_dir/${cmds[i]}.log" >&2
+            failed=1
+        fi
+    done
+
+    rm -rf "$log_dir"
+    if [ $failed -ne 0 ]; then
+        exit 1
+    fi
+}
+
 
 # --- 依赖库编译函数定义 ---
 
 build_zlib() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build zlib⭐⭐⭐⭐⭐⭐"
-  (
-    if [ ! -f "$INSTALL_PATH"/lib/libz.a ]; then
-      ( wget -q -O- https://zlib.net/zlib-1.3.2.tar.gz || wget -q -O- https://github.com/madler/zlib/releases/download/v1.3.2/zlib-1.3.2.tar.gz ) | tar xz
-      cd zlib-* || exit
-      CC=$WGET_GCC LDFLAGS="$LDFLAGS_DEPS" ./configure --64 --static --prefix="$INSTALL_PATH"
-      make -j$(nproc) && make install
-    fi
-  )
+  if [ ! -f "$INSTALL_PATH"/lib/libz.a ]; then
+    rm -rf zlib-*
+    ( wget -q -O- https://zlib.net/zlib-1.3.2.tar.gz || wget -q -O- https://github.com/madler/zlib/releases/download/v1.3.2/zlib-1.3.2.tar.gz ) | tar xz
+    cd zlib-* || exit 1
+    CC=$WGET_GCC LDFLAGS="$LDFLAGS_DEPS" ./configure --64 --static --prefix="$INSTALL_PATH"
+    make -j$NPROC && make install
+  fi
 }
 
 build_gmp() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gmp⭐⭐⭐⭐⭐⭐"
-  (
-    if [ ! -f "$INSTALL_PATH"/lib/libgmp.a ]; then
-      wget -nv -O- ${GNU_MIRROR}/gmp/gmp-6.3.0.tar.xz | tar x --xz
-      cd gmp-* || exit
-      LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH"
-      make -j$(nproc) && make install
-    fi
-  )
+  if [ ! -f "$INSTALL_PATH"/lib/libgmp.a ]; then
+    rm -rf gmp-*
+    wget -nv -O- ${GNU_MIRROR}/gmp/gmp-6.3.0.tar.xz | tar x --xz
+    cd gmp-* || exit 1
+    LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH"
+    make -j$NPROC && make install
+  fi
 }
 
 build_nettle() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build nettle⭐⭐⭐⭐⭐⭐"
-  (
-    if [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
-      wget -q -O- ${GNU_MIRROR}/nettle/nettle-4.0.tar.gz | tar xz
-      cd nettle-* || exit
-      # 明确传递包含gmp的路径，以确保nettle能找到它并构建libhogweed
-      LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" CFLAGS="-I$INSTALL_PATH/include $CFLAGS" \
-      ./configure --host=$WGET_MINGW_HOST --disable-shared --enable-static --disable-documentation --prefix="$INSTALL_PATH"
-      make -j$(nproc) && make install
-    fi
-  )
+  if [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
+    rm -rf nettle-*
+    wget -q -O- ${GNU_MIRROR}/nettle/nettle-4.0.tar.gz | tar xz
+    cd nettle-* || exit 1
+    LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" CFLAGS="-I$INSTALL_PATH/include $CFLAGS" \
+    ./configure --host=$WGET_MINGW_HOST --disable-shared --enable-static --disable-documentation --prefix="$INSTALL_PATH"
+    make -j$NPROC && make install
+  fi
 }
 
 build_libtasn1() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libtasn1⭐⭐⭐⭐⭐⭐"
-  (
-    if [ ! -f "$INSTALL_PATH"/lib/libtasn1.a ]; then
-      wget -q -O- ${GNU_MIRROR}/libtasn1/libtasn1-4.21.0.tar.gz | tar xz
-      cd libtasn1-* || exit
-      LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --disable-doc --prefix="$INSTALL_PATH"
-      make -j$(nproc) && make install
-    fi
-  )
+  if [ ! -f "$INSTALL_PATH"/lib/libtasn1.a ]; then
+    rm -rf libtasn1-*
+    wget -q -O- ${GNU_MIRROR}/libtasn1/libtasn1-4.21.0.tar.gz | tar xz
+    cd libtasn1-* || exit 1
+    LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --disable-doc --prefix="$INSTALL_PATH"
+    make -j$NPROC && make install
+  fi
 }
 
 build_libunistring() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libunistring⭐⭐⭐⭐⭐⭐"
-  (
-    if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
-      wget -q -O- ${GNU_MIRROR}/libunistring/libunistring-1.4.2.tar.gz | tar xz
-      cd libunistring-* || exit
-      LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH"
-      make -j$(nproc) && make install
-    fi
-  )
+  if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
+    rm -rf libunistring-*
+    wget -q -O- ${GNU_MIRROR}/libunistring/libunistring-1.4.2.tar.gz | tar xz
+    cd libunistring-* || exit 1
+    LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH"
+    make -j$NPROC && make install
+  fi
 }
 
 build_gpg_error() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gpg-error⭐⭐⭐⭐⭐⭐"
-  (
-    if [ ! -f "$INSTALL_PATH"/lib/libgpg-error.a ]; then
-      wget -q -O- https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.61.tar.gz | tar xz
-      cd libgpg-error-* || exit
-      sed -i 's/w32_utils_init ()\./w32_utils_init ();/' src/w32-utils.c
-      LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --disable-doc
-      make -j$(nproc) && make install
-    fi
-  )
+  if [ ! -f "$INSTALL_PATH"/lib/libgpg-error.a ]; then
+    rm -rf libgpg-error-*
+    wget -q -O- https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.61.tar.gz | tar xz
+    cd libgpg-error-* || exit 1
+    sed -i 's/w32_utils_init ()\./w32_utils_init ();/' src/w32-utils.c
+    LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --disable-doc
+    make -j$NPROC && make install
+  fi
 }
 
 build_libassuan() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libassuan⭐⭐⭐⭐⭐⭐"
-  (
-    if [ ! -f "$INSTALL_PATH"/lib/libassuan.a ]; then
-      wget -q -O- https://gnupg.org/ftp/gcrypt/libassuan/libassuan-3.0.2.tar.bz2 | tar xj
-      cd libassuan-* || exit
-      LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --disable-doc --with-libgpg-error-prefix="$INSTALL_PATH"
-      make -j$(nproc) && make install
-    fi
-  )
+  if [ ! -f "$INSTALL_PATH"/lib/libassuan.a ]; then
+    rm -rf libassuan-*
+    wget -q -O- https://gnupg.org/ftp/gcrypt/libassuan/libassuan-3.0.2.tar.bz2 | tar xj
+    cd libassuan-* || exit 1
+    LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --disable-doc --with-libgpg-error-prefix="$INSTALL_PATH"
+    make -j$NPROC && make install
+  fi
 }
 
 build_gpgme() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gpgme⭐⭐⭐⭐⭐⭐"
-  (
-    if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
-      wget -q -O- https://gnupg.org/ftp/gcrypt/gpgme/gpgme-2.1.0.tar.bz2 | tar xj
-      cd gpgme-* || exit
-      env PYTHON="$(command -v python3 || command -v python)" LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --with-libgpg-error-prefix="$INSTALL_PATH" --disable-gpg-test --disable-g13-test --disable-gpgsm-test --disable-gpgconf-test --disable-glibtest --with-libassuan-prefix="$INSTALL_PATH"
-      make -j$(nproc) && make install
-    fi
-  )
+  if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
+    rm -rf gpgme-*
+    wget -q -O- https://gnupg.org/ftp/gcrypt/gpgme/gpgme-2.1.0.tar.bz2 | tar xj
+    cd gpgme-* || exit 1
+    env PYTHON="$(command -v python3 || command -v python)" LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --with-libgpg-error-prefix="$INSTALL_PATH" --disable-gpg-test --disable-g13-test --disable-gpgsm-test --disable-gpgconf-test --disable-glibtest --with-libassuan-prefix="$INSTALL_PATH"
+    make -j$NPROC && make install
+  fi
 }
 
 build_c_ares() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build c-ares⭐⭐⭐⭐⭐⭐"
-  (
-    if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
-      wget -q -O- https://github.com/c-ares/c-ares/releases/download/v1.34.6/c-ares-1.34.6.tar.gz | tar xz
-      cd c-ares-* || exit
-      CPPFLAGS="-DCARES_STATICLIB=1" LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --disable-tests
-      make -j$(nproc) && make install
-    fi
-  )
+  if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
+    rm -rf c-ares-*
+    wget -q -O- https://github.com/c-ares/c-ares/releases/download/v1.34.6/c-ares-1.34.6.tar.gz | tar xz
+    cd c-ares-* || exit 1
+    CPPFLAGS="-DCARES_STATICLIB=1" LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --disable-tests
+    make -j$NPROC && make install
+  fi
 }
 
 build_libiconv() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libiconv⭐⭐⭐⭐⭐⭐"
-  (
-    if [ ! -f "$INSTALL_PATH"/lib/libiconv.a ]; then
-      wget -q -O- ${GNU_MIRROR}/libiconv/libiconv-1.19.tar.gz | tar xz
-      cd libiconv-* || exit
-      LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static
-      make -j$(nproc) && make install
-    fi
-  )
+  if [ ! -f "$INSTALL_PATH"/lib/libiconv.a ]; then
+    rm -rf libiconv-*
+    wget -q -O- ${GNU_MIRROR}/libiconv/libiconv-1.19.tar.gz | tar xz
+    cd libiconv-* || exit 1
+    LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static
+    make -j$NPROC && make install
+  fi
 }
 
 build_libidn2() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libidn2⭐⭐⭐⭐⭐⭐"
-  (
-    if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
-      wget -q -O- ${GNU_MIRROR}/libidn/libidn2-2.3.8.tar.gz | tar xz
-      cd libidn2-* || exit
-      LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --enable-static --disable-shared --disable-doc --prefix="$INSTALL_PATH"
-      make -j$(nproc) && make install
-    fi
-  )
+  if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
+    rm -rf libidn2-*
+    wget -q -O- ${GNU_MIRROR}/libidn/libidn2-2.3.8.tar.gz | tar xz
+    cd libidn2-* || exit 1
+    LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --enable-static --disable-shared --disable-doc --prefix="$INSTALL_PATH"
+    make -j$NPROC && make install
+  fi
 }
 
 build_libpsl() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libpsl⭐⭐⭐⭐⭐⭐"
-  (
-    if [ ! -f "$INSTALL_PATH"/lib/libpsl.a ]; then
-      wget -q -O- https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz | tar xz
-      cd libpsl-* || exit
-      LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --disable-gtk-doc --enable-builtin --enable-runtime=libidn2 --with-libiconv-prefix="$INSTALL_PATH"
-      make -j$(nproc) && make install
-    fi
-  )
+  if [ ! -f "$INSTALL_PATH"/lib/libpsl.a ]; then
+    rm -rf libpsl-*
+    wget -q -O- https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz | tar xz
+    cd libpsl-* || exit 1
+    LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --disable-gtk-doc --enable-builtin --enable-runtime=libidn2 --with-libiconv-prefix="$INSTALL_PATH"
+    make -j$NPROC && make install
+  fi
 }
 
 build_pcre2() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build pcre2⭐⭐⭐⭐⭐⭐"
-  (
-    if [ ! -f "$INSTALL_PATH"/lib/libpcre2-8.a ]; then
-      wget -q -O- https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.gz | tar xz
-      cd pcre2-* || exit
-      LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static
-      make -j$(nproc) && make install
-    fi
-  )
+  if [ ! -f "$INSTALL_PATH"/lib/libpcre2-8.a ]; then
+    rm -rf pcre2-*
+    wget -q -O- https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.gz | tar xz
+    cd pcre2-* || exit 1
+    LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static
+    make -j$NPROC && make install
+  fi
 }
 
 build_expat() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build expat⭐⭐⭐⭐⭐⭐"
-  (
-    if [ ! -f "$INSTALL_PATH"/lib/libexpat.a ]; then
-      wget -q -O- https://github.com/libexpat/libexpat/releases/download/R_2_8_1/expat-2.8.1.tar.gz | tar xz
-      cd expat-* || exit
-      LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --without-docbook --without-tests
-      make -j$(nproc) && make install
-    fi
-  )
+  if [ ! -f "$INSTALL_PATH"/lib/libexpat.a ]; then
+    rm -rf expat-*
+    wget -q -O- https://github.com/libexpat/libexpat/releases/download/R_2_8_1/expat-2.8.1.tar.gz | tar xz
+    cd expat-* || exit 1
+    LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --without-docbook --without-tests
+    make -j$NPROC && make install
+  fi
 }
 
 build_libmetalink() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libmetalink⭐⭐⭐⭐⭐⭐"
-  (
-    if [ ! -f "$INSTALL_PATH"/lib/libmetalink.a ]; then
-      wget -q -O- https://github.com/metalink-dev/libmetalink/releases/download/release-0.1.3/libmetalink-0.1.3.tar.gz | tar xz
-      cd libmetalink-* || exit
-      LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --with-libexpat
-      make -j$(nproc) && make install
-    fi
-  )
+  if [ ! -f "$INSTALL_PATH"/lib/libmetalink.a ]; then
+    rm -rf libmetalink-*
+    wget -q -O- https://github.com/metalink-dev/libmetalink/releases/download/release-0.1.3/libmetalink-0.1.3.tar.gz | tar xz
+    cd libmetalink-* || exit 1
+    LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --with-libexpat
+    make -j$NPROC && make install
+  fi
 }
 
 build_gnutls() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gnutls⭐⭐⭐⭐⭐⭐"
-  (
-    if [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; then
-      rm -rf gnutls-*
-      wget -q -O- https://gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.13.tar.xz | tar x --xz
-      cd gnutls-* || exit
-      
-      # 下载并应用 Nettle 4.0 兼容性补丁
-      #echo "Applying Nettle 4.0 compatibility patch..."
-      #wget -q -O- https://www.linuxfromscratch.org/patches/blfs/svn/gnutls-3.8.12-nettle4_fixes-1.patch | patch -Np1
-      
-      LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST \
-        --prefix="$INSTALL_PATH" \
-        --with-included-unistring \
-        --disable-nls \
-        --disable-shared \
-        --enable-static \
-        --disable-doc \
-        --disable-tools \
-        --disable-cxx \
-        --disable-tests \
-        --disable-maintainer-mode \
-        --disable-hardware-acceleration \
-        --disable-padlock \
-        --disable-ocsp \
-        --disable-dsa \
-        --disable-dhe \
-        --disable-ecdhe \
-        --disable-gost \
-        --disable-anon-authentication \
-        --disable-psk-authentication \
-        --disable-srp-authentication \
-        --disable-alpn-support \
-        --without-p11-kit \
-        --without-tpm2 \
-        --without-tpm \
-        --without-idn \
-        --without-brotli \
-        --without-zstd \
-        --disable-full-test-suite \
-        --disable-valgrind-tests \
-        --disable-seccomp-tests
-      make -j$(nproc) && make install
-    fi
-  )
+  if [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; then
+    rm -rf gnutls-*
+    wget -q -O- https://gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.13.tar.xz | tar x --xz
+    cd gnutls-* || exit 1
+    
+    LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST \
+      --prefix="$INSTALL_PATH" \
+      --with-included-unistring \
+      --disable-nls \
+      --disable-shared \
+      --enable-static \
+      --disable-doc \
+      --disable-tools \
+      --disable-cxx \
+      --disable-tests \
+      --disable-maintainer-mode \
+      --disable-hardware-acceleration \
+      --disable-padlock \
+      --disable-ocsp \
+      --disable-dsa \
+      --disable-dhe \
+      --disable-ecdhe \
+      --disable-gost \
+      --disable-anon-authentication \
+      --disable-psk-authentication \
+      --disable-srp-authentication \
+      --disable-alpn-support \
+      --without-p11-kit \
+      --without-tpm2 \
+      --without-tpm \
+      --without-idn \
+      --without-brotli \
+      --without-zstd \
+      --disable-full-test-suite \
+      --disable-valgrind-tests \
+      --disable-seccomp-tests
+    make -j$NPROC && make install
+  fi
 }
 
 build_openssl() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build openssl⭐⭐⭐⭐⭐⭐"
-  (
-    if [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
-      rm -rf openssl-*
-      wget -q -O- https://github.com/openssl/openssl/releases/download/openssl-3.6.2/openssl-3.6.2.tar.gz | tar xz
-      cd openssl-* || exit
-      # 优化后的禁用列表
-      DISABLED_FEATURES=(
-        no-quic no-err no-dso no-engine no-async no-autoalginit
-        no-dtls no-sctp no-ssl3 no-tls1 no-tls1_1
-        no-comp no-ts no-ocsp no-ct no-cms no-psk no-srp no-srtp no-rfc3779
-        no-fips no-acvp-tests no-docs no-stdio no-ui-console
-        no-afalgeng no-ssl-trace no-filenames
-        no-aria no-bf no-blake2 no-camellia no-cast no-cmac
-        no-dh no-dsa no-ec2m no-gost no-idea no-rc2 no-rc4 no-rc5 no-rmd160
-        no-scrypt no-seed no-siphash no-siv no-sm2 no-sm3 no-sm4 no-whirlpool
-        no-tests no-apps
-      )
-      #CFLAGS="-march=tigerlake -mtune=tigerlake -Os -ffunction-sections -fdata-sections -pipe -g0 $LTO_FLAGS" \
-      CFLAGS="-march=tigerlake -mtune=tigerlake -Os -ffunction-sections -fdata-sections -pipe -g0 -fvisibility=hidden $LTO_FLAGS" \
-      LDFLAGS="-Wl,--gc-sections -Wl,--icf=all -static -static-libgcc $LTO_FLAGS" \
-      ./Configure -static \
-        --prefix="$INSTALL_PATH" \
-        --libdir=lib \
-        --cross-compile-prefix=x86_64-w64-mingw32- \
-        mingw64 no-shared \
-        --with-zlib-include="$INSTALL_PATH/include" \
-        --with-zlib-lib="$INSTALL_PATH/lib/libz.a" \
-        "${DISABLED_FEATURES[@]}"
-      make -j$(nproc) && make install_sw
-      $MINGW_STRIP_TOOL --strip-unneeded "$INSTALL_PATH"/lib/libcrypto.a || true
-      $MINGW_STRIP_TOOL --strip-unneeded "$INSTALL_PATH"/lib/libssl.a || true
-    fi
-  )
+  if [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
+    rm -rf openssl-*
+    wget -q -O- https://github.com/openssl/openssl/releases/download/openssl-3.6.2/openssl-3.6.2.tar.gz | tar xz
+    cd openssl-* || exit 1
+    DISABLED_FEATURES=(
+      no-quic no-err no-dso no-engine no-async no-autoalginit
+      no-dtls no-sctp no-ssl3 no-tls1 no-tls1_1
+      no-comp no-ts no-ocsp no-ct no-cms no-psk no-srp no-srtp no-rfc3779
+      no-fips no-acvp-tests no-docs no-stdio no-ui-console
+      no-afalgeng no-ssl-trace no-filenames
+      no-aria no-bf no-blake2 no-camellia no-cast no-cmac
+      no-dh no-dsa no-ec2m no-gost no-idea no-rc2 no-rc4 no-rc5 no-rmd160
+      no-scrypt no-seed no-siphash no-siv no-sm2 no-sm3 no-sm4 no-whirlpool
+      no-tests no-apps
+    )
+    CFLAGS="-march=tigerlake -mtune=tigerlake -Os -ffunction-sections -fdata-sections -pipe -g0 -fvisibility=hidden $LTO_FLAGS" \
+    LDFLAGS="-Wl,--gc-sections -Wl,--icf=all -static -static-libgcc $LTO_FLAGS" \
+    ./Configure -static \
+      --prefix="$INSTALL_PATH" \
+      --libdir=lib \
+      --cross-compile-prefix=x86_64-w64-mingw32- \
+      mingw64 no-shared \
+      --with-zlib-include="$INSTALL_PATH/include" \
+      --with-zlib-lib="$INSTALL_PATH/lib/libz.a" \
+      "${DISABLED_FEATURES[@]}"
+    make -j$NPROC && make install_sw
+    # 【优化点】此处绝不能对静态库 (.a) 执行 strip，极易造成后续 wget 构建找不到辅助符号
+  fi
 }
 
 build_wget_gnutls() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (gnuTLS)⭐⭐⭐⭐⭐⭐"
-  (
-    rm -rf wget-*
-    wget -q -O- ${GNU_MIRROR}/wget/wget-1.25.0.tar.gz | tar xz
-    cd wget-* || exit 1
+  rm -rf wget-*
+  wget -q -O- ${GNU_MIRROR}/wget/wget-1.25.0.tar.gz | tar xz
+  cd wget-* || exit 1
 
-    # ========== 强制修复 http-ntlm.c 中的 Nettle 4.0 API 问题 ==========
-    echo "正在强制修复 http-ntlm.c 以兼容 Nettle 4.0..."
-    
-    # 方法1：直接替换整个函数调用（最可靠）
-    cat > /tmp/fix_ntlm.sed << 'EOF'
-/nettle_md4_digest(&MD4, MD4_DIGEST_SIZE, ntbuffer);/ {
-    c\
-    {\
-      uint8_t digest[MD4_DIGEST_SIZE];\
-      nettle_md4_digest(&MD4, digest);\
-      memcpy(ntbuffer, digest, MD4_DIGEST_SIZE);\
-    }
-}
-EOF
-    
-    # 应用 sed 脚本
-    sed -i -f /tmp/fix_ntlm.sed src/http-ntlm.c || {
-        echo "sed 脚本失败，尝试备用方法..."
-        
-        # 备用方法：使用 Perl（如果可用）
-        if command -v perl >/dev/null 2>&1; then
-            perl -i -pe 's/nettle_md4_digest\(&MD4,\s*MD4_DIGEST_SIZE,\s*ntbuffer\);/{\n      uint8_t digest[MD4_DIGEST_SIZE];\n      nettle_md4_digest(\&MD4, digest);\n      memcpy(ntbuffer, digest, MD4_DIGEST_SIZE);\n    }/' src/http-ntlm.c
-        else
-            # 最后手段：直接用 echo 重写相关部分
-            awk '
-            /nettle_md4_digest\(&MD4, MD4_DIGEST_SIZE, ntbuffer\);/ {
-                print "    {"
-                print "      uint8_t digest[MD4_DIGEST_SIZE];"
-                print "      nettle_md4_digest(&MD4, digest);"
-                print "      memcpy(ntbuffer, digest, MD4_DIGEST_SIZE);"
-                print "    }"
-                next
-            }
-            { print }
-            ' src/http-ntlm.c > src/http-ntlm.c.tmp && mv src/http-ntlm.c.tmp src/http-ntlm.c
-        fi
-    }
-    
-    # 验证修补是否成功
-    echo "验证修补结果..."
-    if grep -q "nettle_md4_digest(&MD4, MD4_DIGEST_SIZE, ntbuffer)" src/http-ntlm.c; then
-        echo "错误：修补失败，旧代码仍然存在！"
-        echo "显示相关代码："
-        grep -n -A2 -B2 "nettle_md4_digest" src/http-ntlm.c
-        exit 1
-    else
-        echo "修补成功！"
-    fi
-    # ================================================
+  # 【优化点】精简、准确的一行 sed 脚本，用于兼容 Nettle 4.0 API（去除 length 参数并改为局部 buffer 赋值）
+  echo "正在修复 http-ntlm.c 以兼容 Nettle 4.0..."
+  sed -i 's/nettle_md4_digest(&MD4, MD4_DIGEST_SIZE, ntbuffer);/{\n      uint8_t digest[MD4_DIGEST_SIZE];\n      nettle_md4_digest(\&MD4, digest);\n      memcpy(ntbuffer, digest, MD4_DIGEST_SIZE);\n    }/' src/http-ntlm.c
 
-    # 修复 gnulib 在 MinGW-w64 下的 bug
-    sed -i 's/__gl_error_call (error,/__gl_error_call ((error),/' lib/error.in.h
-    sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' lib/error.in.h
+  # 修复 gnulib 兼容性
+  sed -i 's/__gl_error_call (error,/__gl_error_call ((error),/' lib/error.in.h
+  sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' lib/error.in.h
 
-    WGET_CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2 -flto=$(nproc) -DSO_LINGER=0 -DTCP_LINGER2=0 -D_DISABLE_CLOSE_WAIT"
-    WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS"
-    WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lgnutls -lhogweed -lnettle -lgmp -ltasn1 -lz -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lwinpthread -lws2_32 -liphlpapi -lcrypt32 -lbcrypt -lncrypt"
+  WGET_CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2 -flto=$NPROC -DSO_LINGER=0 -DTCP_LINGER2=0 -D_DISABLE_CLOSE_WAIT"
+  WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS"
+  WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lgnutls -lhogweed -lnettle -lgmp -ltasn1 -lz -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lwinpthread -lws2_32 -liphlpapi -lcrypt32 -lbcrypt -lncrypt"
 
-    ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" \
-      --disable-debug --enable-iri --enable-pcre2 --with-ssl=gnutls \
-      --with-included-libunistring=no --with-cares --with-libpsl --with-metalink \
-      --with-gpgme-prefix="$INSTALL_PATH" \
-      CFLAGS="$WGET_CFLAGS" LDFLAGS="$WGET_LDFLAGS" LIBS="$WGET_LIBS"
+  ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" \
+    --disable-debug --enable-iri --enable-pcre2 --with-ssl=gnutls \
+    --with-included-libunistring=no --with-cares --with-libpsl --with-metalink \
+    --with-gpgme-prefix="$INSTALL_PATH" \
+    CFLAGS="$WGET_CFLAGS" LDFLAGS="$WGET_LDFLAGS" LIBS="$WGET_LIBS"
 
-    make -j$(nproc) && make install
+  make -j$NPROC && make install
 
-    mkdir -p "$INSTALL_PATH"/wget-gnutls
-    cp "$INSTALL_PATH"/bin/wget.exe "$INSTALL_PATH"/wget-gnutls/wget-gnutls-x64.exe
-    $MINGW_STRIP_TOOL --strip-all "$INSTALL_PATH"/wget-gnutls/wget-gnutls-x64.exe
-  )
+  mkdir -p "$INSTALL_PATH"/wget-gnutls
+  cp "$INSTALL_PATH"/bin/wget.exe "$INSTALL_PATH"/wget-gnutls/wget-gnutls-x64.exe
+  $MINGW_STRIP_TOOL --strip-all "$INSTALL_PATH"/wget-gnutls/wget-gnutls-x64.exe
 }
 
 build_wget_openssl() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (openssl)⭐⭐⭐⭐⭐⭐"
-  (
-    rm -rf wget-*
-    wget -q -O- ${GNU_MIRROR}/wget/wget-1.25.0.tar.gz | tar xz
-    cd wget-* || exit 1
+  rm -rf wget-*
+  wget -q -O- ${GNU_MIRROR}/wget/wget-1.25.0.tar.gz | tar xz
+  cd wget-* || exit 1
 
-    # 为 gnulib 在 MinGW-w64 下的 bug 打补丁
-    sed -i 's/__gl_error_call (error,/__gl_error_call ((error),/' lib/error.in.h
-    sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' lib/error.in.h
-    
-    WGET_CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2"
-    WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS"
-    WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -Wl,--whole-archive -lssl -lcrypto -Wl,--no-whole-archive -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lbcrypt -lcrypt32 -lws2_32 -liphlpapi"
+  # 修复 gnulib 兼容性
+  sed -i 's/__gl_error_call (error,/__gl_error_call ((error),/' lib/error.in.h
+  sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' lib/error.in.h
+  
+  WGET_CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2"
+  WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS"
+  WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -Wl,--whole-archive -lssl -lcrypto -Wl,--no-whole-archive -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lbcrypt -lcrypt32 -lws2_32 -liphlpapi"
 
-    ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" --disable-debug --enable-iri --enable-pcre2 --with-ssl=openssl --with-included-libunistring=no --with-cares --with-libpsl --with-metalink --with-gpgme-prefix="$INSTALL_PATH" \
-      CFLAGS="$WGET_CFLAGS" LDFLAGS="$WGET_LDFLAGS" LIBS="$WGET_LIBS"
+  ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" --disable-debug --enable-iri --enable-pcre2 --with-ssl=openssl --with-included-libunistring=no --with-cares --with-libpsl --with-metalink --with-gpgme-prefix="$INSTALL_PATH" \
+    CFLAGS="$WGET_CFLAGS" LDFLAGS="$WGET_LDFLAGS" LIBS="$WGET_LIBS"
 
-    make -j$(nproc) && make install
-    
-    mkdir -p "$INSTALL_PATH"/wget-openssl
-    cp "$INSTALL_PATH"/bin/wget.exe "$INSTALL_PATH"/wget-openssl/wget-openssl-x64.exe
-    $MINGW_STRIP_TOOL --strip-all "$INSTALL_PATH"/wget-openssl/wget-openssl-x64.exe
-  )
+  make -j$NPROC && make install
+  
+  mkdir -p "$INSTALL_PATH"/wget-openssl
+  cp "$INSTALL_PATH"/bin/wget.exe "$INSTALL_PATH"/wget-openssl/wget-openssl-x64.exe
+  $MINGW_STRIP_TOOL --strip-all "$INSTALL_PATH"/wget-openssl/wget-openssl-x64.exe
 }
 
 
 # --- 主执行流程 ---
 
-# STAGE 1: 编译没有内部依赖或只依赖zlib的基础库
-echo "--- LAUNCHING STAGE 1 BUILDS ---"
-build_gpg_error
-build_zlib
-build_libunistring
-build_c_ares
-build_libiconv
-build_pcre2
-build_expat
-
+# STAGE 1: 编译没有内部依赖或只依赖 zlib 的基础库
+echo "--- LAUNCHING STAGE 1 BUILDS (PARALLEL) ---"
+stage1_tasks=(build_gpg_error build_zlib build_libunistring build_c_ares build_libiconv build_pcre2 build_expat)
 if [[ "$ssl_type" == "gnutls" ]]; then
-  build_gmp
-  build_libtasn1
+  stage1_tasks+=(build_gmp build_libtasn1)
 fi
-wait
+run_parallel "${stage1_tasks[@]}"
 
-# STAGE 2: 编译依赖于STAGE 1库的库
-echo "--- LAUNCHING STAGE 2 BUILDS ---"
-build_libidn2      # Depends on libunistring
-build_libassuan     # Depends on gpg-error
-build_libmetalink   # Depends on expat
-
+# STAGE 2: 编译依赖于 STAGE 1 库的库
+echo "--- LAUNCHING STAGE 2 BUILDS (PARALLEL) ---"
+stage2_tasks=(build_libidn2 build_libassuan build_libmetalink)
 if [[ "$ssl_type" == "gnutls" ]]; then
-  build_nettle      # Depends on gmp
+  stage2_tasks+=(build_nettle)
 fi
-wait
 if [[ "$ssl_type" == "openssl" ]]; then
-  build_openssl     # Depends on zlib
+  stage2_tasks+=(build_openssl)
 fi
-wait
+run_parallel "${stage2_tasks[@]}"
 
-# STAGE 3: 编译依赖于STAGE 2库的库
-echo "--- LAUNCHING STAGE 3 BUILDS ---"
-build_libpsl        # Depends on libidn2, libiconv
-build_gpgme         # Depends on libassuan, gpg-error
-wait
+# STAGE 3: 编译依赖于 STAGE 2 库的库
+echo "--- LAUNCHING STAGE 3 BUILDS (PARALLEL) ---"
+run_parallel build_libpsl build_gpgme
 
-# STAGE 4: 编译GnuTLS (如果需要)
+# STAGE 4: 编译 GnuTLS（仅限 gnutls 模式）
 if [[ "$ssl_type" == "gnutls" ]]; then
   echo "--- LAUNCHING STAGE 4 BUILD (gnutls) ---"
   build_gnutls
 fi
-wait
 
-# FINAL STAGE: 编译Wget
+# FINAL STAGE: 编译 Wget
 echo "--- LAUNCHING FINAL BUILD (wget) ---"
 if [[ "$ssl_type" == "gnutls" ]]; then
   build_wget_gnutls
-else # Default to openssl
+else
   build_wget_openssl
 fi
 
