@@ -33,11 +33,11 @@ jobs:
         id: build
         run: |
           set -eo pipefail
-          chmod +x wget-build.sh
+          chmod +x wget-build1.sh
           echo "::group::构建日志"
           # 从 GitHub Release 自动下载对应依赖包（如果你的仓库不同，请修改 DEPS_URL）
           export DEPS_URL="https://github.com/${{ github.repository }}/releases/download/wget-deps/wget-deps-${SSL_TYPE}.tar.zst"
-          ./wget-build.sh 2>&1 | tee build.log
+          ./wget-build1.sh 2>&1 | tee build.log
           echo "::endgroup::"
           if [ ${PIPESTATUS[0]} -ne 0 ]; then
             echo "::error::构建失败"
