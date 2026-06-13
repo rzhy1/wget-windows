@@ -10,9 +10,9 @@ MINGW_HOST="x86_64-w64-mingw32"
 NPROC=$(nproc 2>/dev/null || echo 4)
 
 # 编译优化参数
-CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -ffunction-sections -fdata-sections -fvisibility=hidden -fno-stack-protector -fomit-frame-pointer -DNDEBUG -flto=$NPROC"
-LDFLAGS_DEPS="-static -static-libgcc -Wl,--gc-sections -Wl,-S -flto=$NPROC"
-LTO_FLAGS="-flto=$NPROC"
+export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -ffunction-sections -fdata-sections -fuse-linker-plugin -fvisibility=hidden -fno-stack-protector -fomit-frame-pointer -DNDEBUG -flto=$NPROC"
+export LDFLAGS_DEPS="-static -static-libgcc -Wl,--gc-sections -Wl,-S -flto=$NPROC"
+export LTO_FLAGS="-flto=$NPROC"
 
 # ---------- 快速镜像测速 ----------
 select_fastest_gnu_mirror() {
@@ -96,7 +96,7 @@ sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' 
 
 # 编译选项
 # 核心安全修改：让 WGET_CFLAGS 继承全局优化参数 $CFLAGS
-WGET_CFLAGS="$CFLAGS -I$INSTALL_PATH/include -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1"
+WGET_CFLAGS="$CFLAGS -I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2 -DSO_LINGER=0 -DTCP_LINGER2=0 -D_DISABLE_CLOSE_WAIT"
 WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS -Wl,-u,strndup"
 
 if [[ "$SSL_TYPE" == "gnutls" ]]; then
