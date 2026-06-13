@@ -10,8 +10,8 @@ MINGW_HOST="x86_64-w64-mingw32"
 NPROC=$(nproc 2>/dev/null || echo 4)
 
 # 编译优化参数
-CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -ffunction-sections -fdata-sections -fvisibility=hidden -fno-stack-protector -fomit-frame-pointer -DNDEBUG"
-LDFLAGS_DEPS="-static -static-libgcc -Wl,--gc-sections -Wl,-S"
+CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -ffunction-sections -fdata-sections -fvisibility=hidden -fno-stack-protector -fomit-frame-pointer -DNDEBUG  -flto=$NPROC"
+LDFLAGS_DEPS="-static -static-libgcc -Wl,--gc-sections -Wl,-S  -flto=$NPROC"
 LTO_FLAGS="-flto=$NPROC"
 
 # ---------- 快速镜像测速 ----------
@@ -93,11 +93,11 @@ sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' 
 
 # 编译选项
 WGET_CFLAGS="-I$INSTALL_PATH/include -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2"
-WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS"
+WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS -Wl,-u,strndup"
 
 if [[ "$SSL_TYPE" == "gnutls" ]]; then
     WGET_CFLAGS+=" -DGNUTLS_INTERNAL_BUILD=1"
-    WGET_LIBS="-lgnutls -lhogweed -lnettle -lgmp -ltasn1"
+    WGET_LIBS="-lgnutls -lhogweed -lnettle -lgmp -ltasn1 -lmingwex"
     SSL_OPT="--with-ssl=gnutls"
 else
     WGET_LIBS="-lssl -lcrypto"
