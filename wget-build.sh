@@ -139,6 +139,7 @@ run_parallel() {
 build_zlib() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build zlib⭐⭐⭐⭐⭐⭐"
   if [ ! -f "$INSTALL_PATH"/lib/libz.a ]; then
+    cd "$INSTALL_PATH" || exit 1
     rm -rf zlib-*
     ( wget -q -O- https://zlib.net/zlib-1.3.2.tar.gz || wget -q -O- https://github.com/madler/zlib/releases/download/v1.3.2/zlib-1.3.2.tar.gz ) | tar xz
     cd zlib-* || exit 1
@@ -161,6 +162,7 @@ build_gmp() {
 build_nettle() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build nettle⭐⭐⭐⭐⭐⭐"
   if [ ! -f "$INSTALL_PATH"/lib/libnettle.a ]; then
+    cd "$INSTALL_PATH" || exit 1
     rm -rf nettle-*
     wget -q -O- ${GNU_MIRROR}/nettle/nettle-4.0.tar.gz | tar xz
     cd nettle-* || exit 1
@@ -173,6 +175,7 @@ build_nettle() {
 build_libtasn1() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libtasn1⭐⭐⭐⭐⭐⭐"
   if [ ! -f "$INSTALL_PATH"/lib/libtasn1.a ]; then
+    cd "$INSTALL_PATH" || exit 1
     rm -rf libtasn1-*
     wget -q -O- ${GNU_MIRROR}/libtasn1/libtasn1-4.21.0.tar.gz | tar xz
     cd libtasn1-* || exit 1
@@ -184,6 +187,7 @@ build_libtasn1() {
 build_libunistring() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libunistring⭐⭐⭐⭐⭐⭐"
   if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
+    cd "$INSTALL_PATH" || exit 1
     rm -rf libunistring-*
     wget -q -O- ${GNU_MIRROR}/libunistring/libunistring-1.4.2.tar.gz | tar xz
     cd libunistring-* || exit 1
@@ -195,6 +199,7 @@ build_libunistring() {
 build_gpg_error() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gpg-error⭐⭐⭐⭐⭐⭐"
   if [ ! -f "$INSTALL_PATH"/lib/libgpg-error.a ]; then
+    cd "$INSTALL_PATH" || exit 1
     rm -rf libgpg-error-*
     wget -q -O- https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.61.tar.gz | tar xz
     cd libgpg-error-* || exit 1
@@ -207,6 +212,7 @@ build_gpg_error() {
 build_libassuan() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libassuan⭐⭐⭐⭐⭐⭐"
   if [ ! -f "$INSTALL_PATH"/lib/libassuan.a ]; then
+    cd "$INSTALL_PATH" || exit 1
     rm -rf libassuan-*
     wget -q -O- https://gnupg.org/ftp/gcrypt/libassuan/libassuan-3.0.2.tar.bz2 | tar xj
     cd libassuan-* || exit 1
@@ -218,6 +224,7 @@ build_libassuan() {
 build_gpgme() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gpgme⭐⭐⭐⭐⭐⭐"
   if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
+    cd "$INSTALL_PATH" || exit 1
     rm -rf gpgme-*
     wget -q -O- https://gnupg.org/ftp/gcrypt/gpgme/gpgme-2.1.0.tar.bz2 | tar xj
     cd gpgme-* || exit 1
@@ -229,6 +236,7 @@ build_gpgme() {
 build_c_ares() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build c-ares⭐⭐⭐⭐⭐⭐"
   if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
+    cd "$INSTALL_PATH" || exit 1
     rm -rf c-ares-*
     wget -q -O- https://github.com/c-ares/c-ares/releases/download/v1.34.6/c-ares-1.34.6.tar.gz | tar xz
     cd c-ares-* || exit 1
@@ -240,6 +248,7 @@ build_c_ares() {
 build_libiconv() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libiconv⭐⭐⭐⭐⭐⭐"
   if [ ! -f "$INSTALL_PATH"/lib/libiconv.a ]; then
+    cd "$INSTALL_PATH" || exit 1
     rm -rf libiconv-*
     wget -q -O- ${GNU_MIRROR}/libiconv/libiconv-1.19.tar.gz | tar xz
     cd libiconv-* || exit 1
@@ -251,6 +260,7 @@ build_libiconv() {
 build_libidn2() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libidn2⭐⭐⭐⭐⭐⭐"
   if [ ! -f "$INSTALL_PATH"/lib/libidn2.a ]; then
+    cd "$INSTALL_PATH" || exit 1
     rm -rf libidn2-*
     wget -q -O- ${GNU_MIRROR}/libidn/libidn2-2.3.8.tar.gz | tar xz
     cd libidn2-* || exit 1
@@ -262,6 +272,7 @@ build_libidn2() {
 build_libpsl() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libpsl⭐⭐⭐⭐⭐⭐"
   if [ ! -f "$INSTALL_PATH"/lib/libpsl.a ]; then
+    cd "$INSTALL_PATH" || exit 1
     rm -rf libpsl-*
     wget -q -O- https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz | tar xz
     cd libpsl-* || exit 1
@@ -273,6 +284,7 @@ build_libpsl() {
 build_pcre2() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build pcre2⭐⭐⭐⭐⭐⭐"
   if [ ! -f "$INSTALL_PATH"/lib/libpcre2-8.a ]; then
+    cd "$INSTALL_PATH" || exit 1
     rm -rf pcre2-*
     wget -q -O- https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.gz | tar xz
     cd pcre2-* || exit 1
@@ -284,6 +296,7 @@ build_pcre2() {
 build_expat() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build expat⭐⭐⭐⭐⭐⭐"
   if [ ! -f "$INSTALL_PATH"/lib/libexpat.a ]; then
+    cd "$INSTALL_PATH" || exit 1
     rm -rf expat-*
     wget -q -O- https://github.com/libexpat/libexpat/releases/download/R_2_8_1/expat-2.8.1.tar.gz | tar xz
     cd expat-* || exit 1
@@ -295,6 +308,7 @@ build_expat() {
 build_libmetalink() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build libmetalink⭐⭐⭐⭐⭐⭐"
   if [ ! -f "$INSTALL_PATH"/lib/libmetalink.a ]; then
+    cd "$INSTALL_PATH" || exit 1
     rm -rf libmetalink-*
     wget -q -O- https://github.com/metalink-dev/libmetalink/releases/download/release-0.1.3/libmetalink-0.1.3.tar.gz | tar xz
     cd libmetalink-* || exit 1
@@ -306,6 +320,7 @@ build_libmetalink() {
 build_gnutls() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gnutls⭐⭐⭐⭐⭐⭐"
   if [ ! -f "$INSTALL_PATH"/lib/libgnutls.a ]; then
+    cd "$INSTALL_PATH" || exit 1
     rm -rf gnutls-*
     wget -q -O- https://gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.13.tar.xz | tar x --xz
     cd gnutls-* || exit 1
@@ -348,6 +363,7 @@ build_gnutls() {
 build_openssl() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build openssl⭐⭐⭐⭐⭐⭐"
   if [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
+    cd "$INSTALL_PATH" || exit 1
     rm -rf openssl-*
     wget -q -O- https://github.com/openssl/openssl/releases/download/openssl-3.6.2/openssl-3.6.2.tar.gz | tar xz
     cd openssl-* || exit 1
@@ -379,6 +395,7 @@ build_openssl() {
 
 build_wget_gnutls() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (gnuTLS)⭐⭐⭐⭐⭐⭐"
+  cd "$INSTALL_PATH" || exit 1
   rm -rf wget-*
   wget -q -O- ${GNU_MIRROR}/wget/wget-1.25.0.tar.gz | tar xz
   cd wget-* || exit 1
@@ -390,26 +407,10 @@ build_wget_gnutls() {
   # 修复 gnulib 兼容性
   sed -i 's/__gl_error_call (error,/__gl_error_call ((error),/' lib/error.in.h
   sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' lib/error.in.h
-  # 手动提供 strndup，彻底解决 undefined reference
-  cat > strndup.c << 'EOF'
-#include <string.h>
-#include <stdlib.h>
-char *strndup(const char *s, size_t n) {
-    size_t len = strnlen(s, n);
-    char *new = malloc(len + 1);
-    if (new) {
-        memcpy(new, s, len);
-        new[len] = '\0';
-    }
-    return new;
-}
-EOF
-  x86_64-w64-mingw32-gcc -c strndup.c -o strndup.o
-  STRNDUP_O="$(pwd)/strndup.o"
-
+ 
   WGET_CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2 -flto=$NPROC -DSO_LINGER=0 -DTCP_LINGER2=0 -D_DISABLE_CLOSE_WAIT"
-  WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS"
-  WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lgnutls -lhogweed -lnettle -lgmp -ltasn1 -lz -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lwinpthread -lws2_32 -liphlpapi -lcrypt32 -lbcrypt -lncrypt"
+  WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS -Wl,-u,strndup"
+  WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lgnutls -lhogweed -lnettle -lgmp -ltasn1 -lz -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lwinpthread -lws2_32 -liphlpapi -lcrypt32 -lbcrypt -lncrypt  -lmingwex"
 
   ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" \
     --disable-debug --enable-iri --enable-pcre2 --with-ssl=gnutls \
@@ -426,6 +427,7 @@ EOF
 
 build_wget_openssl() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (openssl)⭐⭐⭐⭐⭐⭐"
+  cd "$INSTALL_PATH" || exit 1
   rm -rf wget-*
   wget -q -O- ${GNU_MIRROR}/wget/wget-1.25.0.tar.gz | tar xz
   cd wget-* || exit 1
