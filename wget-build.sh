@@ -395,7 +395,7 @@ build_wget_gnutls() {
   WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS"
   WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lgnutls -lhogweed -lnettle -lgmp -ltasn1 -lz -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lwinpthread -lws2_32 -liphlpapi -lcrypt32 -lbcrypt -lncrypt"
 
-  ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" \
+  ac_cv_func_strndup=no ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" \
     --disable-debug --enable-iri --enable-pcre2 --with-ssl=gnutls \
     --with-included-libunistring=no --with-cares --with-libpsl --with-metalink \
     --with-gpgme-prefix="$INSTALL_PATH" \
