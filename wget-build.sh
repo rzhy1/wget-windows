@@ -23,7 +23,7 @@ else
 fi
 
 # --- 核心编译参数定义 ---
-export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -ffunction-sections -fdata-sections -fuse-linker-plugin -fvisibility=hidden -fno-stack-protector -fomit-frame-pointer -DNDEBUG  -flto=$NPROC"
+export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -ffunction-sections -fdata-sections -fuse-linker-plugin -fvisibility=hidden -fno-stack-protector -fomit-frame-pointer -DNDEBUG -flto=$NPROC"
 export CXXFLAGS="$CFLAGS"
 export LDFLAGS_DEPS="-static -static-libgcc -Wl,--gc-sections -Wl,-S -flto=$NPROC"
 export LTO_FLAGS="-flto=$NPROC"
@@ -76,8 +76,8 @@ select_fastest_gnu_mirror() {
         pids+=($!)
     done
 
-    # 等待所有测速子进程结束
-    wait "${pids[@]}" 2>/dev/null
+    # 修正点：等待所有测速子进程结束，使用 || true 避免因网络失败导致脚本闪退
+    wait "${pids[@]}" 2>/dev/null || true
 
     # 评估最快镜像
     local fastest_url="${candidates[0]}"
@@ -105,7 +105,6 @@ echo "使用镜像源: $GNU_MIRROR" >&2
 
 
 # ========== 并行执行辅助管理器 ==========
-# 用于并行运行构建函数，在隔离的日志中打印输出，若有错误立即报错退出
 run_parallel() {
     local pids=()
     local cmds=("$@")
@@ -113,7 +112,6 @@ run_parallel() {
     log_dir=$(mktemp -d)
 
     for cmd in "${cmds[@]}"; do
-        # 在后台执行构建函数，并将输出重定向至独立日志中
         ( $cmd > "$log_dir/${cmd}.log" 2>&1 ) &
         pids+=($!)
     done
@@ -151,6 +149,7 @@ build_zlib() {
 build_gmp() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build gmp⭐⭐⭐⭐⭐⭐"
   if [ ! -f "$INSTALL_PATH"/lib/libgmp.a ]; then
+    cd "$INSTALL_PATH" || exit 1
     rm -rf gmp-*
     wget -nv -O- ${GNU_MIRROR}/gmp/gmp-6.3.0.tar.xz | tar x --xz
     cd gmp-* || exit 1
@@ -389,7 +388,6 @@ build_openssl() {
       --with-zlib-lib="$INSTALL_PATH/lib/libz.a" \
       "${DISABLED_FEATURES[@]}"
     make -j$NPROC && make install_sw
-    # 【优化点】此处绝不能对静态库 (.a) 执行 strip，极易造成后续 wget 构建找不到辅助符号
   fi
 }
 
@@ -400,7 +398,6 @@ build_wget_gnutls() {
   wget -q -O- ${GNU_MIRROR}/wget/wget-1.25.0.tar.gz | tar xz
   cd wget-* || exit 1
 
-  # 【优化点】精简、准确的一行 sed 脚本，用于兼容 Nettle 4.0 API（去除 length 参数并改为局部 buffer 赋值）
   echo "正在修复 http-ntlm.c 以兼容 Nettle 4.0..."
   sed -i 's/nettle_md4_digest(&MD4, MD4_DIGEST_SIZE, ntbuffer);/{\n      uint8_t digest[MD4_DIGEST_SIZE];\n      nettle_md4_digest(\&MD4, digest);\n      memcpy(ntbuffer, digest, MD4_DIGEST_SIZE);\n    }/' src/http-ntlm.c
 
@@ -408,9 +405,10 @@ build_wget_gnutls() {
   sed -i 's/__gl_error_call (error,/__gl_error_call ((error),/' lib/error.in.h
   sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' lib/error.in.h
  
-  WGET_CFLAGS="-I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2 -flto=$NPROC -DSO_LINGER=0 -DTCP_LINGER2=0 -D_DISABLE_CLOSE_WAIT"
+  # 修正点：将全局优化参数 $CFLAGS 注入 WGET_CFLAGS
+  WGET_CFLAGS="$CFLAGS -I$INSTALL_PATH/include -DGNUTLS_INTERNAL_BUILD=1 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2 -DSO_LINGER=0 -DTCP_LINGER2=0 -D_DISABLE_CLOSE_WAIT"
   WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS -Wl,-u,strndup"
-  WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lgnutls -lhogweed -lnettle -lgmp -ltasn1 -lz -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lwinpthread -lws2_32 -liphlpapi -lcrypt32 -lbcrypt -lncrypt  -lmingwex"
+  WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lgnutls -lhogweed -lnettle -lgmp -ltasn1 -lz -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lwinpthread -lws2_32 -liphlpapi -lcrypt32 -lbcrypt -lncrypt -lmingwex"
 
   ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" \
     --disable-debug --enable-iri --enable-pcre2 --with-ssl=gnutls \
@@ -436,9 +434,11 @@ build_wget_openssl() {
   sed -i 's/__gl_error_call (error,/__gl_error_call ((error),/' lib/error.in.h
   sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' lib/error.in.h
   
-  WGET_CFLAGS="-I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2 $LDFLAGS_DEPS"
+  # 修正点：将全局优化参数 $CFLAGS 注入 WGET_CFLAGS，剔除拼写错误的 $LDFLAGS_DEPS 
+  WGET_CFLAGS="$CFLAGS -I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2"
   WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS  -Wl,-u,strndup"
-  WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lssl -lcrypto -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lbcrypt -lcrypt32 -lgdi32 -lws2_32 -liphlpapi  -lmingwex"
+  WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lssl -lcrypto -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lbcrypt -lcrypt32 -lgdi32 -lws2_32 -liphlpapi -lmingwex"
+  
   ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" --disable-debug --enable-iri --enable-pcre2 --with-ssl=openssl --with-included-libunistring=no --with-cares --with-libpsl --with-metalink --with-gpgme-prefix="$INSTALL_PATH" \
   CFLAGS="$WGET_CFLAGS" LDFLAGS="$WGET_LDFLAGS" LIBS="$WGET_LIBS"
 
