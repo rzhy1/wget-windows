@@ -10,8 +10,8 @@ MINGW_HOST="x86_64-w64-mingw32"
 NPROC=$(nproc 2>/dev/null || echo 4)
 
 # 编译优化参数
-CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -ffunction-sections -fdata-sections -fvisibility=hidden -fno-stack-protector -fomit-frame-pointer -DNDEBUG  -flto=$NPROC"
-LDFLAGS_DEPS="-static -static-libgcc -Wl,--gc-sections -Wl,-S  -flto=$NPROC"
+CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -ffunction-sections -fdata-sections -fvisibility=hidden -fno-stack-protector -fomit-frame-pointer -DNDEBUG -flto=$NPROC"
+LDFLAGS_DEPS="-static -static-libgcc -Wl,--gc-sections -Wl,-S -flto=$NPROC"
 LTO_FLAGS="-flto=$NPROC"
 
 # ---------- 快速镜像测速 ----------
@@ -37,7 +37,7 @@ select_fastest_gnu_mirror() {
                 out=$(curl -o /dev/null -s -w '%{http_code} %{time_total}' --connect-timeout 2 --max-time 4 "${mirror}/" 2>/dev/null)
                 local code=$(echo "$out" | awk '{print $1}')
                 local t=$(echo "$out" | awk '{print $2}')
-                if [[ "$code" =~ ^[23][0-9][0-9]$ ]] && awk -v t="$t" 'BEGIN{exit !(t>0)}'; then
+                if [[ "$code" =~ ^[23][0-9][0-9]$ ]] && awk -v t="$t" 'BEGIN{exit !(t>0)}' 2>/dev/null; then
                     echo "$t $mirror" > "$tmp_dir/$i"
                 fi
             elif command -v wget >/dev/null 2>&1; then
@@ -47,12 +47,15 @@ select_fastest_gnu_mirror() {
             fi
         ) &
     done
-    wait
+    
+    # 核心安全修改：防止后台测速失败的子进程触发 set -e 导致脚本中断
+    wait 2>/dev/null || true
+    
     for i in "${!candidates[@]}"; do
         if [ -f "$tmp_dir/$i" ]; then
             read -r t m < "$tmp_dir/$i"
             printf "  %-45s %.3f 秒\n" "$m" "$t" >&2
-            if awk -v t1="$t" -v t2="$fast_time" 'BEGIN{exit !(t1 < t2)}'; then
+            if awk -v t1="$t" -v t2="$fast_time" 'BEGIN{exit !(t1 < t2)}' 2>/dev/null; then
                 fast_time=$t
                 fast_url=$m
             fi
@@ -92,20 +95,21 @@ sed -i 's/__gl_error_call (error,/__gl_error_call ((error),/' lib/error.in.h
 sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' lib/error.in.h
 
 # 编译选项
-WGET_CFLAGS="-I$INSTALL_PATH/include -DNDEBUG -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2"
-WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS $LTO_FLAGS -Wl,-u,strndup"
+# 核心安全修改：让 WGET_CFLAGS 继承全局优化参数 $CFLAGS
+WGET_CFLAGS="$CFLAGS -I$INSTALL_PATH/include -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2 -DCARES_STATICLIB=1 -DPCRE2_STATIC=1"
+WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS -Wl,-u,strndup"
 
 if [[ "$SSL_TYPE" == "gnutls" ]]; then
     WGET_CFLAGS+=" -DGNUTLS_INTERNAL_BUILD=1"
-    WGET_LIBS="-lgnutls -lhogweed -lnettle -lgmp -ltasn1 -lmingwex"
+    WGET_LIBS="-lgnutls -lhogweed -lnettle -lgmp -ltasn1"
     SSL_OPT="--with-ssl=gnutls"
 else
     WGET_LIBS="-lssl -lcrypto"
     SSL_OPT="--with-ssl=openssl"
 fi
 
-WGET_CFLAGS+=" -DCARES_STATICLIB=1 -DPCRE2_STATIC=1"
-WGET_LIBS+=" -lmetalink -lexpat -lcares -lpcre2-8 -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lws2_32 -liphlpapi -lcrypt32 -lbcrypt -lncrypt -lwinpthread"
+# 核心安全修改：将所有公共静态库与最后的 -lmingwex 拼接
+WGET_LIBS+=" -lmetalink -lexpat -lcares -lpcre2-8 -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lws2_32 -liphlpapi -lcrypt32 -lbcrypt -lncrypt -lwinpthread -lmingwex"
 
 echo ">>> 配置 wget ($SSL_TYPE)"
 ./configure --host=$MINGW_HOST \
