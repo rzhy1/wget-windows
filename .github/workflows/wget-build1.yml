@@ -68,15 +68,14 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: wget-${{ matrix.ssl }}
-          path: ${{ runner.home }}/output/wget-${{ matrix.ssl }}-x64.exe
-
+          path: ~/output/wget-${{ matrix.ssl }}-x64.exe
       - name: 发布到 Release
         if: success()
         uses: ncipollo/release-action@v1
         with:
           tag: wget-${{ matrix.ssl }}
           allowUpdates: true
-          artifacts: "${{ runner.home }}/output/wget-${{ matrix.ssl }}-x64.exe"
+          artifacts: "~/output/wget-${{ matrix.ssl }}-x64.exe"
           body: |
             ## wget Windows x64（${{ matrix.ssl }} 路线）
             - 文件名：wget-${{ matrix.ssl }}-x64.exe
