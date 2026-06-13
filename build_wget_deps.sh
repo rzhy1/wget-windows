@@ -27,7 +27,7 @@ x86_64-w64-mingw32-gcc --version
 # ---- 带校验的下载函数 ----
 download() {
     local url="$1"
-    local output="$2"   # 必须指定文件名，不再使用 stdout
+    local output="$2"
     local max_retries=3
     local retry=0
     while [ $retry -lt $max_retries ]; do
@@ -36,7 +36,7 @@ download() {
             if [ -f "$output" ]; then
                 local size
                 size=$(stat -c%s "$output" 2>/dev/null || echo 0)
-                if [ "$size" -gt 1024 ]; then   # 必须大于1KB
+                if [ "$size" -gt 1024 ]; then
                     return 0
                 else
                     echo "文件过小 (${size} bytes)，可能损坏，重试..." >&2
@@ -50,7 +50,7 @@ download() {
     return 1
 }
 
-# ---- 镜像测速（不变） ----
+# ---- 镜像测速 ----
 select_fastest_gnu_mirror() {
     local candidates=(
         "https://mirrors.aliyun.com/gnu"
@@ -126,7 +126,7 @@ run_parallel() {
     fi
 }
 
-# ---- 所有构建函数（关键修改：全部先下载到文件再解压） ----
+# ---- 所有构建函数（全部先下载到文件再解压） ----
 mkdir -p "$INSTALL_PATH"
 
 build_zlib() {
@@ -453,9 +453,14 @@ if [[ "$ssl_type" == "gnutls" ]]; then
     build_gnutls
 fi
 
-# 打包
+# 打包前检查
+if [ ! -d "$INSTALL_PATH/include" ] || [ ! -d "$INSTALL_PATH/lib" ]; then
+    echo "错误: 缺少 include 或 lib 目录，构建可能不完整" >&2
+    exit 1
+fi
+
 echo ">>> 开始打包依赖：wget-deps.tar.zst"
-tar -I zstd -cf wget-deps.tar.zst -C "$INSTALL_PATH" include lib pkgconfig
+tar -I zstd -cf wget-deps.tar.zst -C "$INSTALL_PATH" include lib
 mv wget-deps.tar.zst "wget-deps-${ssl_type}.tar.zst"
 echo ">>> 打包完成！"
 ls -lh "wget-deps-${ssl_type}.tar.zst"
