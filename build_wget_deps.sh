@@ -15,9 +15,9 @@ else
     export NPROC=${NUMBER_OF_PROCESSORS:-4}
 fi
 
-export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -ffunction-sections -fdata-sections -fvisibility=hidden -fno-stack-protector -fomit-frame-pointer -DNDEBUG"
+export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -ffunction-sections -fdata-sections -fvisibility=hidden -fno-stack-protector -fomit-frame-pointer -DNDEBUG -flto=$NPROC"
 export CXXFLAGS="$CFLAGS"
-export LDFLAGS_DEPS="-static -static-libgcc -Wl,--gc-sections -Wl,-S"
+export LDFLAGS_DEPS="-static -static-libgcc -Wl,--gc-sections -Wl,-S -flto=$NPROC"
 export LTO_FLAGS="-flto=$NPROC"
 
 ssl_type="${SSL_TYPE:-gnutls}"
@@ -132,6 +132,7 @@ mkdir -p "$INSTALL_PATH"
 build_zlib() {
   echo ">>> 构建 zlib"
   if [ -f "$INSTALL_PATH/lib/libz.a" ]; then return 0; fi
+  cd "$INSTALL_PATH" || exit 1
   rm -rf zlib-*
   local tarball="zlib.tar.gz"
   download "https://zlib.net/zlib-1.3.2.tar.gz" "$tarball" || download "https://github.com/madler/zlib/releases/download/v1.3.2/zlib-1.3.2.tar.gz" "$tarball" || exit 1
@@ -146,6 +147,7 @@ build_zlib() {
 build_gmp() {
   echo ">>> 构建 gmp"
   if [ -f "$INSTALL_PATH/lib/libgmp.a" ]; then return 0; fi
+  cd "$INSTALL_PATH" || exit 1
   rm -rf gmp-*
   local tarball="gmp.tar.xz"
   download "${GNU_MIRROR}/gmp/gmp-6.3.0.tar.xz" "$tarball" || exit 1
@@ -160,6 +162,7 @@ build_gmp() {
 build_nettle() {
   echo ">>> 构建 nettle"
   if [ -f "$INSTALL_PATH/lib/libnettle.a" ]; then return 0; fi
+  cd "$INSTALL_PATH" || exit 1
   rm -rf nettle-*
   local tarball="nettle.tar.gz"
   download "${GNU_MIRROR}/nettle/nettle-4.0.tar.gz" "$tarball" || exit 1
@@ -175,6 +178,7 @@ build_nettle() {
 build_libtasn1() {
   echo ">>> 构建 libtasn1"
   if [ -f "$INSTALL_PATH/lib/libtasn1.a" ]; then return 0; fi
+  cd "$INSTALL_PATH" || exit 1
   rm -rf libtasn1-*
   local tarball="libtasn1.tar.gz"
   download "${GNU_MIRROR}/libtasn1/libtasn1-4.21.0.tar.gz" "$tarball" || exit 1
@@ -189,6 +193,7 @@ build_libtasn1() {
 build_libunistring() {
   echo ">>> 构建 libunistring"
   if [ -f "$INSTALL_PATH/lib/libunistring.a" ]; then return 0; fi
+  cd "$INSTALL_PATH" || exit 1
   rm -rf libunistring-*
   local tarball="libunistring.tar.gz"
   download "${GNU_MIRROR}/libunistring/libunistring-1.4.2.tar.gz" "$tarball" || exit 1
@@ -203,6 +208,7 @@ build_libunistring() {
 build_gpg_error() {
   echo ">>> 构建 libgpg-error"
   if [ -f "$INSTALL_PATH/lib/libgpg-error.a" ]; then return 0; fi
+  cd "$INSTALL_PATH" || exit 1
   rm -rf libgpg-error-*
   local tarball="libgpg-error.tar.gz"
   download "https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.61.tar.gz" "$tarball" || exit 1
@@ -218,6 +224,7 @@ build_gpg_error() {
 build_libassuan() {
   echo ">>> 构建 libassuan"
   if [ -f "$INSTALL_PATH/lib/libassuan.a" ]; then return 0; fi
+  cd "$INSTALL_PATH" || exit 1
   rm -rf libassuan-*
   local tarball="libassuan.tar.bz2"
   download "https://gnupg.org/ftp/gcrypt/libassuan/libassuan-3.0.2.tar.bz2" "$tarball" || exit 1
@@ -232,6 +239,7 @@ build_libassuan() {
 build_gpgme() {
   echo ">>> 构建 gpgme"
   if [ -f "$INSTALL_PATH/lib/libgpgme.a" ]; then return 0; fi
+  cd "$INSTALL_PATH" || exit 1
   rm -rf gpgme-*
   local tarball="gpgme.tar.bz2"
   download "https://gnupg.org/ftp/gcrypt/gpgme/gpgme-2.1.0.tar.bz2" "$tarball" || exit 1
@@ -249,6 +257,7 @@ build_gpgme() {
 build_c_ares() {
   echo ">>> 构建 c-ares"
   if [ -f "$INSTALL_PATH/lib/libcares.a" ]; then return 0; fi
+  cd "$INSTALL_PATH" || exit 1
   rm -rf c-ares-*
   local tarball="cares.tar.gz"
   download "https://github.com/c-ares/c-ares/releases/download/v1.34.6/c-ares-1.34.6.tar.gz" "$tarball" || exit 1
@@ -264,6 +273,7 @@ build_c_ares() {
 build_libiconv() {
   echo ">>> 构建 libiconv"
   if [ -f "$INSTALL_PATH/lib/libiconv.a" ]; then return 0; fi
+  cd "$INSTALL_PATH" || exit 1
   rm -rf libiconv-*
   local tarball="libiconv.tar.gz"
   download "${GNU_MIRROR}/libiconv/libiconv-1.19.tar.gz" "$tarball" || exit 1
@@ -278,6 +288,7 @@ build_libiconv() {
 build_libidn2() {
   echo ">>> 构建 libidn2"
   if [ -f "$INSTALL_PATH/lib/libidn2.a" ]; then return 0; fi
+  cd "$INSTALL_PATH" || exit 1
   rm -rf libidn2-*
   local tarball="libidn2.tar.gz"
   download "${GNU_MIRROR}/libidn/libidn2-2.3.8.tar.gz" "$tarball" || exit 1
@@ -292,6 +303,7 @@ build_libidn2() {
 build_libpsl() {
   echo ">>> 构建 libpsl"
   if [ -f "$INSTALL_PATH/lib/libpsl.a" ]; then return 0; fi
+  cd "$INSTALL_PATH" || exit 1
   rm -rf libpsl-*
   local tarball="libpsl.tar.gz"
   download "https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz" "$tarball" || exit 1
@@ -308,6 +320,7 @@ build_libpsl() {
 build_pcre2() {
   echo ">>> 构建 pcre2"
   if [ -f "$INSTALL_PATH/lib/libpcre2-8.a" ]; then return 0; fi
+  cd "$INSTALL_PATH" || exit 1
   rm -rf pcre2-*
   local tarball="pcre2.tar.gz"
   download "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.gz" "$tarball" || exit 1
@@ -322,6 +335,7 @@ build_pcre2() {
 build_expat() {
   echo ">>> 构建 expat"
   if [ -f "$INSTALL_PATH/lib/libexpat.a" ]; then return 0; fi
+  cd "$INSTALL_PATH" || exit 1
   rm -rf expat-*
   local tarball="expat.tar.gz"
   download "https://github.com/libexpat/libexpat/releases/download/R_2_8_1/expat-2.8.1.tar.gz" "$tarball" || exit 1
@@ -336,6 +350,7 @@ build_expat() {
 build_libmetalink() {
   echo ">>> 构建 libmetalink"
   if [ -f "$INSTALL_PATH/lib/libmetalink.a" ]; then return 0; fi
+  cd "$INSTALL_PATH" || exit 1
   rm -rf libmetalink-*
   local tarball="libmetalink.tar.gz"
   download "https://github.com/metalink-dev/libmetalink/releases/download/release-0.1.3/libmetalink-0.1.3.tar.gz" "$tarball" || exit 1
@@ -350,6 +365,7 @@ build_libmetalink() {
 build_gnutls() {
   echo ">>> 构建 gnutls"
   if [ -f "$INSTALL_PATH/lib/libgnutls.a" ]; then return 0; fi
+  cd "$INSTALL_PATH" || exit 1
   rm -rf gnutls-*
   local tarball="gnutls.tar.xz"
   download "https://gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.13.tar.xz" "$tarball" || exit 1
@@ -395,6 +411,7 @@ build_gnutls() {
 build_openssl() {
   echo ">>> 构建 openssl"
   if [ -f "$INSTALL_PATH/lib/libssl.a" ]; then return 0; fi
+  cd "$INSTALL_PATH" || exit 1
   rm -rf openssl-*
   local tarball="openssl.tar.gz"
   download "https://github.com/openssl/openssl/releases/download/openssl-3.6.2/openssl-3.6.2.tar.gz" "$tarball" || exit 1
