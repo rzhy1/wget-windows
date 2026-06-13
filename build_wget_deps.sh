@@ -210,7 +210,7 @@ build_gpg_error() {
   rm -f "$tarball"
   cd libgpg-error-* || exit 1
   sed -i 's/w32_utils_init ()\./w32_utils_init ();/' src/w32-utils.c
-  LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --disable-doc || exit 1
+  LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --disable-doc --disable-nls || exit 1
   make -j$NPROC && make install
   cd ..
 }
