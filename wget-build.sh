@@ -23,9 +23,9 @@ else
 fi
 
 # --- 核心编译参数定义 ---
-export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -ffunction-sections -fdata-sections -fuse-linker-plugin -fvisibility=hidden -fno-stack-protector -fomit-frame-pointer -DNDEBUG"
+export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -ffunction-sections -fdata-sections -fuse-linker-plugin -fvisibility=hidden -fno-stack-protector -fomit-frame-pointer -DNDEBUG  -flto=$NPROC"
 export CXXFLAGS="$CFLAGS"
-export LDFLAGS_DEPS="-static -static-libgcc -Wl,--gc-sections -Wl,-S"
+export LDFLAGS_DEPS="-static -static-libgcc -Wl,--gc-sections -Wl,-S -flto=$NPROC"
 export LTO_FLAGS="-flto=$NPROC"
 
 ssl_type="$SSL_TYPE"
