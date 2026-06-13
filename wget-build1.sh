@@ -105,7 +105,7 @@ else
 fi
 
 WGET_CFLAGS+=" -DCARES_STATICLIB=1 -DPCRE2_STATIC=1"
-WGET_LIBS+=" -lmetalink -lexpat -lcares -lpcre2-8 -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lws2_32 -liphlpapi -lcrypt32 -lbcrypt -lwinpthread"
+WGET_LIBS+=" -lmetalink -lexpat -lcares -lpcre2-8 -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lws2_32 -liphlpapi -lcrypt32 -lbcrypt -lncrypt -lwinpthread"
 
 echo ">>> 配置 wget ($SSL_TYPE)"
 ./configure --host=$MINGW_HOST \
