@@ -1,11 +1,4 @@
 #!/bin/bash
-
-#
-# wget 依赖预编译打包脚本（增强版）
-# 用法: SSL_TYPE=gnutls ./build_wget_deps.sh    # GnuTLS 路线
-#       SSL_TYPE=openssl ./build_wget_deps.sh   # OpenSSL 路线
-#
-
 set -o pipefail
 set -e
 
@@ -31,18 +24,24 @@ ssl_type="${SSL_TYPE:-gnutls}"
 echo ">>> 打包目标: SSL_TYPE=$ssl_type"
 x86_64-w64-mingw32-gcc --version
 
-# ---- 带重试的下载函数 ----
+# ---- 带校验的下载函数 ----
 download() {
     local url="$1"
-    local output="$2"
+    local output="$2"   # 必须指定文件名，不再使用 stdout
     local max_retries=3
     local retry=0
     while [ $retry -lt $max_retries ]; do
-        echo "下载: $url (尝试 $((retry+1)))" >&2
-        if [ -n "$output" ]; then
-            wget -nv -O "$output" "$url" && return 0
-        else
-            wget -nv "$url" && return 0
+        echo "下载: $url → $output (尝试 $((retry+1)))" >&2
+        if wget -nv -O "$output" "$url"; then
+            if [ -f "$output" ]; then
+                local size
+                size=$(stat -c%s "$output" 2>/dev/null || echo 0)
+                if [ "$size" -gt 1024 ]; then   # 必须大于1KB
+                    return 0
+                else
+                    echo "文件过小 (${size} bytes)，可能损坏，重试..." >&2
+                fi
+            fi
         fi
         retry=$((retry+1))
         sleep 5
@@ -51,7 +50,7 @@ download() {
     return 1
 }
 
-# ---- 镜像测速（保持不变） ----
+# ---- 镜像测速（不变） ----
 select_fastest_gnu_mirror() {
     local candidates=(
         "https://mirrors.aliyun.com/gnu"
@@ -102,7 +101,7 @@ select_fastest_gnu_mirror() {
 GNU_MIRROR=$(select_fastest_gnu_mirror)
 export GNU_MIRROR
 
-# ---- 并行辅助（增强日志） ----
+# ---- 并行辅助 ----
 run_parallel() {
     local pids=() cmds=("$@") log_dir
     log_dir=$(mktemp -d)
@@ -123,19 +122,21 @@ run_parallel() {
     done
     rm -rf "$log_dir"
     if [ $failed -ne 0 ]; then
-        echo ">>> 并行阶段有任务失败，终止构建！" >&2
         exit 1
     fi
 }
 
-# ---- 所有构建函数（增加内部错误检查） ----
+# ---- 所有构建函数（关键修改：全部先下载到文件再解压） ----
 mkdir -p "$INSTALL_PATH"
 
 build_zlib() {
   echo ">>> 构建 zlib"
   if [ -f "$INSTALL_PATH/lib/libz.a" ]; then return 0; fi
   rm -rf zlib-*
-  ( download "https://zlib.net/zlib-1.3.2.tar.gz" -O- || download "https://github.com/madler/zlib/releases/download/v1.3.2/zlib-1.3.2.tar.gz" -O- ) | tar xz
+  local tarball="zlib.tar.gz"
+  download "https://zlib.net/zlib-1.3.2.tar.gz" "$tarball" || download "https://github.com/madler/zlib/releases/download/v1.3.2/zlib-1.3.2.tar.gz" "$tarball" || exit 1
+  tar xzf "$tarball" || exit 1
+  rm -f "$tarball"
   cd zlib-* || exit 1
   CC=$WGET_GCC LDFLAGS="$LDFLAGS_DEPS" ./configure --64 --static --prefix="$INSTALL_PATH" || exit 1
   make -j$NPROC && make install
@@ -146,7 +147,10 @@ build_gmp() {
   echo ">>> 构建 gmp"
   if [ -f "$INSTALL_PATH/lib/libgmp.a" ]; then return 0; fi
   rm -rf gmp-*
-  download "${GNU_MIRROR}/gmp/gmp-6.3.0.tar.xz" - | tar x --xz || exit 1
+  local tarball="gmp.tar.xz"
+  download "${GNU_MIRROR}/gmp/gmp-6.3.0.tar.xz" "$tarball" || exit 1
+  tar xf "$tarball" || exit 1
+  rm -f "$tarball"
   cd gmp-* || exit 1
   LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" || exit 1
   make -j$NPROC && make install
@@ -157,7 +161,10 @@ build_nettle() {
   echo ">>> 构建 nettle"
   if [ -f "$INSTALL_PATH/lib/libnettle.a" ]; then return 0; fi
   rm -rf nettle-*
-  download "${GNU_MIRROR}/nettle/nettle-4.0.tar.gz" - | tar xz || exit 1
+  local tarball="nettle.tar.gz"
+  download "${GNU_MIRROR}/nettle/nettle-4.0.tar.gz" "$tarball" || exit 1
+  tar xzf "$tarball" || exit 1
+  rm -f "$tarball"
   cd nettle-* || exit 1
   LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" CFLAGS="-I$INSTALL_PATH/include $CFLAGS" \
   ./configure --host=$WGET_MINGW_HOST --disable-shared --enable-static --disable-documentation --prefix="$INSTALL_PATH" || exit 1
@@ -169,7 +176,10 @@ build_libtasn1() {
   echo ">>> 构建 libtasn1"
   if [ -f "$INSTALL_PATH/lib/libtasn1.a" ]; then return 0; fi
   rm -rf libtasn1-*
-  download "${GNU_MIRROR}/libtasn1/libtasn1-4.21.0.tar.gz" - | tar xz || exit 1
+  local tarball="libtasn1.tar.gz"
+  download "${GNU_MIRROR}/libtasn1/libtasn1-4.21.0.tar.gz" "$tarball" || exit 1
+  tar xzf "$tarball" || exit 1
+  rm -f "$tarball"
   cd libtasn1-* || exit 1
   LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --disable-doc --prefix="$INSTALL_PATH" || exit 1
   make -j$NPROC && make install
@@ -180,7 +190,10 @@ build_libunistring() {
   echo ">>> 构建 libunistring"
   if [ -f "$INSTALL_PATH/lib/libunistring.a" ]; then return 0; fi
   rm -rf libunistring-*
-  download "${GNU_MIRROR}/libunistring/libunistring-1.4.2.tar.gz" - | tar xz || exit 1
+  local tarball="libunistring.tar.gz"
+  download "${GNU_MIRROR}/libunistring/libunistring-1.4.2.tar.gz" "$tarball" || exit 1
+  tar xzf "$tarball" || exit 1
+  rm -f "$tarball"
   cd libunistring-* || exit 1
   LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" || exit 1
   make -j$NPROC && make install
@@ -191,7 +204,10 @@ build_gpg_error() {
   echo ">>> 构建 libgpg-error"
   if [ -f "$INSTALL_PATH/lib/libgpg-error.a" ]; then return 0; fi
   rm -rf libgpg-error-*
-  download "https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.61.tar.gz" - | tar xz || exit 1
+  local tarball="libgpg-error.tar.gz"
+  download "https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.61.tar.gz" "$tarball" || exit 1
+  tar xzf "$tarball" || exit 1
+  rm -f "$tarball"
   cd libgpg-error-* || exit 1
   sed -i 's/w32_utils_init ()\./w32_utils_init ();/' src/w32-utils.c
   LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --disable-doc || exit 1
@@ -203,7 +219,10 @@ build_libassuan() {
   echo ">>> 构建 libassuan"
   if [ -f "$INSTALL_PATH/lib/libassuan.a" ]; then return 0; fi
   rm -rf libassuan-*
-  download "https://gnupg.org/ftp/gcrypt/libassuan/libassuan-3.0.2.tar.bz2" - | tar xj || exit 1
+  local tarball="libassuan.tar.bz2"
+  download "https://gnupg.org/ftp/gcrypt/libassuan/libassuan-3.0.2.tar.bz2" "$tarball" || exit 1
+  tar xf "$tarball" || exit 1
+  rm -f "$tarball"
   cd libassuan-* || exit 1
   LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --disable-doc --with-libgpg-error-prefix="$INSTALL_PATH" || exit 1
   make -j$NPROC && make install
@@ -214,7 +233,10 @@ build_gpgme() {
   echo ">>> 构建 gpgme"
   if [ -f "$INSTALL_PATH/lib/libgpgme.a" ]; then return 0; fi
   rm -rf gpgme-*
-  download "https://gnupg.org/ftp/gcrypt/gpgme/gpgme-2.1.0.tar.bz2" - | tar xj || exit 1
+  local tarball="gpgme.tar.bz2"
+  download "https://gnupg.org/ftp/gcrypt/gpgme/gpgme-2.1.0.tar.bz2" "$tarball" || exit 1
+  tar xf "$tarball" || exit 1
+  rm -f "$tarball"
   cd gpgme-* || exit 1
   env PYTHON="$(command -v python3 || command -v python)" LDFLAGS="$LDFLAGS_DEPS" \
   ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static \
@@ -228,7 +250,10 @@ build_c_ares() {
   echo ">>> 构建 c-ares"
   if [ -f "$INSTALL_PATH/lib/libcares.a" ]; then return 0; fi
   rm -rf c-ares-*
-  download "https://github.com/c-ares/c-ares/releases/download/v1.34.6/c-ares-1.34.6.tar.gz" - | tar xz || exit 1
+  local tarball="cares.tar.gz"
+  download "https://github.com/c-ares/c-ares/releases/download/v1.34.6/c-ares-1.34.6.tar.gz" "$tarball" || exit 1
+  tar xzf "$tarball" || exit 1
+  rm -f "$tarball"
   cd c-ares-* || exit 1
   CPPFLAGS="-DCARES_STATICLIB=1" LDFLAGS="$LDFLAGS_DEPS" \
   ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --disable-tests || exit 1
@@ -240,7 +265,10 @@ build_libiconv() {
   echo ">>> 构建 libiconv"
   if [ -f "$INSTALL_PATH/lib/libiconv.a" ]; then return 0; fi
   rm -rf libiconv-*
-  download "${GNU_MIRROR}/libiconv/libiconv-1.19.tar.gz" - | tar xz || exit 1
+  local tarball="libiconv.tar.gz"
+  download "${GNU_MIRROR}/libiconv/libiconv-1.19.tar.gz" "$tarball" || exit 1
+  tar xzf "$tarball" || exit 1
+  rm -f "$tarball"
   cd libiconv-* || exit 1
   LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static || exit 1
   make -j$NPROC && make install
@@ -251,7 +279,10 @@ build_libidn2() {
   echo ">>> 构建 libidn2"
   if [ -f "$INSTALL_PATH/lib/libidn2.a" ]; then return 0; fi
   rm -rf libidn2-*
-  download "${GNU_MIRROR}/libidn/libidn2-2.3.8.tar.gz" - | tar xz || exit 1
+  local tarball="libidn2.tar.gz"
+  download "${GNU_MIRROR}/libidn/libidn2-2.3.8.tar.gz" "$tarball" || exit 1
+  tar xzf "$tarball" || exit 1
+  rm -f "$tarball"
   cd libidn2-* || exit 1
   LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --enable-static --disable-shared --disable-doc --prefix="$INSTALL_PATH" || exit 1
   make -j$NPROC && make install
@@ -262,7 +293,10 @@ build_libpsl() {
   echo ">>> 构建 libpsl"
   if [ -f "$INSTALL_PATH/lib/libpsl.a" ]; then return 0; fi
   rm -rf libpsl-*
-  download "https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz" - | tar xz || exit 1
+  local tarball="libpsl.tar.gz"
+  download "https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz" "$tarball" || exit 1
+  tar xzf "$tarball" || exit 1
+  rm -f "$tarball"
   cd libpsl-* || exit 1
   LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" \
   ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static \
@@ -275,7 +309,10 @@ build_pcre2() {
   echo ">>> 构建 pcre2"
   if [ -f "$INSTALL_PATH/lib/libpcre2-8.a" ]; then return 0; fi
   rm -rf pcre2-*
-  download "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.gz" - | tar xz || exit 1
+  local tarball="pcre2.tar.gz"
+  download "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.gz" "$tarball" || exit 1
+  tar xzf "$tarball" || exit 1
+  rm -f "$tarball"
   cd pcre2-* || exit 1
   LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static || exit 1
   make -j$NPROC && make install
@@ -286,7 +323,10 @@ build_expat() {
   echo ">>> 构建 expat"
   if [ -f "$INSTALL_PATH/lib/libexpat.a" ]; then return 0; fi
   rm -rf expat-*
-  download "https://github.com/libexpat/libexpat/releases/download/R_2_8_1/expat-2.8.1.tar.gz" - | tar xz || exit 1
+  local tarball="expat.tar.gz"
+  download "https://github.com/libexpat/libexpat/releases/download/R_2_8_1/expat-2.8.1.tar.gz" "$tarball" || exit 1
+  tar xzf "$tarball" || exit 1
+  rm -f "$tarball"
   cd expat-* || exit 1
   LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --without-docbook --without-tests || exit 1
   make -j$NPROC && make install
@@ -297,7 +337,10 @@ build_libmetalink() {
   echo ">>> 构建 libmetalink"
   if [ -f "$INSTALL_PATH/lib/libmetalink.a" ]; then return 0; fi
   rm -rf libmetalink-*
-  download "https://github.com/metalink-dev/libmetalink/releases/download/release-0.1.3/libmetalink-0.1.3.tar.gz" - | tar xz || exit 1
+  local tarball="libmetalink.tar.gz"
+  download "https://github.com/metalink-dev/libmetalink/releases/download/release-0.1.3/libmetalink-0.1.3.tar.gz" "$tarball" || exit 1
+  tar xzf "$tarball" || exit 1
+  rm -f "$tarball"
   cd libmetalink-* || exit 1
   LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --with-libexpat || exit 1
   make -j$NPROC && make install
@@ -308,7 +351,10 @@ build_gnutls() {
   echo ">>> 构建 gnutls"
   if [ -f "$INSTALL_PATH/lib/libgnutls.a" ]; then return 0; fi
   rm -rf gnutls-*
-  download "https://gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.13.tar.xz" - | tar x --xz || exit 1
+  local tarball="gnutls.tar.xz"
+  download "https://gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.13.tar.xz" "$tarball" || exit 1
+  tar xf "$tarball" || exit 1
+  rm -f "$tarball"
   cd gnutls-* || exit 1
   LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" \
   ./configure --host=$WGET_MINGW_HOST \
@@ -350,7 +396,10 @@ build_openssl() {
   echo ">>> 构建 openssl"
   if [ -f "$INSTALL_PATH/lib/libssl.a" ]; then return 0; fi
   rm -rf openssl-*
-  download "https://github.com/openssl/openssl/releases/download/openssl-3.6.2/openssl-3.6.2.tar.gz" - | tar xz || exit 1
+  local tarball="openssl.tar.gz"
+  download "https://github.com/openssl/openssl/releases/download/openssl-3.6.2/openssl-3.6.2.tar.gz" "$tarball" || exit 1
+  tar xzf "$tarball" || exit 1
+  rm -f "$tarball"
   cd openssl-* || exit 1
   DISABLED_FEATURES=(
     no-quic no-err no-dso no-engine no-async no-autoalginit
