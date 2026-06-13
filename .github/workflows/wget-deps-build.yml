@@ -8,7 +8,7 @@ on:
       - '.github/workflows/wget-deps-build.yml'
       - 'build_wget_deps.sh'
   schedule:
-    - cron: "0 0 * * 0"   # 每周一次
+    - cron: "0 0 * * 0"
 
 jobs:
   build-deps:
@@ -22,14 +22,14 @@ jobs:
       SSL_TYPE: ${{ matrix.ssl }}
     steps:
       - uses: actions/checkout@v6
-        name: 检出代码
 
       - name: 安装依赖
         run: |
           set -e
           sudo apt-get update
           sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
-          sudo apt-get install -y make m4 pkg-config automake gettext autopoint autoconf-archive gperf python3-dev python3-venv zstd
+          # 增加 libtool, autopoint, texinfo 等常见缺失工具
+          sudo apt-get install -y make m4 pkg-config automake autoconf libtool autopoint gettext autoconf-archive gperf texinfo python3-dev python3-venv zstd
           python3 -m venv myenv
           source myenv/bin/activate
           pip3 install setuptools
@@ -48,10 +48,6 @@ jobs:
             echo "::error::构建失败"
             exit 1
           fi
-          # 重命名打包文件，区分 SSL 类型
-          mv wget-deps.tar.zst wget-deps-${{ matrix.ssl }}.tar.zst
-          echo "产出文件:"
-          ls -lh wget-deps-${{ matrix.ssl }}.tar.zst
 
       - name: 收集失败日志
         if: failure()
