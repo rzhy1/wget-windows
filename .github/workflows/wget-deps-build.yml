@@ -11,11 +11,12 @@ on:
     - cron: "0 0 * * 0"
 
 jobs:
-  build-deps:
+  # ========== 并行构建 GnuTLS 和 OpenSSL 依赖 ==========
+  build:
     strategy:
       matrix:
         ssl: [gnutls, openssl]
-      fail-fast: false
+      fail-fast: false       # 一个失败不影响另一个继续
     runs-on: ubuntu-24.04
     name: Build wget deps (${{ matrix.ssl }})
     env:
@@ -28,7 +29,6 @@ jobs:
           set -e
           sudo apt-get update
           sudo apt-get install -y mingw-w64 mingw-w64-tools gcc
-          # 增加 libtool, autopoint, texinfo 等常见缺失工具
           sudo apt-get install -y make m4 pkg-config automake autoconf libtool autopoint gettext autoconf-archive gperf texinfo python3-dev python3-venv zstd
           python3 -m venv myenv
           source myenv/bin/activate
@@ -37,7 +37,7 @@ jobs:
           x86_64-w64-mingw32-gcc --version || { echo "编译器检查失败"; exit 1; }
 
       - name: 构建依赖包 (${{ matrix.ssl }})
-        id: build_deps
+        id: build
         run: |
           set -eo pipefail
           chmod +x build_wget_deps.sh
@@ -70,23 +70,39 @@ jobs:
           path: failure_logs/
           retention-days: 7
 
-      - name: 上传依赖包
+      - name: 上传依赖包（构建成功）
         if: success()
         uses: actions/upload-artifact@v7
         with:
           name: wget-deps-${{ matrix.ssl }}
           path: wget-deps-${{ matrix.ssl }}.tar.zst
 
-      - name: 发布依赖包
-        if: success()
+  # ========== 合并发布到同一个 Release ==========
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    name: Publish merged deps release
+    steps:
+      - name: 下载所有构建产物
+        uses: actions/download-artifact@v8
+        with:
+          pattern: wget-deps-*
+          merge-multiple: true
+
+      - name: 检查产物
+        run: ls -lh wget-deps-*.tar.zst
+
+      - name: 发布到 Release
         uses: ncipollo/release-action@v1
         with:
-          tag: wget-deps-${{ matrix.ssl }}
+          tag: wget-deps
           allowUpdates: true
-          artifacts: "wget-deps-${{ matrix.ssl }}.tar.zst"
+          artifacts: "wget-deps-gnutls.tar.zst,wget-deps-openssl.tar.zst"
           body: |
-            ## wget 预编译依赖包（${{ matrix.ssl }} 路线）
+            ## wget 预编译依赖包（GnuTLS + OpenSSL 路线）
+            - `wget-deps-gnutls.tar.zst` – 适用于 GnuTLS 路线的 wget 编译
+            - `wget-deps-openssl.tar.zst` – 适用于 OpenSSL 路线的 wget 编译
             - 包含所有静态库、头文件和 pkgconfig
             - 适用于交叉编译 wget (MinGW-w64)
-            - 自动生成，每周更新
+            - 自动并行构建，每周更新
           token: ${{ secrets.GITHUB_TOKEN }}
