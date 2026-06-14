@@ -483,6 +483,7 @@ fi
 
 # FINAL STAGE: 编译 Wget
 echo "--- LAUNCHING FINAL BUILD (wget) ---"
+find "$INSTALL_PATH/lib" -name "*.la" -delete 2>/dev/null || true
 if [[ "$ssl_type" == "gnutls" ]]; then
   build_wget_gnutls
 else
