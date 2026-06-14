@@ -4,7 +4,7 @@ set -eo pipefail
 # ---------- 配置 ----------
 SSL_TYPE="${SSL_TYPE:-gnutls}"
 DEPS_URL="${DEPS_URL:-https://github.com/rzhy1/wget-windows/releases/download/wget-deps/wget-deps-${SSL_TYPE}.tar.zst}"
-INSTALL_PATH="${INSTALL_PATH:-$HOME/wget-deps}"
+INSTALL_PATH="${INSTALL_PATH:-$HOME/wget-deps-install}"
 WGET_VERSION="1.25.0"
 MINGW_HOST="x86_64-w64-mingw32"
 NPROC=$(nproc 2>/dev/null || echo 4)
