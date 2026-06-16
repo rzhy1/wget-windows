@@ -439,9 +439,11 @@ build_wget_openssl() {
   WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS  -Wl,-u,strndup"
   WGET_LIBS="-lmetalink -lexpat -lcares -lpcre2-8 -lssl -lcrypto -lpsl -lidn2 -lunistring -liconv -lgpgme -lassuan -lgpg-error -lz -lbcrypt -lcrypt32 -lgdi32 -lws2_32 -liphlpapi -lmingwex"
   
-  ac_cv_func_nanosleep=yes gl_cv_func_nanosleep_works=yes ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" --disable-debug --enable-iri --enable-pcre2 --with-ssl=openssl --with-included-libunistring=no --with-cares --with-libpsl --with-metalink --with-gpgme-prefix="$INSTALL_PATH" \
+  ./configure --host=$WGET_MINGW_HOST --prefix="$INSTALL_PATH" --disable-debug --enable-iri --enable-pcre2 --with-ssl=openssl --with-included-libunistring=no --with-cares --with-libpsl --with-metalink --with-gpgme-prefix="$INSTALL_PATH" \
   CFLAGS="$WGET_CFLAGS" LDFLAGS="$WGET_LDFLAGS" LIBS="$WGET_LIBS"
-
+  # 屏蔽冲突源文件
+  sed -i '1i #if 0' lib/nanosleep.c
+  echo '#endif' >> lib/nanosleep.c
   make -j$NPROC && make install
   
   mkdir -p "$INSTALL_PATH"/wget-openssl
