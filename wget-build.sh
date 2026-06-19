@@ -23,7 +23,7 @@ else
 fi
 
 # --- 核心编译参数定义 ---
-export CFLAGS="-march=tigerlake -mtune=tigerlake -O2 -pipe -ffunction-sections -fdata-sections -fuse-linker-plugin -fvisibility=hidden -fno-stack-protector -fomit-frame-pointer -DNDEBUG -flto=$NPROC"
+export CFLAGS="-march=x86-64-v3 -O2 -pipe -ffunction-sections -fdata-sections -fuse-linker-plugin -fvisibility=hidden -fno-stack-protector -fomit-frame-pointer -DNDEBUG -flto=$NPROC"
 export CXXFLAGS="$CFLAGS"
 export LDFLAGS_DEPS="-static -static-libgcc -Wl,--gc-sections -Wl,-S -flto=$NPROC"
 export LTO_FLAGS="-flto=$NPROC"
@@ -377,7 +377,7 @@ build_openssl() {
       no-scrypt no-seed no-siphash no-siv no-sm2 no-sm3 no-sm4 no-whirlpool
       no-tests no-apps
     )
-    CFLAGS="-march=tigerlake -mtune=tigerlake -Os -ffunction-sections -fdata-sections -pipe -g0 -fvisibility=hidden $LTO_FLAGS" \
+    CFLAGS="-march=x86-64-v3 -Os -ffunction-sections -fdata-sections -pipe -g0 -fvisibility=hidden $LTO_FLAGS" \
     LDFLAGS="-Wl,--gc-sections -Wl,--icf=all -static -static-libgcc $LTO_FLAGS" \
     ./Configure -static \
       --prefix="$INSTALL_PATH" \
