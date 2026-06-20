@@ -433,7 +433,7 @@ build_wget_openssl() {
   # 修复 gnulib 兼容性
   sed -i 's/__gl_error_call (error,/__gl_error_call ((error),/' lib/error.in.h
   sed -i '/#include <stdio.h>/a extern void error (int, int, const char *, ...);' lib/error.in.h
-  
+  sed -i 's/SSLv3_client_method()/TLS_client_method()/g' src/openssl.c
   # 修正点：将全局优化参数 $CFLAGS 注入 WGET_CFLAGS，剔除拼写错误的 $LDFLAGS_DEPS 
   WGET_CFLAGS="$CFLAGS -I$INSTALL_PATH/include -DCARES_STATICLIB=1 -DPCRE2_STATIC=1 -DF_DUPFD=0 -DF_GETFD=1 -DF_SETFD=2"
   WGET_LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS  -Wl,-u,strndup"
