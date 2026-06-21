@@ -395,8 +395,13 @@ build_wget_gnutls() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (gnuTLS)⭐⭐⭐⭐⭐⭐"
   cd "$INSTALL_PATH" || exit 1
   rm -rf wget-*
-  wget -q -O- ${GNU_MIRROR}/wget/wget-1.25.0.tar.gz | tar xz
-  cd wget-* || exit 1
+  #wget -q -O- ${GNU_MIRROR}/wget/wget-1.25.0.tar.gz | tar xz
+  #cd wget-* || exit 1
+
+  git clone --depth=1  https://gitlab.com/gnuwget/wget.git wget-git
+  cd wget-git || exit 1
+  git submodule update --init --recursive --depth=1 || exit 1
+  ./bootstrap --skip-po --gnulib-srcdir=gnulib || exit 1
 
   echo "正在修复 http-ntlm.c 以兼容 Nettle 4.0..."
   sed -i 's/nettle_md4_digest(&MD4, MD4_DIGEST_SIZE, ntbuffer);/{\n      uint8_t digest[MD4_DIGEST_SIZE];\n      nettle_md4_digest(\&MD4, digest);\n      memcpy(ntbuffer, digest, MD4_DIGEST_SIZE);\n    }/' src/http-ntlm.c
@@ -427,8 +432,15 @@ build_wget_openssl() {
   echo "⭐⭐⭐⭐⭐⭐$(date '+%Y/%m/%d %a %H:%M:%S.%N') - build wget (openssl)⭐⭐⭐⭐⭐⭐"
   cd "$INSTALL_PATH" || exit 1
   rm -rf wget-*
-  wget -q -O- ${GNU_MIRROR}/wget/wget-1.25.0.tar.gz | tar xz
-  cd wget-* || exit 1
+  #wget -q -O- ${GNU_MIRROR}/wget/wget-1.25.0.tar.gz | tar xz
+  #cd wget-* || exit 1
+
+  git clone --depth=1  https://gitlab.com/gnuwget/wget.git wget-git
+  cd wget-git || exit 1
+  git submodule update --init --recursive --depth=1 || exit 1
+  ./bootstrap --skip-po --gnulib-srcdir=gnulib || exit 1
+
+  
 
   # 修复 gnulib 兼容性
   sed -i 's/__gl_error_call (error,/__gl_error_call ((error),/' lib/error.in.h
