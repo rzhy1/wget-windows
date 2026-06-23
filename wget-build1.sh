@@ -81,8 +81,12 @@ export PKG_CONFIG_PATH="$INSTALL_PATH/lib/pkgconfig"
 
 # ---------- 编译 wget ----------
 echo ">>> 下载 wget 源码"
-wget -nv -O- "${GNU_MIRROR}/wget/wget-${WGET_VERSION}.tar.gz" | tar xz
+#wget -nv -O- "${GNU_MIRROR}/wget/wget-${WGET_VERSION}.tar.gz" | tar xz
 cd wget-${WGET_VERSION} || exit 1
+
+git clone --depth=1  https://gitlab.com/gnuwget/wget.git wget-git
+git submodule update --init --recursive --depth=1 || exit 1
+./bootstrap --skip-po --gnulib-srcdir=gnulib || exit 1
 
 # 针对 GnuTLS 版本的 Nettle 4.0 兼容修复
 if [[ "$SSL_TYPE" == "gnutls" ]]; then
