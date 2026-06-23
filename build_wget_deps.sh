@@ -467,7 +467,7 @@ run_parallel build_libpsl build_gpgme
 
 if [[ "$ssl_type" == "gnutls" ]]; then
     echo "--- STAGE 4: 编译 GnuTLS ---"
-    build_gnutls
+    (build_gnutls)
 fi
 
 # 打包前检查
