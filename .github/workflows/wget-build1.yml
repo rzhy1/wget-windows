@@ -1,0 +1,84 @@
+name: Build wget1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+    paths:
+      - '.github/workflows/wget-build1.yml'
+      - 'wget-build1.sh'
+  schedule:
+    - cron: "0 0 * * 0"
+
+jobs:
+  build-wget:
+    strategy:
+      matrix:
+        ssl: [gnutls, openssl]
+      fail-fast: false
+    runs-on: ubuntu-24.04
+    name: Build wget (${{ matrix.ssl }})
+    env:
+      SSL_TYPE: ${{ matrix.ssl }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: 安装编译工具
+        run: |
+          set -e
+          sudo apt-get update
+          sudo apt-get install -y mingw-w64 mingw-w64-tools gcc make pkg-config zstd wget
+
+      - name: 构建 wget (${{ matrix.ssl }})
+        id: build
+        run: |
+          set -eo pipefail
+          chmod +x wget-build1.sh
+          echo "::group::构建日志"
+          # 从 GitHub Release 自动下载对应依赖包（如果你的仓库不同，请修改 DEPS_URL）
+          export DEPS_URL="https://github.com/${{ github.repository }}/releases/download/wget-deps/wget-deps-${SSL_TYPE}.tar.zst"
+          ./wget-build1.sh 2>&1 | tee build.log
+          echo "::endgroup::"
+          if [ ${PIPESTATUS[0]} -ne 0 ]; then
+            echo "::error::构建失败"
+            exit 1
+          fi
+
+      - name: 收集失败日志
+        if: failure()
+        run: |
+          mkdir -p failure_logs
+          [ -f build.log ] && mv build.log failure_logs/
+          uname -a > failure_logs/system_info.txt
+          dpkg -l >> failure_logs/system_info.txt
+          env > failure_logs/environment.txt
+          x86_64-w64-mingw32-gcc -v 2> failure_logs/compiler_info.txt
+          ls -laR > failure_logs/directory_structure.txt
+
+      - name: 上传失败日志
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: 失败日志-wget-${{ matrix.ssl }}-${{ github.run_id }}
+          path: failure_logs/
+          retention-days: 7
+
+      - name: 上传 wget 二进制
+        if: success()
+        uses: actions/upload-artifact@v7
+        with:
+          name: wget-${{ matrix.ssl }}
+          path: ~/output/wget-${{ matrix.ssl }}-x64.exe
+      - name: 发布到 Release
+        if: success()
+        uses: ncipollo/release-action@v1
+        with:
+          tag: wget-${{ matrix.ssl }}
+          allowUpdates: true
+          artifacts: "~/output/wget-${{ matrix.ssl }}-x64.exe"
+          body: |
+            ## wget Windows x64（${{ matrix.ssl }} 路线）
+            - 文件名：wget-${{ matrix.ssl }}-x64.exe
+            - 使用预编译依赖静态链接，无需外部 DLL
+            - 自动构建，每周更新
+          token: ${{ secrets.GITHUB_TOKEN }}
