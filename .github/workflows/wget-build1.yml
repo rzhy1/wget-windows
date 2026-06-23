@@ -72,7 +72,7 @@ jobs:
         if: success()
         uses: ncipollo/release-action@v1
         with:
-          tag: wget-${{ matrix.ssl }}
+          tag: wget-1.25.0
           allowUpdates: true
           artifacts: "~/output/wget-${{ matrix.ssl }}-x64.exe"
           body: |
