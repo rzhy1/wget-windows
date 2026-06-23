@@ -27,8 +27,7 @@ jobs:
         run: |
           set -e
           sudo apt-get update
-          sudo apt-get install -y mingw-w64 mingw-w64-tools gcc make pkg-config zstd wget
-
+          sudo apt-get install -y mingw-w64 mingw-w64-tools gcc make pkg-config zstd wget autopoint gettext autoconf-archive gperf texinfo autoconf libtool  python3-dev python3-venv
       - name: 构建 wget (${{ matrix.ssl }})
         id: build
         run: |
