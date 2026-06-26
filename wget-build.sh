@@ -225,7 +225,7 @@ build_gpgme() {
   if [ ! -f "$INSTALL_PATH"/lib/libgpgme.a ]; then
     cd "$INSTALL_PATH" || exit 1
     rm -rf gpgme-*
-    wget -q -O- https://gnupg.org/ftp/gcrypt/gpgme/gpgme-2.1.0.tar.bz2 | tar xj
+    wget -q -O- https://gnupg.org/ftp/gcrypt/gpgme/gpgme-2.1.1.tar.bz2 | tar xj
     cd gpgme-* || exit 1
     env PYTHON="$(command -v python3 || command -v python)" LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --with-libgpg-error-prefix="$INSTALL_PATH" --disable-gpg-test --disable-g13-test --disable-gpgsm-test --disable-gpgconf-test --disable-glibtest --with-libassuan-prefix="$INSTALL_PATH"
     make -j$NPROC && make install
@@ -297,7 +297,7 @@ build_expat() {
   if [ ! -f "$INSTALL_PATH"/lib/libexpat.a ]; then
     cd "$INSTALL_PATH" || exit 1
     rm -rf expat-*
-    wget -q -O- https://github.com/libexpat/libexpat/releases/download/R_2_8_1/expat-2.8.1.tar.gz | tar xz
+    wget -q -O- https://github.com/libexpat/libexpat/releases/download/R_2_8_2/expat-2.8.2.tar.gz | tar xz
     cd expat-* || exit 1
     LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --without-docbook --without-tests
     make -j$NPROC && make install
