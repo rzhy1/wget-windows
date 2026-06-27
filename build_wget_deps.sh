@@ -246,6 +246,7 @@ build_gpgme() {
   tar xf "$tarball" || exit 1
   rm -f "$tarball"
   cd gpgme-* || exit 1
+  sed -i '/gpg_err_set_errno (EIO);/{n;s/^#else$/#endif/;}' src/w32-io.c
   env PYTHON="$(command -v python3 || command -v python)" LDFLAGS="$LDFLAGS_DEPS" \
   ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static \
     --with-libgpg-error-prefix="$INSTALL_PATH" --disable-gpg-test --disable-g13-test \
