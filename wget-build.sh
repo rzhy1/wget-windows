@@ -468,7 +468,7 @@ build_wget_openssl() {
 # --- 主执行流程 ---
 
 # STAGE 1: 编译没有内部依赖或只依赖 zlib 的基础库
-echo "--- LAUNCHING STAGE 1 BUILDS (PARALLEL) ---"
+echo "--- LAUNCHING STAGE 1 BUILDS (gpg_error✴️zlib✴️libunistring✴️c_ares✴️libiconv✴️pcre2✴️expat) ---"
 stage1_tasks=(build_gpg_error build_zlib build_libunistring build_c_ares build_libiconv build_pcre2 build_expat)
 if [[ "$ssl_type" == "gnutls" ]]; then
   stage1_tasks+=(build_gmp build_libtasn1)
@@ -476,7 +476,7 @@ fi
 run_parallel "${stage1_tasks[@]}"
 
 # STAGE 2: 编译依赖于 STAGE 1 库的库
-echo "--- LAUNCHING STAGE 2 BUILDS (PARALLEL) ---"
+echo "--- LAUNCHING STAGE 2 BUILDS (libidn2✴️libassuan✴️libmetalink) ---"
 stage2_tasks=(build_libidn2 build_libassuan build_libmetalink)
 if [[ "$ssl_type" == "gnutls" ]]; then
   stage2_tasks+=(build_nettle)
@@ -487,7 +487,7 @@ fi
 run_parallel "${stage2_tasks[@]}"
 
 # STAGE 3: 编译依赖于 STAGE 2 库的库
-echo "--- LAUNCHING STAGE 3 BUILDS (PARALLEL) ---"
+echo "--- LAUNCHING STAGE 3 BUILDS (libpsl✴️gpgme) ---"
 run_parallel build_libpsl build_gpgme
 
 # STAGE 4: 编译 GnuTLS（仅限 gnutls 模式）
