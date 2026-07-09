@@ -261,7 +261,7 @@ build_c_ares() {
   cd "$INSTALL_PATH" || exit 1
   rm -rf c-ares-*
   local tarball="cares.tar.gz"
-  download "https://github.com/c-ares/c-ares/releases/download/v1.34.6/c-ares-1.34.6.tar.gz" "$tarball" || exit 1
+  download "https://github.com/c-ares/c-ares/releases/download/v1.34.8/c-ares-1.34.8.tar.gz" "$tarball" || exit 1
   tar xzf "$tarball" || exit 1
   rm -f "$tarball"
   cd c-ares-* || exit 1
