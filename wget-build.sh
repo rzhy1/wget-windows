@@ -238,7 +238,7 @@ build_c_ares() {
   if [ ! -f "$INSTALL_PATH"/lib/libcares.a ]; then
     cd "$INSTALL_PATH" || exit 1
     rm -rf c-ares-*
-    wget -q -O- https://github.com/c-ares/c-ares/releases/download/v1.34.6/c-ares-1.34.6.tar.gz | tar xz
+    wget -q -O- https://github.com/c-ares/c-ares/releases/download/v1.34.8/c-ares-1.34.8.tar.gz | tar xz
     cd c-ares-* || exit 1
     CPPFLAGS="-DCARES_STATICLIB=1" LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --disable-tests
     make -j$NPROC && make install
