@@ -134,7 +134,8 @@ echo ">>> 配置 wget ($SSL_TYPE)"
     
 # 修复 wget 与 c-ares 1.34.8+ 的类型不兼容问题
 echo "Applying patch for c-ares 1.34.8+ compatibility..."
-sed -i 's/extern ares_channel ares;/extern void *ares;/g' src/host.c
+sed -i '/extern void \*ares;/i #include <ares.h>' src/wget.h
+sed -i 's/extern void \*ares;/extern ares_channel ares;/g' src/wget.h
 
 echo ">>> 编译 wget"
 make -j$NPROC
