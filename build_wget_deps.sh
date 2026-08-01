@@ -307,7 +307,7 @@ build_libpsl() {
   cd "$INSTALL_PATH" || exit 1
   rm -rf libpsl-*
   local tarball="libpsl.tar.gz"
-  download "https://github.com/rockdaboot/libpsl/releases/download/0.23.0/libpsl-0.23.0.tar.gz" "$tarball" || exit 1
+  download "https://github.com/rockdaboot/libpsl/releases/download/0.23.1/libpsl-0.23.1.tar.gz" "$tarball" || exit 1
   tar xzf "$tarball" || exit 1
   rm -f "$tarball"
   cd libpsl-* || exit 1
