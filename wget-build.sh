@@ -139,7 +139,7 @@ build_zlib() {
   if [ ! -f "$INSTALL_PATH"/lib/libz.a ]; then
     cd "$INSTALL_PATH" || exit 1
     rm -rf zlib-*
-    ( wget -q -O- https://zlib.net/zlib-1.3.2.tar.gz || wget -q -O- https://github.com/madler/zlib/releases/download/v1.3.2/zlib-1.3.2.tar.gz ) | tar xz
+    ( wget -q -O- https://github.com/madler/zlib/releases/download/v1.3.2/zlib-1.3.2.tar.gz ) | tar xz
     cd zlib-* || exit 1
     CC=$WGET_GCC LDFLAGS="$LDFLAGS_DEPS" ./configure --64 --static --prefix="$INSTALL_PATH"
     make -j$NPROC && make install
