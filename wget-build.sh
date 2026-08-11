@@ -274,7 +274,7 @@ build_libpsl() {
   if [ ! -f "$INSTALL_PATH"/lib/libpsl.a ]; then
     cd "$INSTALL_PATH" || exit 1
     rm -rf libpsl-*
-    wget -q -O- https://github.com/rockdaboot/libpsl/releases/download/0.23.1/libpsl-0.23.1.tar.gz | tar xz
+    wget -q -O- https://github.com/rockdaboot/libpsl/releases/download/0.23.2/libpsl-0.23.2.tar.gz | tar xz
     cd libpsl-* || exit 1
     LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --disable-gtk-doc --enable-builtin --enable-runtime=libidn2 --with-libiconv-prefix="$INSTALL_PATH"
     make -j$NPROC && make install
@@ -298,7 +298,7 @@ build_expat() {
   if [ ! -f "$INSTALL_PATH"/lib/libexpat.a ]; then
     cd "$INSTALL_PATH" || exit 1
     rm -rf expat-*
-    wget -q -O- https://github.com/libexpat/libexpat/releases/download/R_2_8_2/expat-2.8.2.tar.gz | tar xz
+    wget -q -O- https://github.com/libexpat/libexpat/releases/download/R_2_8_3/expat-2.8.3.tar.gz | tar xz
     cd expat-* || exit 1
     LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --without-docbook --without-tests
     make -j$NPROC && make install
