@@ -274,7 +274,7 @@ build_libpsl() {
   if [ ! -f "$INSTALL_PATH"/lib/libpsl.a ]; then
     cd "$INSTALL_PATH" || exit 1
     rm -rf libpsl-*
-    wget -q -O- https://github.com/rockdaboot/libpsl/releases/download/0.23.2/libpsl-0.23.2.tar.gz | tar xz
+    wget -q -O- https://github.com/rockdaboot/libpsl/releases/download/0.23.3/libpsl-0.23.3.tar.gz | tar xz
     cd libpsl-* || exit 1
     LDFLAGS="-L$INSTALL_PATH/lib $LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --disable-gtk-doc --enable-builtin --enable-runtime=libidn2 --with-libiconv-prefix="$INSTALL_PATH"
     make -j$NPROC && make install
