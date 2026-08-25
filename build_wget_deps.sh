@@ -415,7 +415,7 @@ build_openssl() {
   cd "$INSTALL_PATH" || exit 1
   rm -rf openssl-*
   local tarball="openssl.tar.gz"
-  download "https://github.com/openssl/openssl/releases/download/openssl-3.6.2/openssl-3.6.2.tar.gz" "$tarball" || exit 1
+  download "https://github.com/openssl/openssl/releases/download/openssl-4.0.2/openssl-4.0.2.tar.gz" "$tarball" || exit 1
   tar xzf "$tarball" || exit 1
   rm -f "$tarball"
   cd openssl-* || exit 1
