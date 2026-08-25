@@ -365,7 +365,7 @@ build_openssl() {
   if [ ! -f "$INSTALL_PATH"/lib/libssl.a ]; then
     cd "$INSTALL_PATH" || exit 1
     rm -rf openssl-*
-    wget -q -O- https://github.com/openssl/openssl/releases/download/openssl-4.0.1/openssl-4.0.1.tar.gz | tar xz
+    wget -q -O- https://github.com/openssl/openssl/releases/download/openssl-4.0.2/openssl-4.0.2.tar.gz | tar xz
     cd openssl-* || exit 1
     DISABLED_FEATURES=(
       no-quic no-err no-dso no-engine no-async no-autoalginit
