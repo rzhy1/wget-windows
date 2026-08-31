@@ -242,7 +242,7 @@ build_gpgme() {
   cd "$INSTALL_PATH" || exit 1
   rm -rf gpgme-*
   local tarball="gpgme.tar.bz2"
-  download "https://gnupg.org/ftp/gcrypt/gpgme/gpgme-2.1.2.tar.bz2" "$tarball" || exit 1
+  download "https://gnupg.org/ftp/gcrypt/gpgme/gpgme-2.2.0.tar.bz2" "$tarball" || exit 1
   tar xf "$tarball" || exit 1
   rm -f "$tarball"
   cd gpgme-* || exit 1
@@ -339,7 +339,7 @@ build_expat() {
   cd "$INSTALL_PATH" || exit 1
   rm -rf expat-*
   local tarball="expat.tar.gz"
-  download "https://github.com/libexpat/libexpat/releases/download/R_2_8_3/expat-2.8.3.tar.gz" "$tarball" || exit 1
+  download "https://github.com/libexpat/libexpat/releases/download/R_2_8_4/expat-2.8.4.tar.gz" "$tarball" || exit 1
   tar xzf "$tarball" || exit 1
   rm -f "$tarball"
   cd expat-* || exit 1
