@@ -324,7 +324,7 @@ build_pcre2() {
   cd "$INSTALL_PATH" || exit 1
   rm -rf pcre2-*
   local tarball="pcre2.tar.gz"
-  download "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.gz" "$tarball" || exit 1
+  download "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.48/pcre2-10.48.tar.gz" "$tarball" || exit 1
   tar xzf "$tarball" || exit 1
   rm -f "$tarball"
   cd pcre2-* || exit 1
