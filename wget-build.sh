@@ -399,7 +399,7 @@ build_wget_gnutls() {
   #wget -q -O- ${GNU_MIRROR}/wget/wget-1.25.0.tar.gz | tar xz
   #cd wget-* || exit 1
 
-  git clone --depth=1  https://gitlab.com/gnuwget/wget.git wget-git
+  git clone https://gitlab.com/gnuwget/wget.git wget-git
   cd wget-git || exit 1
   git submodule update --init --recursive --depth=1 || exit 1
   ./bootstrap --skip-po --gnulib-srcdir=gnulib || exit 1
@@ -441,7 +441,7 @@ build_wget_openssl() {
   #wget -q -O- ${GNU_MIRROR}/wget/wget-1.25.0.tar.gz | tar xz
   #cd wget-* || exit 1
 
-  git clone --depth=1  https://gitlab.com/gnuwget/wget.git wget-git
+  git clone https://gitlab.com/gnuwget/wget.git wget-git
   cd wget-git || exit 1
   git submodule update --init --recursive --depth=1 || exit 1
   ./bootstrap --skip-po --gnulib-srcdir=gnulib || exit 1
