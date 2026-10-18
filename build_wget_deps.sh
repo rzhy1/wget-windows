@@ -196,7 +196,7 @@ build_libunistring() {
   cd "$INSTALL_PATH" || exit 1
   rm -rf libunistring-*
   local tarball="libunistring.tar.gz"
-  download "${GNU_MIRROR}/libunistring/libunistring-1.4.2.tar.gz" "$tarball" || exit 1
+  download "${GNU_MIRROR}/libunistring/libunistring-1.5.tar.gz" "$tarball" || exit 1
   tar xzf "$tarball" || exit 1
   rm -f "$tarball"
   cd libunistring-* || exit 1
