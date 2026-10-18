@@ -36,11 +36,6 @@ x86_64-w64-mingw32-gcc --version
 # ========== 并行镜像测速选择函数 ==========
 select_fastest_gnu_mirror() {
     local candidates=(
-        "https://mirrors.aliyun.com/gnu"
-        "https://mirrors.tuna.tsinghua.edu.cn/gnu"
-        "https://mirrors.huaweicloud.com/gnu"
-        "https://mirrors.ustc.edu.cn/gnu"
-        "https://mirrors.tencent.com/gnu"
         "https://ftp.gnu.org/gnu"
         "https://ftp.jaist.ac.jp/pub/GNU"
         "http://mirrors.kernel.org/gnu"
