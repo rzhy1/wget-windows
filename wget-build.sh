@@ -188,7 +188,7 @@ build_libunistring() {
   if [ ! -f "$INSTALL_PATH"/lib/libunistring.a ]; then
     cd "$INSTALL_PATH" || exit 1
     rm -rf libunistring-*
-    wget -q -O- ${GNU_MIRROR}/libunistring/libunistring-1.4.2.tar.gz | tar xz
+    wget -q -O- ${GNU_MIRROR}/libunistring/libunistring-1.5.tar.gz | tar xz
     cd libunistring-* || exit 1
     LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH"
     make -j$NPROC && make install
