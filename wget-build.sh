@@ -245,7 +245,7 @@ build_libiconv() {
   if [ ! -f "$INSTALL_PATH"/lib/libiconv.a ]; then
     cd "$INSTALL_PATH" || exit 1
     rm -rf libiconv-*
-    wget -q -O- ${GNU_MIRROR}/libiconv/libiconv-1.19.tar.gz | tar xz
+    wget -q -O- ${GNU_MIRROR}/libiconv/libiconv-1.19.1.tar.gz | tar xz
     cd libiconv-* || exit 1
     LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static
     make -j$NPROC && make install
