@@ -277,7 +277,7 @@ build_libiconv() {
   cd "$INSTALL_PATH" || exit 1
   rm -rf libiconv-*
   local tarball="libiconv.tar.gz"
-  download "${GNU_MIRROR}/libiconv/libiconv-1.19.tar.gz" "$tarball" || exit 1
+  download "${GNU_MIRROR}/libiconv/libiconv-1.19.1.tar.gz" "$tarball" || exit 1
   tar xzf "$tarball" || exit 1
   rm -f "$tarball"
   cd libiconv-* || exit 1
