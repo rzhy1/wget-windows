@@ -369,7 +369,7 @@ build_gnutls() {
   cd "$INSTALL_PATH" || exit 1
   rm -rf gnutls-*
   local tarball="gnutls.tar.xz"
-  download "https://gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.13.tar.xz" "$tarball" || exit 1
+  download "https://gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.14.tar.xz" "$tarball" || exit 1
   tar xf "$tarball" || exit 1
   rm -f "$tarball"
   cd gnutls-* || exit 1
