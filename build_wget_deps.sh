@@ -339,7 +339,7 @@ build_expat() {
   cd "$INSTALL_PATH" || exit 1
   rm -rf expat-*
   local tarball="expat.tar.gz"
-  download "https://github.com/libexpat/libexpat/releases/download/R_2_10_0/expat-2.10.0.tar.gz" "$tarball" || exit 1
+  download "https://github.com/libexpat/libexpat/releases/download/R_2_11_0/expat-2.11.0.tar.gz" "$tarball" || exit 1
   tar xzf "$tarball" || exit 1
   rm -f "$tarball"
   cd expat-* || exit 1
