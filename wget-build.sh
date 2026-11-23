@@ -293,7 +293,7 @@ build_expat() {
   if [ ! -f "$INSTALL_PATH"/lib/libexpat.a ]; then
     cd "$INSTALL_PATH" || exit 1
     rm -rf expat-*
-    wget -q -O- https://github.com/libexpat/libexpat/releases/download/R_2_10_0/expat-2.10.0.tar.gz | tar xz
+    wget -q -O- https://github.com/libexpat/libexpat/releases/download/R_2_11_0/expat-2.11.0.tar.gz | tar xz
     cd expat-* || exit 1
     LDFLAGS="$LDFLAGS_DEPS" ./configure --host=$WGET_MINGW_HOST --disable-shared --prefix="$INSTALL_PATH" --enable-static --without-docbook --without-tests
     make -j$NPROC && make install
